@@ -143,11 +143,17 @@ export const Hero = () => {
                 className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
                 style={{ filter: 'brightness(0) saturate(100%) invert(75%) sepia(46%) saturate(356%) hue-rotate(297deg) brightness(106%) contrast(103%)' }}
               />
-              {["Forbes", "USA News", "AP", "ABC", "CBS", "FOX", "CNBC"].map((outlet, index) => (
+              <img 
+                src="/lovable-uploads/cd84d210-67a0-4b98-9091-fb5b30cad1aa.png" 
+                alt="Forbes" 
+                className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
+                style={{ filter: 'brightness(0) saturate(100%) invert(75%) sepia(46%) saturate(356%) hue-rotate(297deg) brightness(106%) contrast(103%)' }}
+              />
+              {["USA News", "AP", "ABC", "CBS", "FOX", "CNBC"].map((outlet, index) => (
                 <div 
                   key={outlet}
                   className="text-2xl font-bold hover:text-white transition-colors cursor-pointer magnetic"
-                  style={{ animationDelay: `${1 + (index + 1) * 0.1}s`, color: '#FFB6C1' }}
+                  style={{ animationDelay: `${1 + (index + 2) * 0.1}s`, color: '#FFB6C1' }}
                 >
                   {outlet}
                 </div>
