@@ -1,10 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/components/AuthWrapper";
+import { User, LogOut } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   const handleNavigation = (path: string) => {
     if (location.pathname === '/' && path.startsWith('#')) {
@@ -56,9 +60,33 @@ export const Header = () => {
         </nav>
 
         <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="sm">
-            Login
-          </Button>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">{user.email}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => navigate('/post-checkout')}>
+                  Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={signOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/auth')}
+            >
+              Login
+            </Button>
+          )}
           <Button 
             variant="hero" 
             size="sm"

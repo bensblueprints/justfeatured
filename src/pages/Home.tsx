@@ -24,7 +24,7 @@ export const Home = () => {
       {/* Footer */}
       <footer className="py-8 bg-background border-t border-border">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2024 Just Featured. All rights reserved.</p>
+          <p>&copy; 2025 Just Featured. All rights reserved.</p>
         </div>
       </footer>
     </div>
