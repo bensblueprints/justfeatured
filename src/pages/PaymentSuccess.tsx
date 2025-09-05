@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, Download, Mail, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const sessionId = searchParams.get('session_id');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -17,6 +18,10 @@ const PaymentSuccess = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const handleContinueToSetup = () => {
+    navigate(`/post-checkout${sessionId ? `?session_id=${sessionId}` : ""}`);
+  };
 
   if (isLoading) {
     return (
@@ -83,9 +88,9 @@ const PaymentSuccess = () => {
                     <span className="text-primary font-semibold text-sm">1</span>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-1">Content Review</h4>
+                    <h4 className="font-medium mb-1">Business Information Collection</h4>
                     <p className="text-muted-foreground text-sm">
-                      Our team will review your content and optimize it for each publication's requirements.
+                      Complete your business details to help us create the perfect press release for your company.
                     </p>
                   </div>
                 </div>
@@ -94,15 +99,26 @@ const PaymentSuccess = () => {
                     <span className="text-primary font-semibold text-sm">2</span>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-1">Publication Outreach</h4>
+                    <h4 className="font-medium mb-1">Content Creation & Review</h4>
                     <p className="text-muted-foreground text-sm">
-                      We'll begin reaching out to your selected publications and securing placement.
+                      Our team will create your press release and collaborate with you through our review board.
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="bg-primary/10 rounded-full p-2 mt-1">
                     <span className="text-primary font-semibold text-sm">3</span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-1">Publication Outreach</h4>
+                    <p className="text-muted-foreground text-sm">
+                      Once approved, we'll begin reaching out to your selected publications and securing placement.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 rounded-full p-2 mt-1">
+                    <span className="text-primary font-semibold text-sm">4</span>
                   </div>
                   <div>
                     <h4 className="font-medium mb-1">Delivery & Reporting</h4>
@@ -140,16 +156,17 @@ const PaymentSuccess = () => {
 
           {/* Action Buttons */}
           <div className="text-center space-y-4">
-            <Link to="/publications">
-              <Button size="lg" className="w-full sm:w-auto">
-                Browse More Publications
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
+            <Button size="lg" className="w-full sm:w-auto" onClick={handleContinueToSetup}>
+              Continue to Business Setup
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
             <div>
-              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                Return to Homepage
-              </Link>
+              <button 
+                onClick={() => navigate("/")} 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Skip for now - Return to Homepage
+              </button>
             </div>
           </div>
         </div>
