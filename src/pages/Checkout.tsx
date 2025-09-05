@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, CreditCard, Shield, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CheckoutItem {
   id: string;
@@ -99,24 +100,32 @@ export const Checkout = () => {
     setIsProcessing(true);
     
     try {
-      // TODO: Integrate with Stripe payment processing
-      // For now, show success message
-      toast({
-        title: "Checkout Initiated",
-        description: "Payment processing will be implemented with Stripe integration.",
+      // Call the Stripe payment function
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: {
+          items,
+          customerInfo,
+          packageType
+        }
       });
-      
-      // Simulate processing delay
-      setTimeout(() => {
-        setIsProcessing(false);
-        // navigate('/payment-success');
-      }, 2000);
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
       
     } catch (error) {
       setIsProcessing(false);
+      console.error('Payment error:', error);
       toast({
-        title: "Error",
-        description: "There was a problem processing your order. Please try again.",
+        title: "Payment Failed",
+        description: error.message || "There was an error processing your payment. Please try again.",
         variant: "destructive"
       });
     }
