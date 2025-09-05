@@ -25,9 +25,64 @@ export const Hero = () => {
               </span>
             </h2>
             
-            <div className="bg-card border border-border p-8 rounded-xl shadow-lg backdrop-blur-sm">
-              <h3 className="text-xl font-bold mb-4 text-primary">Your Success Story Here</h3>
-              <p className="text-muted-foreground">Featured in 200+ Major News Outlets</p>
+            <div className="bg-card border border-border p-8 rounded-xl shadow-lg backdrop-blur-sm overflow-hidden">
+              <h3 className="text-xl font-bold mb-4 text-primary text-center">Featured in 200+ Major News Outlets</h3>
+              <div className="relative">
+                <div className="flex animate-scroll whitespace-nowrap">
+                  <div className="flex items-center space-x-8 text-lg font-semibold text-muted-foreground">
+                    <span>USA TODAY</span>
+                    <span>•</span>
+                    <span>FORBES</span>
+                    <span>•</span>
+                    <span>CNN</span>
+                    <span>•</span>
+                    <span>REUTERS</span>
+                    <span>•</span>
+                    <span>BLOOMBERG</span>
+                    <span>•</span>
+                    <span>WALL STREET JOURNAL</span>
+                    <span>•</span>
+                    <span>BUSINESS INSIDER</span>
+                    <span>•</span>
+                    <span>CNBC</span>
+                    <span>•</span>
+                    <span>TIME</span>
+                    <span>•</span>
+                    <span>NEWSWEEK</span>
+                    <span>•</span>
+                    <span>WASHINGTON POST</span>
+                    <span>•</span>
+                    <span>NEW YORK TIMES</span>
+                    <span>•</span>
+                  </div>
+                  <div className="flex items-center space-x-8 text-lg font-semibold text-muted-foreground">
+                    <span>USA TODAY</span>
+                    <span>•</span>
+                    <span>FORBES</span>
+                    <span>•</span>
+                    <span>CNN</span>
+                    <span>•</span>
+                    <span>REUTERS</span>
+                    <span>•</span>
+                    <span>BLOOMBERG</span>
+                    <span>•</span>
+                    <span>WALL STREET JOURNAL</span>
+                    <span>•</span>
+                    <span>BUSINESS INSIDER</span>
+                    <span>•</span>
+                    <span>CNBC</span>
+                    <span>•</span>
+                    <span>TIME</span>
+                    <span>•</span>
+                    <span>NEWSWEEK</span>
+                    <span>•</span>
+                    <span>WASHINGTON POST</span>
+                    <span>•</span>
+                    <span>NEW YORK TIMES</span>
+                    <span>•</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
