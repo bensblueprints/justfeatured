@@ -15,19 +15,20 @@ export const Hero = () => {
   const duplicatedOutlets = [...featuredOutlets, ...featuredOutlets];
 
   return (
-    <section className="relative min-h-screen bg-gradient-hero overflow-hidden">
+    <section className="relative min-h-screen overflow-hidden" style={{ background: 'linear-gradient(135deg, #6366F1 0%, #4C1D95 100%)' }}>
+      {/* Semi-transparent white overlay */}
+      <div className="absolute inset-0 hero-overlay" />
+      
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full blur-xl animate-float" />
-        <div className="absolute top-40 right-20 w-32 h-32 bg-primary-secondary/20 rounded-full blur-xl animate-float-delayed" />
-        <div className="absolute bottom-40 left-20 w-24 h-24 bg-accent/20 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }} />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-primary opacity-10 rounded-full blur-3xl" />
+        <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-float" />
+        <div className="absolute top-40 right-20 w-32 h-32 bg-white/10 rounded-full blur-xl animate-float-delayed" />
+        <div className="absolute bottom-40 left-20 w-24 h-24 bg-white/10 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
       </div>
 
-      {/* Glassmorphism Grid Pattern */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="h-full w-full bg-dot-pattern bg-opacity-20" />
-      </div>
+      {/* Purple Dot Pattern */}
+      <div className="absolute inset-0 purple-dots" />
 
       <div className="container-premium relative z-10 pt-32 pb-20">
         <div className="max-w-7xl mx-auto">
@@ -36,29 +37,29 @@ export const Hero = () => {
             <div className="glass rounded-full px-6 py-3 magnetic">
               <div className="flex items-center gap-2">
                 <Star className="h-4 w-4 text-accent fill-current" />
-                <span className="text-sm font-semibold text-foreground">1,000+ Success Stories</span>
+                <span className="text-sm font-semibold hero-text">1,000+ Success Stories</span>
               </div>
             </div>
             <div className="glass rounded-full px-6 py-3 magnetic">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-success" />
-                <span className="text-sm font-semibold text-foreground">355+ Premium Outlets</span>
+                <span className="text-sm font-semibold hero-text">355+ Premium Outlets</span>
               </div>
             </div>
           </div>
 
           {/* Hero Headline */}
           <div className="text-center mb-12 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <h1 className="text-5xl md:text-7xl xl:text-8xl font-bold leading-none mb-8">
+            <h1 className="text-5xl md:text-7xl xl:text-8xl font-bold leading-none mb-8 hero-text">
               Get Featured in <br />
               <span className="text-gradient animate-gradient-x">
                 Top News Outlets
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl mb-10 max-w-4xl mx-auto leading-relaxed hero-text">
               We'll write an article for your business and get you featured in premium news publications. 
-              <span className="text-foreground font-semibold block mt-2">
+              <span className="font-semibold block mt-2">
                 Guaranteed placement starting at just $97.
               </span>
             </p>
@@ -80,7 +81,7 @@ export const Hero = () => {
               onClick={() => navigate("/publications")}
               variant="outline"
               size="lg"
-              className="glass border-2 border-white/20 hover:border-primary/30 text-foreground hover:text-primary px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300 hover:shadow-glow magnetic group"
+              className="glass border-2 border-white/20 hover:border-white/40 text-white hover:text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300 hover:shadow-glow magnetic group"
             >
               355+ PREMIUM PUBLICATIONS
               <Sparkles className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
@@ -90,17 +91,17 @@ export const Hero = () => {
           {/* Floating Publication Cards */}
           <div className="relative mb-16 animate-slide-up" style={{ animationDelay: '0.6s' }}>
             <div className="glass rounded-2xl p-8 mb-8">
-              <h3 className="text-xl font-bold mb-6 text-primary text-center">Featured in 200+ Major News Outlets</h3>
+              <h3 className="text-xl font-bold mb-6 text-center hero-text">Featured in 200+ Major News Outlets</h3>
               <div className="relative">
-                <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-card to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-card to-transparent z-10 pointer-events-none" />
+                <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-current to-transparent z-10 pointer-events-none opacity-20" />
+                <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-current to-transparent z-10 pointer-events-none opacity-20" />
                 
                 <div className="overflow-hidden">
                   <div className="flex animate-scroll whitespace-nowrap">
                     {duplicatedOutlets.map((outlet, index) => (
-                      <div key={index} className="flex items-center space-x-8 text-lg font-semibold text-muted-foreground">
-                        <span className="hover:text-primary transition-colors cursor-pointer">{outlet}</span>
-                        <span>•</span>
+                      <div key={index} className="flex items-center space-x-8 text-lg font-semibold">
+                        <span className="hover:text-accent transition-colors cursor-pointer hero-text">{outlet}</span>
+                        <span className="hero-text">•</span>
                       </div>
                     ))}
                   </div>
@@ -118,21 +119,21 @@ export const Hero = () => {
             ].map((guarantee, index) => (
               <div key={guarantee} className="flex items-center gap-2 glass rounded-full px-6 py-3">
                 <CheckCircle className="h-4 w-4 text-success" />
-                <span className="text-sm font-semibold text-foreground">{guarantee}</span>
+                <span className="text-sm font-semibold hero-text">{guarantee}</span>
               </div>
             ))}
           </div>
 
           {/* Premium Social Proof */}
           <div className="text-center animate-fade-in" style={{ animationDelay: '0.8s' }}>
-            <p className="text-sm text-muted-foreground mb-6 uppercase tracking-wider font-semibold">
+            <p className="text-sm mb-6 uppercase tracking-wider font-semibold hero-text opacity-80">
               AS SEEN IN
             </p>
             <div className="flex justify-center items-center gap-12 flex-wrap">
               {["NBC", "Forbes", "USA News", "AP", "ABC", "CBS", "FOX", "CNBC"].map((outlet, index) => (
                 <div 
                   key={outlet}
-                  className="text-2xl font-bold text-muted-foreground hover:text-primary transition-colors cursor-pointer magnetic"
+                  className="text-2xl font-bold hover:text-accent transition-colors cursor-pointer magnetic hero-text"
                   style={{ animationDelay: `${1 + index * 0.1}s` }}
                 >
                   {outlet}

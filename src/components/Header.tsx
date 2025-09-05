@@ -24,11 +24,12 @@ export const Header = () => {
   };
 
   return (
-    <header className="glass border-b border-white/20 sticky top-0 z-50 backdrop-blur-xl">
+    <header className="sticky top-0 z-50" style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(147, 51, 234, 0.1)' }}>
       <div className="container-premium py-6 flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <h1 
-            className="text-3xl font-bold text-gradient cursor-pointer magnetic tracking-tight"
+            className="text-3xl font-bold cursor-pointer magnetic tracking-tight"
+            style={{ color: '#0F172A' }}
             onClick={() => navigate('/')}
           >
             Just Featured
@@ -41,19 +42,22 @@ export const Header = () => {
         <nav className="hidden md:flex items-center space-x-8">
           <button 
             onClick={() => handleNavigation('/publications')}
-            className="text-muted-foreground hover:text-primary transition-all duration-300 font-medium magnetic"
+            className="transition-all duration-300 font-medium magnetic"
+            style={{ color: '#475569' }}
           >
             Publications
           </button>
           <button 
             onClick={() => handleNavigation('#pricing')}
-            className="text-muted-foreground hover:text-primary transition-all duration-300 font-medium magnetic"
+            className="transition-all duration-300 font-medium magnetic"
+            style={{ color: '#475569' }}
           >
             Pricing
           </button>
           <button 
             onClick={() => handleNavigation('#testimonials')}
-            className="text-muted-foreground hover:text-primary transition-all duration-300 font-medium magnetic"
+            className="transition-all duration-300 font-medium magnetic"
+            style={{ color: '#475569' }}
           >
             Reviews
           </button>
