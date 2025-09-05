@@ -18,7 +18,7 @@ export const Hero = () => {
             <h2 className="text-3xl md:text-5xl font-bold leading-tight">
               Get Published in a Major News Outlet Like{" "}
               <span className="bg-gradient-hero bg-clip-text text-transparent">
-                USA News, New York Review, CEO Times, Biz Weekly, and Women's Insider
+                USA News, New York Review, CEO Times, Business Weekly, and Women's Insider for Only $97
               </span>
             </h2>
             
@@ -33,9 +33,9 @@ export const Hero = () => {
               🔥 NEW: CHOOSE YOUR OWN PUBLICATIONS
             </Badge>
             
-            <h3 className="text-2xl md:text-3xl font-bold">Browse 355+ Premium Publications</h3>
+            <h3 className="text-2xl md:text-3xl font-bold">Or Browse 355+ Premium Publications</h3>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Select exactly which news outlets you want to be featured in. From $150 local publications to $1,500+ major outlets like Chicago Tribune, NY Daily News, and Hollywood Life.
+              Want something bigger? Select from premium outlets like LA Weekly ($2,000), Rolling Stone ($25,000), Wall Street Journal ($15,000), and more high-tier publications.
             </p>
           </div>
 

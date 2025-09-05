@@ -1,4 +1,5 @@
 import { Publication } from '../types';
+import { EXTENDED_PUBLICATIONS } from './publications-extended';
 
 export const PUBLICATIONS: Publication[] = [
   // Exclusive ($1000+)
@@ -429,6 +430,330 @@ export const PUBLICATIONS: Publication[] = [
     is_active: true
   },
 
+  // Additional Exclusive Publications
+  {
+    id: '46',
+    name: 'Billboard Magazine (Contributor)',
+    type: 'exclusive',
+    category: 'Music & Entertainment',
+    price: 1500000, // $15,000
+    tat_days: 10,
+    description: 'Music industry authority with contributor content',
+    features: ['Music industry leader', 'Contributor article', 'Chart authority', 'Global reach'],
+    website_url: 'https://billboard.com',
+    tier: 'exclusive',
+    popularity: 92,
+    is_active: true
+  },
+  {
+    id: '47',
+    name: 'Wall Street Journal (Contributor)',
+    type: 'exclusive',
+    category: 'Business & Finance',
+    price: 1500000, // $15,000
+    tat_days: 25,
+    description: 'Leading business publication with contributor content',
+    features: ['Business authority', 'Contributor article', 'Financial focus', 'Premium editorial'],
+    website_url: 'https://wsj.com',
+    tier: 'exclusive',
+    popularity: 93,
+    is_active: true
+  },
+  {
+    id: '48',
+    name: 'She Knows',
+    type: 'exclusive',
+    category: 'Lifestyle & Culture',
+    price: 1300000, // $13,000
+    tat_days: 7,
+    description: 'Women\'s lifestyle and parenting publication',
+    features: ['Women\'s content', 'Parenting focus', 'Lifestyle authority', 'Female audience'],
+    website_url: 'https://sheknows.com',
+    tier: 'exclusive',
+    popularity: 89,
+    is_active: true
+  },
+  {
+    id: '49',
+    name: 'Stylecaster',
+    type: 'exclusive',
+    category: 'Lifestyle & Culture',
+    price: 1300000, // $13,000
+    tat_days: 7,
+    description: 'Fashion and beauty lifestyle publication',
+    features: ['Fashion authority', 'Beauty content', 'Style trends', 'Lifestyle focus'],
+    website_url: 'https://stylecaster.com',
+    tier: 'exclusive',
+    popularity: 87,
+    is_active: true
+  },
+  {
+    id: '50',
+    name: 'The Real Deal',
+    type: 'tier1',
+    category: 'Business & Finance',
+    price: 1000000, // $10,000
+    tat_days: 10,
+    description: 'Real estate industry publication',
+    features: ['Real estate focus', 'Industry authority', 'Market analysis', 'Property coverage'],
+    website_url: 'https://therealdeal.com',
+    tier: 'tier1',
+    popularity: 85,
+    is_active: true
+  },
+  {
+    id: '51',
+    name: 'Vogue (Ukraine)',
+    type: 'tier1',
+    category: 'Lifestyle & Culture',
+    price: 900000, // $9,000
+    tat_days: 10,
+    description: 'Ukrainian edition of prestigious fashion magazine',
+    features: ['Fashion authority', 'International reach', 'Style content', 'Luxury brand'],
+    website_url: 'https://vogue.ua',
+    tier: 'tier1',
+    popularity: 86,
+    is_active: true
+  },
+  {
+    id: '52',
+    name: 'Foot Wear News',
+    type: 'tier1',
+    category: 'Business & Finance',
+    price: 800000, // $8,000
+    tat_days: 7,
+    description: 'Footwear industry trade publication',
+    features: ['Footwear industry', 'Fashion business', 'Trade authority', 'Industry insights'],
+    website_url: 'https://footwearnews.com',
+    tier: 'tier1',
+    popularity: 82,
+    is_active: true
+  },
+  {
+    id: '53',
+    name: 'Sourcing Journal',
+    type: 'tier1',
+    category: 'Business & Finance',
+    price: 800000, // $8,000
+    tat_days: 7,
+    description: 'Fashion and retail supply chain publication',
+    features: ['Supply chain focus', 'Fashion business', 'Retail industry', 'Trade content'],
+    website_url: 'https://sourcingjournal.com',
+    tier: 'tier1',
+    popularity: 78,
+    is_active: true
+  },
+  {
+    id: '54',
+    name: 'USA Today (100,000 Impressions)',
+    type: 'tier1',
+    category: 'News & Media',
+    price: 800000, // $8,000
+    tat_days: 15,
+    description: 'National newspaper with guaranteed 100k impressions',
+    features: ['National reach', 'News authority', '100k impressions', 'Broad audience'],
+    website_url: 'https://usatoday.com',
+    tier: 'tier1',
+    popularity: 94,
+    is_active: true
+  },
+  {
+    id: '55',
+    name: 'WWD',
+    type: 'tier1',
+    category: 'Business & Finance',
+    price: 800000, // $8,000
+    tat_days: 7,
+    description: 'Women\'s Wear Daily - Fashion industry authority',
+    features: ['Fashion business', 'Industry authority', 'Trade publication', 'Fashion trends'],
+    website_url: 'https://wwd.com',
+    tier: 'tier1',
+    popularity: 89,
+    is_active: true
+  },
+  {
+    id: '56',
+    name: 'Inc Magazine (Mention)',
+    type: 'tier1',
+    category: 'Business & Finance',
+    price: 700000, // $7,000
+    tat_days: 14,
+    description: 'Business magazine with mention coverage',
+    features: ['Business authority', 'Entrepreneurship focus', 'Mention article', 'SMB coverage'],
+    website_url: 'https://inc.com',
+    tier: 'tier1',
+    popularity: 91,
+    is_active: true
+  },
+  {
+    id: '57',
+    name: 'Harvard Business Review (Contributor)',
+    type: 'tier1',
+    category: 'Business & Finance',
+    price: 600000, // $6,000
+    tat_days: 21,
+    description: 'Prestigious business publication with contributor content',
+    features: ['Business authority', 'Academic prestige', 'Contributor article', 'Thought leadership'],
+    website_url: 'https://hbr.org',
+    tier: 'tier1',
+    popularity: 95,
+    is_active: true
+  },
+  {
+    id: '58',
+    name: 'IB Times (NA)',
+    type: 'tier1',
+    category: 'News & Media',
+    price: 600000, // $6,000
+    tat_days: 7,
+    description: 'International Business Times North America',
+    features: ['International news', 'Business focus', 'Global reach', 'News authority'],
+    website_url: 'https://ibtimes.com',
+    tier: 'tier1',
+    popularity: 84,
+    is_active: true
+  },
+  {
+    id: '59',
+    name: 'OK Magazine + Social Post',
+    type: 'tier1',
+    category: 'Music & Entertainment',
+    price: 600000, // $6,000
+    tat_days: 7,
+    description: 'Celebrity magazine with social media amplification',
+    features: ['Celebrity focus', 'Social media post', 'Entertainment authority', 'Digital reach'],
+    website_url: 'https://okmagazine.com',
+    tier: 'tier1',
+    popularity: 81,
+    is_active: true
+  },
+  {
+    id: '60',
+    name: 'Radar Magazine + Social Post',
+    type: 'tier1',
+    category: 'Music & Entertainment',
+    price: 600000, // $6,000
+    tat_days: 2,
+    description: 'Celebrity news with social media amplification',
+    features: ['Celebrity news', 'Social media post', 'Entertainment focus', 'Digital reach'],
+    website_url: 'https://radarmagazine.com',
+    tier: 'tier1',
+    popularity: 81,
+    is_active: true
+  },
+  {
+    id: '61',
+    name: 'Radar Online + Social Post',
+    type: 'tier1',
+    category: 'Music & Entertainment',
+    price: 600000, // $6,000
+    tat_days: 2,
+    description: 'Celebrity gossip with social media amplification',
+    features: ['Celebrity news', 'Social media post', 'Entertainment focus', 'Digital reach'],
+    website_url: 'https://radaronline.com',
+    tier: 'tier1',
+    popularity: 81,
+    is_active: true
+  },
+  {
+    id: '62',
+    name: 'Saudi Gazette',
+    type: 'tier1',
+    category: 'News & Media',
+    price: 600000, // $6,000
+    tat_days: 7,
+    description: 'Leading Saudi Arabian news publication',
+    features: ['Middle East coverage', 'Regional authority', 'News focus', 'Saudi market'],
+    website_url: 'https://saudigazette.com.sa',
+    tier: 'tier1',
+    popularity: 79,
+    is_active: true
+  },
+  {
+    id: '63',
+    name: 'The Epoch Times',
+    type: 'tier1',
+    category: 'News & Media',
+    price: 600000, // $6,000
+    tat_days: 7,
+    description: 'International news publication',
+    features: ['International news', 'Global reach', 'News authority', 'Multi-language'],
+    website_url: 'https://epochtimes.com',
+    tier: 'tier1',
+    popularity: 83,
+    is_active: true
+  },
+  {
+    id: '64',
+    name: 'USA Today (50,000 Impressions)',
+    type: 'tier1',
+    category: 'News & Media',
+    price: 600000, // $6,000
+    tat_days: 12,
+    description: 'National newspaper with guaranteed 50k impressions',
+    features: ['National reach', 'News authority', '50k impressions', 'Broad audience'],
+    website_url: 'https://usatoday.com',
+    tier: 'tier1',
+    popularity: 94,
+    is_active: true
+  },
+  {
+    id: '65',
+    name: 'Caller Times',
+    type: 'tier1',
+    category: 'News & Media',
+    price: 550000, // $5,500
+    tat_days: 5,
+    description: 'South Texas regional newspaper',
+    features: ['Regional coverage', 'Texas news', 'Local authority', 'Community focus'],
+    website_url: 'https://caller.com',
+    tier: 'tier1',
+    popularity: 76,
+    is_active: true
+  },
+  {
+    id: '66',
+    name: 'Bitcoin.com (Sponsored)',
+    type: 'tier1',
+    category: 'Technology',
+    price: 500000, // $5,000
+    tat_days: 5,
+    description: 'Cryptocurrency news with sponsored content',
+    features: ['Crypto authority', 'Sponsored content', 'Bitcoin focus', 'Tech audience'],
+    website_url: 'https://bitcoin.com',
+    tier: 'tier1',
+    popularity: 88,
+    is_active: true
+  },
+  {
+    id: '67',
+    name: 'Consequence.net (Staff)',
+    type: 'tier1',
+    category: 'Music & Entertainment',
+    price: 500000, // $5,000
+    tat_days: 7,
+    description: 'Music and entertainment publication with staff content',
+    features: ['Music authority', 'Staff article', 'Entertainment focus', 'Culture coverage'],
+    website_url: 'https://consequence.net',
+    tier: 'tier1',
+    popularity: 85,
+    is_active: true
+  },
+  {
+    id: '68',
+    name: 'Maxim Full Feature',
+    type: 'tier1',
+    category: 'Lifestyle & Culture',
+    price: 500000, // $5,000
+    tat_days: 10,
+    description: 'Men\'s lifestyle magazine with full feature coverage',
+    features: ['Men\'s lifestyle', 'Full feature', 'Entertainment content', 'Lifestyle authority'],
+    website_url: 'https://maxim.com',
+    tier: 'tier1',
+    popularity: 87,
+    is_active: true
+  },
+
   // Additional Premium Publications
   {
     id: '31',
@@ -715,7 +1040,8 @@ export const PUBLICATIONS: Publication[] = [
     tier: 'starter',
     popularity: 76,
     is_active: true
-  }
+  },
+  ...EXTENDED_PUBLICATIONS
 ];
 
 export const getPublicationsByType = (type?: string) => {
