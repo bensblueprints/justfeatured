@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { PublicationCard } from "@/components/PublicationCard";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { PUBLICATIONS } from "@/data/publications";
 import { Publication, CartItem } from "@/types";
 
 export const Publications = () => {
+  const navigate = useNavigate();
   const [selectedPublications, setSelectedPublications] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("popularity");
@@ -262,8 +264,39 @@ export const Publications = () => {
                       </div>
 
                       <div className="space-y-3">
-                        <Button variant="hero" className="w-full" size="lg">
+                        <Button 
+                          variant="hero" 
+                          className="w-full" 
+                          size="lg"
+                          onClick={() => navigate('/checkout', { 
+                            state: { 
+                              selectedPublications: selectedPublications.map(id => {
+                                const pub = PUBLICATIONS.find(p => p.id === id);
+                                return pub ? {
+                                  id: pub.id,
+                                  name: pub.name,
+                                  price: pub.price,
+                                  category: pub.category,
+                                  tat_days: pub.tat_days
+                                } : null;
+                              }).filter(Boolean),
+                              packageType: 'custom'
+                            }
+                          })}
+                        >
                           Proceed to Checkout
+                        </Button>
+                        
+                        <Button 
+                          variant="outline" 
+                          className="w-full"
+                          onClick={() => navigate('/checkout', { 
+                            state: { 
+                              packageType: 'starter'
+                            }
+                          })}
+                        >
+                          Get $97 Starter Package
                         </Button>
                         
                         <div className="text-center">
