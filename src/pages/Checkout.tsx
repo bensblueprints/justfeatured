@@ -8,9 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, CreditCard, Shield, CheckCircle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ShoppingCart, CreditCard, Shield, CheckCircle, Star, TrendingUp, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { PUBLICATIONS } from "@/data/publications";
 
 interface CheckoutItem {
   id: string;
@@ -18,6 +20,7 @@ interface CheckoutItem {
   price: number;
   category: string;
   tat_days: number;
+  isUpsell?: boolean;
 }
 
 interface CustomerInfo {
@@ -46,29 +49,80 @@ export const Checkout = () => {
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [packageType, setPackageType] = useState<'starter' | 'custom'>('custom');
-  const [selectedStarterPublication, setSelectedStarterPublication] = useState<any>(null);
+  const [selectedStarterPublications, setSelectedStarterPublications] = useState<any[]>([]);
+  const [availableStarterPubs] = useState(() => 
+    PUBLICATIONS.filter(pub => pub.type === 'starter')
+  );
+  const [selectedUpsells, setSelectedUpsells] = useState<string[]>([]);
+
+  // Define upsell offers
+  const upsellOffers = [
+    {
+      id: 'la-weekly',
+      name: 'LA Weekly Premium',
+      originalPrice: 350000,
+      discountedPrice: 200000,
+      savings: 150000,
+      category: 'Premium Upgrade',
+      tat_days: 1,
+      description: 'Major Los Angeles publication with do-follow links',
+      features: ['LA culture authority', 'Arts coverage', 'Do-follow links', 'Fast 1-day turnaround'],
+      badge: 'POPULAR',
+      color: 'bg-primary'
+    },
+    {
+      id: 'usa-today-bundle',
+      name: 'USA Today (50K Impressions)',
+      originalPrice: 600000,
+      discountedPrice: 400000,
+      savings: 200000,
+      category: 'National Reach',
+      tat_days: 12,
+      description: 'National newspaper with guaranteed impressions',
+      features: ['National coverage', '50K guaranteed impressions', 'News authority', 'Broad audience'],
+      badge: 'BEST VALUE',
+      color: 'bg-accent'
+    },
+    {
+      id: 'digital-trends',
+      name: 'Digital Trends Tech Feature',
+      originalPrice: 350000,
+      discountedPrice: 250000,
+      savings: 100000,
+      category: 'Technology Focus',
+      tat_days: 7,
+      description: 'Leading technology publication',
+      features: ['Tech authority', 'Product reviews', 'Consumer tech focus', 'Innovation coverage'],
+      badge: 'LIMITED TIME',
+      color: 'bg-gradient-luxury'
+    }
+  ];
 
   useEffect(() => {
     // Get selected publications from navigation state
     const selectedPublications = location.state?.selectedPublications || [];
     const type = location.state?.packageType || 'custom';
-    const starterPub = location.state?.selectedStarterPublication;
+    const starterPubs = location.state?.selectedStarterPublications || [];
     
     setPackageType(type);
     
-    if (type === 'starter' && starterPub) {
-      setSelectedStarterPublication(starterPub);
-      setItems([{
-        id: 'starter-package',
-        name: `Starter Package - ${starterPub.name}`,
-        price: 9700, // $97.00
-        category: 'Package Deal',
-        tat_days: 3
-      }]);
-    } else if (type === 'starter' && !starterPub) {
-      // Redirect to starter selection if no publication selected
-      navigate('/starter-selection');
-      return;
+    if (type === 'starter') {
+      if (starterPubs.length > 0) {
+        setSelectedStarterPublications(starterPubs);
+        // Calculate starter package pricing
+        const starterItems = starterPubs.map((pub: any, index: number) => ({
+          id: `starter-${pub.id}`,
+          name: pub.name,
+          price: index === 0 ? 9700 : 4700, // First publication $97, additional $47 each
+          category: 'Starter Package',
+          tat_days: 3
+        }));
+        setItems(starterItems);
+      } else {
+        // Redirect to starter selection if no publications selected
+        navigate('/starter-selection');
+        return;
+      }
     } else {
       setItems(selectedPublications);
     }
@@ -79,7 +133,61 @@ export const Checkout = () => {
     }
   }, [location.state, navigate]);
 
+  const handleStarterPublicationToggle = (publication: any, checked: boolean) => {
+    if (checked) {
+      const newSelection = [...selectedStarterPublications, publication];
+      setSelectedStarterPublications(newSelection);
+      
+      // Update items with new pricing structure
+      const starterItems = newSelection.map((pub, index) => ({
+        id: `starter-${pub.id}`,
+        name: pub.name,
+        price: index === 0 ? 9700 : 4700, // First $97, additional $47 each
+        category: 'Starter Package',
+        tat_days: 3
+      }));
+      setItems(starterItems);
+    } else {
+      const newSelection = selectedStarterPublications.filter(p => p.id !== publication.id);
+      setSelectedStarterPublications(newSelection);
+      
+      // Update items
+      const starterItems = newSelection.map((pub, index) => ({
+        id: `starter-${pub.id}`,
+        name: pub.name,
+        price: index === 0 ? 9700 : 4700,
+        category: 'Starter Package',
+        tat_days: 3
+      }));
+      setItems(starterItems);
+    }
+  };
+
+  const handleUpsellToggle = (upsellId: string, checked: boolean) => {
+    const upsell = upsellOffers.find(u => u.id === upsellId);
+    if (!upsell) return;
+
+    if (checked) {
+      setSelectedUpsells([...selectedUpsells, upsellId]);
+      setItems(prev => [...prev, {
+        id: upsell.id,
+        name: upsell.name,
+        price: upsell.discountedPrice,
+        category: upsell.category,
+        tat_days: upsell.tat_days,
+        isUpsell: true
+      }]);
+    } else {
+      setSelectedUpsells(selectedUpsells.filter(id => id !== upsellId));
+      setItems(prev => prev.filter(item => item.id !== upsellId));
+    }
+  };
+
   const subtotal = items.reduce((sum, item) => sum + item.price, 0);
+  const totalSavings = selectedUpsells.reduce((sum, upsellId) => {
+    const upsell = upsellOffers.find(u => u.id === upsellId);
+    return sum + (upsell?.savings || 0);
+  }, 0);
   const processingFee = Math.round(subtotal * 0.029); // 2.9% processing fee
   const total = subtotal + processingFee;
 
@@ -112,7 +220,9 @@ export const Checkout = () => {
         body: {
           items,
           customerInfo,
-          packageType
+          packageType,
+          selectedStarterPublications: packageType === 'starter' ? selectedStarterPublications : undefined,
+          selectedUpsells: selectedUpsells.length > 0 ? selectedUpsells : undefined
         }
       });
 
@@ -145,9 +255,14 @@ export const Checkout = () => {
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold mb-4">No Items Selected</h1>
           <p className="text-muted-foreground mb-8">Please select publications to continue with checkout.</p>
-          <Button onClick={() => navigate('/publications')}>
-            Browse Publications
-          </Button>
+          <div className="space-x-4">
+            <Button onClick={() => navigate('/starter-selection')} variant="hero">
+              $97 Starter Package
+            </Button>
+            <Button onClick={() => navigate('/publications')} variant="outline">
+              Browse All Publications
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -268,42 +383,59 @@ export const Checkout = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {packageType === 'starter' ? (
-                    <div className="bg-gradient-hero text-white p-4 rounded-lg">
-                      <Badge className="bg-warning text-warning-foreground mb-2">
-                        Starter Package
-                      </Badge>
-                      <h3 className="font-bold text-lg">
-                        {selectedStarterPublication ? selectedStarterPublication.name : 'Starter Package'}
-                      </h3>
-                      <p className="text-white/90 text-sm mb-3">Perfect for first-time users</p>
-                      {selectedStarterPublication && (
-                        <div className="mb-3 text-sm text-white/80">
-                          <p><strong>Category:</strong> {selectedStarterPublication.category}</p>
-                          <p><strong>Description:</strong> {selectedStarterPublication.description}</p>
+                    <div className="space-y-4">
+                      {/* Multiple Starter Publication Selection */}
+                      <div className="bg-gradient-hero text-white p-4 rounded-lg">
+                        <Badge className="bg-warning text-warning-foreground mb-2">
+                          Starter Package Special
+                        </Badge>
+                        <h3 className="font-bold text-lg mb-2">
+                          Select Your Publications (1st: $97, Additional: $47 each)
+                        </h3>
+                        <p className="text-white/90 text-sm mb-4">Choose multiple publications from our starter collection</p>
+                      </div>
+
+                      <div className="space-y-3">
+                        {availableStarterPubs.map(pub => (
+                          <div key={pub.id} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-muted/20 transition-colors">
+                            <Checkbox
+                              id={`starter-${pub.id}`}
+                              checked={selectedStarterPublications.some(p => p.id === pub.id)}
+                              onCheckedChange={(checked) => handleStarterPublicationToggle(pub, checked as boolean)}
+                            />
+                            <div className="flex-1">
+                              <Label htmlFor={`starter-${pub.id}`} className="font-semibold cursor-pointer">
+                                {pub.name}
+                              </Label>
+                              <p className="text-sm text-muted-foreground">{pub.description}</p>
+                              <p className="text-xs text-muted-foreground">{pub.category} • {pub.tat_days} days</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold">
+                                {selectedStarterPublications.length === 0 || 
+                                 selectedStarterPublications.findIndex(p => p.id === pub.id) === 0 
+                                  ? '$97' : '$47'}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {selectedStarterPublications.length > 0 && (
+                        <div className="bg-muted/20 p-3 rounded-lg">
+                          <h4 className="font-semibold mb-2">Selected Publications:</h4>
+                          {selectedStarterPublications.map((pub, index) => (
+                            <div key={pub.id} className="flex justify-between text-sm">
+                              <span>{pub.name}</span>
+                              <span className="font-semibold">{index === 0 ? '$97' : '$47'}</span>
+                            </div>
+                          ))}
                         </div>
                       )}
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center">
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          1 guaranteed publication
-                        </div>
-                        <div className="flex items-center">
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Professional press release
-                        </div>
-                        <div className="flex items-center">
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          3-day turnaround
-                        </div>
-                        <div className="flex items-center">
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Email support
-                        </div>
-                      </div>
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {items.map(item => (
+                      {items.filter(item => !item.isUpsell).map(item => (
                         <div key={item.id} className="flex justify-between items-start p-3 bg-muted/20 rounded-lg">
                           <div className="flex-1">
                             <h4 className="font-semibold">{item.name}</h4>
@@ -318,6 +450,77 @@ export const Checkout = () => {
                     </div>
                   )}
 
+                  {/* Upsells Section */}
+                  <div className="space-y-4">
+                    <Separator />
+                    <div className="flex items-center space-x-2">
+                      <TrendingUp className="h-5 w-5 text-accent" />
+                      <h3 className="text-lg font-bold">🔥 Exclusive Checkout Offers</h3>
+                    </div>
+                    
+                    {upsellOffers.map(upsell => (
+                      <div key={upsell.id} className="border-2 border-dashed border-accent/30 rounded-lg p-4 hover:border-accent/60 transition-colors">
+                        <div className="flex items-start space-x-3">
+                          <Checkbox
+                            id={`upsell-${upsell.id}`}
+                            checked={selectedUpsells.includes(upsell.id)}
+                            onCheckedChange={(checked) => handleUpsellToggle(upsell.id, checked as boolean)}
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <Label htmlFor={`upsell-${upsell.id}`} className="font-bold cursor-pointer text-lg">
+                                {upsell.name}
+                              </Label>
+                              <Badge className={`${upsell.color} text-white`}>
+                                {upsell.badge}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-2">{upsell.description}</p>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              {upsell.features.map((feature, index) => (
+                                <div key={index} className="flex items-center">
+                                  <CheckCircle className="h-3 w-3 mr-1 text-accent" />
+                                  {feature}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex flex-col items-end">
+                              <span className="text-sm text-muted-foreground line-through">
+                                ${(upsell.originalPrice / 100).toFixed(0)}
+                              </span>
+                              <span className="text-lg font-bold text-accent">
+                                ${(upsell.discountedPrice / 100).toFixed(0)}
+                              </span>
+                              <span className="text-xs text-success font-semibold">
+                                Save ${(upsell.savings / 100).toFixed(0)}!
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {items.filter(item => item.isUpsell).length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-accent">Added Upgrades:</h4>
+                      {items.filter(item => item.isUpsell).map(item => (
+                        <div key={item.id} className="flex justify-between items-start p-3 bg-accent/10 rounded-lg border border-accent/20">
+                          <div className="flex-1">
+                            <h4 className="font-semibold">{item.name}</h4>
+                            <p className="text-sm text-muted-foreground">{item.category}</p>
+                            <p className="text-xs text-muted-foreground">{item.tat_days} days turnaround</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-accent">${(item.price / 100).toFixed(0)}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <Separator />
                   
                   <div className="space-y-2">
@@ -325,6 +528,12 @@ export const Checkout = () => {
                       <span>Subtotal</span>
                       <span>${(subtotal / 100).toFixed(2)}</span>
                     </div>
+                    {totalSavings > 0 && (
+                      <div className="flex justify-between text-success font-semibold">
+                        <span>Total Savings</span>
+                        <span>-${(totalSavings / 100).toFixed(2)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Processing Fee (2.9%)</span>
                       <span>${(processingFee / 100).toFixed(2)}</span>
@@ -334,6 +543,11 @@ export const Checkout = () => {
                       <span>Total</span>
                       <span>${(total / 100).toFixed(2)}</span>
                     </div>
+                    {totalSavings > 0 && (
+                      <p className="text-sm text-success font-semibold text-center">
+                        🎉 You're saving ${(totalSavings / 100).toFixed(2)} with these offers!
+                      </p>
+                    )}
                   </div>
 
                   <Button 
