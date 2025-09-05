@@ -295,12 +295,151 @@ export const Checkout = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
+      {/* Hero Section - Convert Better Copy */}
+      <div className="bg-gradient-to-br from-destructive/20 to-destructive/10 border-b border-destructive/20">
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-destructive">
+              You've been doing it the HARD way
+            </h1>
+            <p className="text-lg text-muted-foreground mb-6">
+              Writing pitches that get rejected, hiring expensive PR firms that over-promise and under-deliver, hoping for breakthrough results...
+            </p>
+            <div className="bg-primary text-primary-foreground rounded-lg p-6 mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">THERE'S A BETTER WAY.</h2>
+              <p className="text-lg mb-4">Demolish your credibility gap with our Professional PR Solution.</p>
+              <p className="text-base opacity-90">We handle the heavy lifting while you focus on what you do best.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Results Section */}
+      <div className="bg-gradient-to-r from-primary/10 to-accent/10 py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-8 text-primary">THE RESULTS SPEAK FOR THEMSELVES:</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <CheckCircle className="h-6 w-6 mr-3 text-success" />
+                  <span className="font-semibold">STOP accepting budget pricing - command premium rates</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-6 w-6 mr-3 text-success" />
+                  <span className="font-semibold">STOP watching prospects choose competitors - convert at higher rates</span>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <CheckCircle className="h-6 w-6 mr-3 text-success" />
+                  <span className="font-semibold">STOP fighting for scraps - dominate your market space</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-6 w-6 mr-3 text-success" />
+                  <span className="font-semibold">STOP feeling like the underdog - become the obvious choice</span>
+                </div>
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold mb-2">One investment of $97. We handle everything. Guaranteed results.</p>
+              <Badge className="bg-success text-success-foreground text-lg px-4 py-2">
+                100% Money Back Promise
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Problem Solution Section */}
+      <div className="bg-gradient-to-r from-destructive/5 to-warning/5 py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-8 text-destructive">STOP BEING THE BEST-KEPT SECRET</h2>
+            <p className="text-center text-lg mb-8 text-muted-foreground">
+              Every day you wait is another day competitors with better credibility steal your prospects.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              <Card className="border-destructive/20 bg-destructive/5">
+                <CardHeader>
+                  <CardTitle className="text-destructive">THE CONVERSION PROBLEM:</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-destructive rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <p>Prospects compare you to competitors and choose based on credibility</p>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-destructive rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <p>Your conversion rates stay frustratingly low</p>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-destructive rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <p>You're working harder for the same mediocre results</p>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-destructive rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <p>Premium pricing feels impossible when you lack authority</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-primary/20 bg-primary/5">
+                <CardHeader>
+                  <CardTitle className="text-primary">HERE'S THE SOLUTION:</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="font-semibold mb-4">While you're struggling with organic reach and expensive ads, your smarter competitors are getting featured in Business Today, Industry Leader, and Market Review.</p>
+                  <p className="text-primary font-bold">THEY'RE WINNING DEALS WITH SUPERIOR CREDIBILITY.</p>
+                  <div className="space-y-2 mt-4">
+                    <div className="flex items-center">
+                      <Star className="h-5 w-5 mr-2 text-primary" />
+                      <span className="font-semibold">HIGHER conversion rates</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Star className="h-5 w-5 mr-2 text-primary" />
+                      <span className="font-semibold">PREMIUM pricing power</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Star className="h-5 w-5 mr-2 text-primary" />
+                      <span className="font-semibold">DOMINANT market position</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="text-center bg-warning/10 border border-warning/20 rounded-lg p-6 mb-8">
+              <p className="text-lg font-bold mb-2">Getting published isn't optional anymore - IT'S COMPETITIVE ADVANTAGE.</p>
+              <p className="text-sm text-muted-foreground">With our credibility acceleration system, your business appears in a premium publication within 5 days - before competitors know what hit them.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 flex items-center">
-            <ShoppingCart className="h-8 w-8 mr-3 text-primary" />
-            Checkout
-          </h1>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-4 text-primary">STOP OVERTHINKING - 3 SIMPLE STEPS</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="text-center">
+                <div className="bg-primary text-primary-foreground rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
+                <h3 className="font-bold mb-2">Complete Our Quick Form</h3>
+                <p className="text-sm text-muted-foreground">Takes 2 minutes</p>
+              </div>
+              <div className="text-center">
+                <div className="bg-primary text-primary-foreground rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
+                <h3 className="font-bold mb-2">We Create Authority Content</h3>
+                <p className="text-sm text-muted-foreground">Professional article that positions you perfectly</p>
+              </div>
+              <div className="text-center">
+                <div className="bg-primary text-primary-foreground rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
+                <h3 className="font-bold mb-2">Dominate Your Competition</h3>
+                <p className="text-sm text-muted-foreground">Feature goes live, you get credibility assets</p>
+              </div>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Customer Information */}
@@ -636,19 +775,45 @@ export const Checkout = () => {
                     )}
                   </div>
 
-                  <Button 
-                    className="w-full" 
-                    size="lg"
-                    onClick={handleCheckout}
-                    disabled={isProcessing}
-                  >
-                    <CreditCard className="h-5 w-5 mr-2" />
-                    {isProcessing ? "Processing..." : "Proceed to Payment"}
-                  </Button>
+                  {/* Enhanced CTA Section */}
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-4 rounded-lg text-center">
+                      <h3 className="font-bold text-lg mb-2 text-primary">STOP SETTLING - GET FEATURED TODAY</h3>
+                      <p className="text-sm text-muted-foreground mb-4">2 MINUTES TO CHANGE EVERYTHING</p>
+                    </div>
 
-                  <div className="text-center text-sm text-muted-foreground">
-                    <p>100% Money Back Guarantee</p>
-                    <p>Secure payment powered by Stripe</p>
+                    <Button 
+                      className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold text-lg py-6" 
+                      size="lg"
+                      onClick={handleCheckout}
+                      disabled={isProcessing}
+                    >
+                      <CreditCard className="h-6 w-6 mr-3" />
+                      {isProcessing ? "Processing Your Authority Upgrade..." : "GET STARTED NOW - SECURE YOUR CREDIBILITY"}
+                    </Button>
+
+                    <div className="text-center space-y-2">
+                      <div className="flex items-center justify-center space-x-2">
+                        <Shield className="h-5 w-5 text-success" />
+                        <span className="font-bold text-success">100% CONVERSION GUARANTEE</span>
+                      </div>
+                      <p className="text-sm font-semibold">Stop Struggling and Let Us Build Your Authority!</p>
+                      <p className="text-xs text-muted-foreground">If we can't boost your credibility within 10 days, you get every penny back.</p>
+                      <p className="text-xs text-muted-foreground">Secure payment powered by Stripe</p>
+                    </div>
+
+                    {/* Urgency Section */}
+                    <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
+                      <p className="font-bold text-destructive mb-2">NEVER compete on price again</p>
+                      <p className="font-bold text-destructive mb-2">NEVER lose deals to inferior competitors</p>
+                      <p className="font-bold text-destructive">NEVER struggle for respect in your market</p>
+                    </div>
+
+                    {/* Social Proof */}
+                    <div className="text-center bg-muted/20 p-4 rounded-lg">
+                      <p className="text-sm font-semibold mb-2">We've helped 1,000+ businesses break through credibility barriers</p>
+                      <p className="text-lg font-bold text-primary">YOUR BREAKTHROUGH IS NEXT.</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -684,6 +849,72 @@ export const Checkout = () => {
                 </CardContent>
               </Card>
             </div>
+          </div>
+
+          {/* FAQ Section */}
+          <div className="mt-16 mb-8">
+            <h2 className="text-3xl font-bold text-center mb-8 text-primary">FREQUENTLY ASKED QUESTIONS</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Who needs this most?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">Any business, entrepreneur, consultant, coach, author, expert, agency, or brand tired of losing deals to competitors with better credibility.</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">What exactly do I get?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">A conversion-boosting feature in outlets like Business Today or Market Review, with guaranteed publication within 10 days or full refund. We handle everything while you get the authority you deserve.</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Can I control the final content?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">Absolutely. You approve everything and can request revisions until it perfectly represents your brand.</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Will this improve my SEO results?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">Yes. High-authority backlink that search engines respect. Stop letting competitors outrank you.</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Can I use "Featured In" everywhere?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">YES. Display "Featured In" badges on your website, ads, proposals, social media - everywhere prospects need to see your credibility.</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">What's your guarantee?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm font-semibold text-success">Complete 100% money-back guarantee. If we can't feature your business within 10 days, you get everything back.</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Footer CTA */}
+          <div className="text-center py-8 bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg">
+            <h3 className="text-2xl font-bold mb-4 text-primary">Just Featured - Stop Losing, Start Converting</h3>
+            <p className="text-sm text-muted-foreground">Copyright © 2025 Just Featured. All Rights Reserved.</p>
           </div>
         </div>
       </div>
