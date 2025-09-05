@@ -31,13 +31,17 @@ serve(async (req) => {
     const lineItems = [];
 
     if (packageType === 'starter') {
-      totalAmount = 49900; // $499
+      // Calculate from selected items just like custom package
+      const subtotal = items.reduce((sum: number, item: any) => sum + item.price, 0);
+      const processingFee = Math.round(subtotal * 0.029); // 2.9% processing fee
+      totalAmount = subtotal + processingFee; // Convert to cents
+
       lineItems.push({
         price_data: {
           currency: "usd",
           product_data: { 
-            name: "Starter Package - 3 Publications",
-            description: "Perfect for businesses looking to get started with media coverage"
+            name: `Starter Package - ${items.length} Publication${items.length > 1 ? 's' : ''}`,
+            description: `Selected publications: ${items.map((item: any) => item.name).join(', ')}`
           },
           unit_amount: totalAmount,
         },
