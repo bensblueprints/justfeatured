@@ -141,25 +141,25 @@ export const Hero = () => {
                 src="/lovable-uploads/63ea97fe-ab5e-4561-b168-779be0b81162.png" 
                 alt="NBC News" 
                 className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
-                style={{ filter: 'brightness(0) saturate(100%) invert(75%) sepia(46%) saturate(356%) hue-rotate(297deg) brightness(106%) contrast(103%)' }}
+                style={{ filter: 'brightness(0.8) contrast(1.2)' }}
               />
               <img 
                 src="/lovable-uploads/cd84d210-67a0-4b98-9091-fb5b30cad1aa.png" 
                 alt="Forbes" 
                 className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
-                style={{ filter: 'brightness(0) saturate(100%) invert(75%) sepia(46%) saturate(356%) hue-rotate(297deg) brightness(106%) contrast(103%)' }}
+                style={{ filter: 'brightness(0.8) contrast(1.2)' }}
               />
               <img 
                 src="/lovable-uploads/69c90a1a-7b81-4bc7-ac30-d18ab67007ac.png" 
                 alt="Associated Press" 
                 className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
-                style={{ filter: 'brightness(0) saturate(100%) invert(75%) sepia(46%) saturate(356%) hue-rotate(297deg) brightness(106%) contrast(103%)' }}
+                style={{ filter: 'brightness(0.8) contrast(1.2)' }}
               />
               <img 
                 src="/lovable-uploads/cnbc-logo.png" 
                 alt="CNBC" 
                 className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
-                style={{ filter: 'brightness(0) saturate(100%) invert(75%) sepia(46%) saturate(356%) hue-rotate(297deg) brightness(106%) contrast(103%)' }}
+                style={{ filter: 'brightness(0.8) contrast(1.2)' }}
               />
               {["USA News", "ABC", "CBS", "FOX"].map((outlet, index) => (
                 <div 
