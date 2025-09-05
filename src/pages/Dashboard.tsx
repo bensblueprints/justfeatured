@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeText } from "@/lib/security";
 import { type PostCheckoutInfo, type PressRelease } from "@/types/press-release";
 
 interface DashboardItem {
@@ -229,7 +230,7 @@ export const Dashboard = () => {
                     <div>
                       <h4 className="font-medium text-foreground mb-2">Business Description</h4>
                       <p className="text-muted-foreground text-sm">
-                        {item.checkoutInfo.business_description}
+                        {sanitizeText(item.checkoutInfo.business_description)}
                       </p>
                     </div>
                     

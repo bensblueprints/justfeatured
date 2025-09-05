@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeContent, sanitizeText } from "@/lib/security";
 import { 
   type PostCheckoutInfo, 
   type PressRelease, 
@@ -418,7 +419,10 @@ export const ReviewBoard = () => {
                       </div>
                     ) : (
                       <div className="prose max-w-none">
-                        <div className="whitespace-pre-wrap">{pressRelease.content}</div>
+                        <div 
+                          className="whitespace-pre-wrap"
+                          dangerouslySetInnerHTML={{ __html: sanitizeContent(pressRelease.content) }}
+                        />
                       </div>
                     )}
                     
@@ -439,7 +443,10 @@ export const ReviewBoard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="prose max-w-none">
-                      <div className="whitespace-pre-wrap">{checkoutInfo.custom_press_release}</div>
+                      <div 
+                        className="whitespace-pre-wrap"
+                        dangerouslySetInnerHTML={{ __html: sanitizeContent(checkoutInfo.custom_press_release) }}
+                      />
                     </div>
                   </CardContent>
                 </Card>
