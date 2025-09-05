@@ -137,11 +137,17 @@ export const Hero = () => {
               AS SEEN IN
             </p>
             <div className="flex justify-center items-center gap-12 flex-wrap">
-              {["NBC", "Forbes", "USA News", "AP", "ABC", "CBS", "FOX", "CNBC"].map((outlet, index) => (
+              <img 
+                src="/lovable-uploads/63ea97fe-ab5e-4561-b168-779be0b81162.png" 
+                alt="NBC News" 
+                className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
+                style={{ filter: 'brightness(0) saturate(100%) invert(75%) sepia(46%) saturate(356%) hue-rotate(297deg) brightness(106%) contrast(103%)' }}
+              />
+              {["Forbes", "USA News", "AP", "ABC", "CBS", "FOX", "CNBC"].map((outlet, index) => (
                 <div 
                   key={outlet}
                   className="text-2xl font-bold hover:text-white transition-colors cursor-pointer magnetic"
-                  style={{ animationDelay: `${1 + index * 0.1}s`, color: '#FFB6C1' }}
+                  style={{ animationDelay: `${1 + (index + 1) * 0.1}s`, color: '#FFB6C1' }}
                 >
                   {outlet}
                 </div>
