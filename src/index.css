@@ -8,59 +8,82 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Professional Light Theme - Clean & Press-Worthy */
-    --background: 0 0% 100%;
-    --foreground: 222 84% 4.9%;
+    /* Premium Modern Design System - Purple/Indigo with Amber Accents */
+    --background: 210 20% 98%; /* #FAFBFC off-white */
+    --foreground: 222 84% 4.9%; /* #0F172A headings */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 84% 4.9%;
+    --card: 0 0% 100%; /* #FFFFFF pure white cards */
+    --card-foreground: 215 25% 26%; /* #475569 body text */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 84% 4.9%;
+    --popover-foreground: 215 25% 26%;
 
-    --primary: 221 83% 53%; /* Professional blue */
-    --primary-foreground: 210 40% 98%;
-    --primary-hover: 221 83% 45%;
+    /* Primary: Purple-Indigo Gradient */
+    --primary: 244 55% 63%; /* #6366F1 indigo */
+    --primary-secondary: 262 83% 58%; /* #8B5CF6 purple */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 244 55% 58%;
+
+    /* Warm Accent: Amber */
+    --accent: 43 96% 56%; /* #F59E0B amber for CTAs */
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 43 96% 50%;
 
     --secondary: 210 40% 96%;
-    --secondary-foreground: 222 84% 4.9%;
+    --secondary-foreground: 215 25% 26%;
 
     --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 46%;
+    --muted-foreground: 215 16% 57%; /* #94A3B8 subtle text */
 
-    --accent: 210 40% 93%;
-    --accent-foreground: 222 84% 4.9%;
+    --destructive: 0 84% 60%; /* #EF4444 error red */
+    --destructive-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --success: 160 84% 39%; /* #10B981 success green */
+    --success-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 244 55% 63%;
 
-    /* Professional design tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 63%));
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 40% 98%));
+    /* Premium Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(244 55% 63%), hsl(262 83% 58%));
+    --gradient-hero: linear-gradient(135deg, hsl(244 55% 63%) 0%, hsl(262 83% 58%) 50%, hsl(280 100% 70%) 100%);
     --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 40% 98%));
-    --gradient-luxury: linear-gradient(135deg, hsl(221 83% 53%), hsl(210 40% 93%));
+    --gradient-cta: linear-gradient(135deg, hsl(43 96% 56%), hsl(38 92% 50%));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.1), hsl(0 0% 100% / 0.05));
     
+    /* Premium Shadows */
     --shadow-soft: 0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
     --shadow-medium: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
     --shadow-large: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+    --shadow-premium: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 8px 10px -6px hsl(0 0% 0% / 0.1);
     --shadow-luxury: 0 25px 50px -12px hsl(0 0% 0% / 0.25);
-    --shadow-glow: 0 0 0 1px hsl(221 83% 53% / 0.05);
+    --shadow-glow: 0 0 0 1px hsl(244 55% 63% / 0.1);
+    --shadow-float: 0 20px 40px -8px hsl(0 0% 0% / 0.15);
     
-    --success: 142 76% 36%;
-    --success-foreground: 355 100% 97%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 48 96% 89%;
+    /* Glass Effect */
+    --glass-bg: hsl(0 0% 100% / 0.1);
+    --glass-border: hsl(0 0% 100% / 0.2);
+    --glass-backdrop: blur(10px);
 
-    --radius: 0.5rem;
+    --radius: 1rem; /* 16px for modern look */
 
-    /* Auth page specific tokens */
-    --auth-background: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 63%));
-    --auth-card-shadow: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 8px 10px -6px hsl(0 0% 0% / 0.1);
-    --auth-input-focus: 0 0 0 2px hsl(221 83% 53% / 0.2);
+    /* Background Pattern */
+    --dot-pattern: radial-gradient(circle at 1px 1px, hsl(220 13% 91%) 1px, transparent 1px);
+    --dot-size: 40px 40px;
+
+    /* Typography */
+    --font-heading: 'Inter', 'Helvetica Neue', sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    
+    /* Spacing Scale */
+    --section-padding: 7.5rem; /* 120px */
+    --card-padding: 2rem; /* 32px */
+    
+    /* Animation Durations */
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
   }
 
   .dark {
@@ -92,6 +115,113 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body antialiased;
+    background-image: var(--dot-pattern);
+    background-size: var(--dot-size);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold tracking-tight;
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl xl:text-7xl leading-none;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl xl:text-5xl leading-tight;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl leading-tight;
+  }
+
+  p {
+    @apply text-lg leading-relaxed text-card-foreground;
+  }
+}
+
+@layer components {
+  /* Glass morphism effect */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-backdrop);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Premium card styles */
+  .card-premium {
+    @apply bg-card rounded-2xl p-8 shadow-premium border-0;
+    transition: transform var(--duration-normal) ease, box-shadow var(--duration-normal) ease;
+  }
+
+  .card-premium:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-float);
+  }
+
+  /* Gradient text effect */
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* CTA Button Styles */
+  .btn-cta {
+    @apply inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300;
+    background: var(--gradient-cta);
+    color: hsl(var(--accent-foreground));
+    box-shadow: var(--shadow-medium);
+  }
+
+  .btn-cta:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-large);
+  }
+
+  /* Floating animation */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  /* Magnetic cursor effect */
+  .magnetic {
+    transition: transform var(--duration-normal) ease;
+  }
+
+  .magnetic:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Reveal animations */
+  .reveal-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity var(--duration-slow) ease, transform var(--duration-slow) ease;
+  }
+
+  .reveal-up.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Section spacing */
+  .section-padding {
+    padding-top: var(--section-padding);
+    padding-bottom: var(--section-padding);
+  }
+
+  /* Container improvements */
+  .container-premium {
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
+    max-width: 1280px;
   }
 }

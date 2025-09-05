@@ -24,51 +24,51 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-background border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-background/95">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+    <header className="glass border-b border-white/20 sticky top-0 z-50 backdrop-blur-xl">
+      <div className="container-premium py-6 flex items-center justify-between">
+        <div className="flex items-center space-x-6">
           <h1 
-            className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer"
+            className="text-3xl font-bold text-gradient cursor-pointer magnetic tracking-tight"
             onClick={() => navigate('/')}
           >
             Just Featured
           </h1>
-          <Badge variant="secondary" className="hidden sm:inline-flex">
-            355+ Publications
-          </Badge>
+          <div className="hidden sm:inline-flex glass rounded-full px-4 py-2">
+            <span className="text-sm font-semibold text-accent">355+ Publications</span>
+          </div>
         </div>
         
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="hidden md:flex items-center space-x-8">
           <button 
             onClick={() => handleNavigation('/publications')}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-muted-foreground hover:text-primary transition-all duration-300 font-medium magnetic"
           >
             Publications
           </button>
           <button 
             onClick={() => handleNavigation('#pricing')}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-muted-foreground hover:text-primary transition-all duration-300 font-medium magnetic"
           >
             Pricing
           </button>
           <button 
             onClick={() => handleNavigation('#testimonials')}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-muted-foreground hover:text-primary transition-all duration-300 font-medium magnetic"
           >
             Reviews
           </button>
         </nav>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                <Button variant="glass" size="sm" className="flex items-center space-x-2">
                   <User className="h-4 w-4" />
                   <span className="hidden sm:inline">{user.email}</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="glass border-white/20">
                 <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                   Dashboard
                 </DropdownMenuItem>
@@ -80,19 +80,21 @@ export const Header = () => {
             </DropdownMenu>
           ) : (
             <Button 
-              variant="ghost" 
+              variant="glass" 
               size="sm"
               onClick={() => navigate('/auth')}
+              className="magnetic"
             >
               Login
             </Button>
           )}
           <Button 
-            variant="hero" 
+            variant="premium" 
             size="sm"
             onClick={() => handleNavigation('/publications')}
+            className="magnetic"
           >
-            Get Featured
+            Get Featured ✨
           </Button>
         </div>
       </div>
