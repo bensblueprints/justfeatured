@@ -14,29 +14,29 @@ export const Hero = () => {
       <div className="container mx-auto px-4 text-center relative z-10">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="space-y-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-muted-foreground">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Do You Have A Personal Brand, Product, or Service?
             </h1>
             
-            <h2 className="text-3xl md:text-5xl font-bold leading-tight">
+            <h2 className="text-3xl md:text-5xl font-bold leading-tight text-foreground">
               Get Published in a Major News Outlet Like{" "}
-              <span className="bg-gradient-hero bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                 USA News, New York Review, CEO Times, Business Weekly, and Women's Insider for Only $97
               </span>
             </h2>
             
-            <div className="bg-gradient-card p-8 rounded-xl border border-accent/20 shadow-luxury backdrop-blur-sm">
-              <h3 className="text-xl font-bold mb-4 text-accent">Your Success Story Here</h3>
+            <div className="bg-card border border-border p-8 rounded-xl shadow-lg backdrop-blur-sm">
+              <h3 className="text-xl font-bold mb-4 text-primary">Your Success Story Here</h3>
               <p className="text-muted-foreground">Featured in 200+ Major News Outlets</p>
             </div>
           </div>
 
           <div className="space-y-6">
-            <Badge variant="secondary" className="text-lg px-6 py-2 bg-accent/20 text-accent border-accent/30">
+            <Badge variant="secondary" className="text-lg px-6 py-2 bg-primary/10 text-primary border-primary/20">
               🔥 NEW: CHOOSE YOUR OWN PUBLICATIONS
             </Badge>
             
-            <h3 className="text-2xl md:text-3xl font-bold">Or Browse 355+ Premium Publications</h3>
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground">Or Browse 355+ Premium Publications</h3>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Want something bigger? Select from premium outlets like LA Weekly ($2,000), Rolling Stone ($25,000), Wall Street Journal ($15,000), and more high-tier publications.
             </p>
@@ -63,7 +63,7 @@ export const Hero = () => {
           </div>
 
           <div className="space-y-4">
-            <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-accent">
+            <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-primary">
               <span>✅ 100% Money Back Guarantee</span>
               <span>✅ Real Publications</span>
               <span>✅ Professional Press Releases</span>
@@ -73,15 +73,15 @@ export const Hero = () => {
           {/* Trust badges */}
           <div className="pt-8">
             <p className="text-sm text-muted-foreground mb-4 font-semibold">AS SEEN IN</p>
-            <div className="flex flex-wrap justify-center items-center gap-8 opacity-70 text-foreground/80">
-              <div className="text-2xl font-bold hover:text-accent transition-colors">NBC</div>
-              <div className="text-2xl font-bold hover:text-accent transition-colors">Forbes</div>
-              <div className="text-2xl font-bold hover:text-accent transition-colors">USA News</div>
-              <div className="text-2xl font-bold hover:text-accent transition-colors">AP</div>
-              <div className="text-2xl font-bold hover:text-accent transition-colors">ABC</div>
-              <div className="text-2xl font-bold hover:text-accent transition-colors">CBS</div>
-              <div className="text-2xl font-bold hover:text-accent transition-colors">FOX</div>
-              <div className="text-2xl font-bold hover:text-accent transition-colors">CNBC</div>
+            <div className="flex flex-wrap justify-center items-center gap-8 opacity-70 text-foreground">
+              <div className="text-2xl font-bold hover:text-primary transition-colors">NBC</div>
+              <div className="text-2xl font-bold hover:text-primary transition-colors">Forbes</div>
+              <div className="text-2xl font-bold hover:text-primary transition-colors">USA News</div>
+              <div className="text-2xl font-bold hover:text-primary transition-colors">AP</div>
+              <div className="text-2xl font-bold hover:text-primary transition-colors">ABC</div>
+              <div className="text-2xl font-bold hover:text-primary transition-colors">CBS</div>
+              <div className="text-2xl font-bold hover:text-primary transition-colors">FOX</div>
+              <div className="text-2xl font-bold hover:text-primary transition-colors">CNBC</div>
             </div>
           </div>
         </div>

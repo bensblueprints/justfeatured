@@ -69,7 +69,7 @@ export const Header = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => navigate('/post-checkout')}>
+                <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                   Dashboard
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut}>

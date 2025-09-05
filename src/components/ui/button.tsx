@@ -9,7 +9,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary-hover shadow-soft transition-all duration-200",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
@@ -18,10 +18,10 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        hero: "bg-gradient-hero text-white shadow-luxury hover:shadow-glow transform hover:-translate-y-0.5 transition-all duration-300 font-semibold",
-        success: "bg-success text-success-foreground hover:bg-success/90 shadow-soft",
-        premium: "bg-gradient-luxury text-white shadow-medium hover:shadow-large transform hover:-translate-y-0.5 transition-all duration-300 font-semibold border border-accent/30",
-        luxury: "bg-gradient-luxury text-white border border-accent/30 hover:shadow-glow transition-all duration-300 font-semibold",
+        hero: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 font-semibold",
+        success: "bg-success text-success-foreground hover:bg-success/90",
+        premium: "bg-gradient-to-r from-primary to-primary/80 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 font-semibold",
+        luxury: "bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-white hover:from-primary/90 hover:to-primary transition-all duration-300 font-semibold",
       },
       size: {
         default: "h-10 px-4 py-2",
