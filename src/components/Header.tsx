@@ -27,13 +27,12 @@ export const Header = () => {
     <header className="sticky top-0 z-50" style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(147, 51, 234, 0.1)' }}>
       <div className="container py-6 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <h1 
-            className="text-3xl font-bold cursor-pointer magnetic tracking-tight"
-            style={{ color: '#2D3748' }}
+          <img 
+            src="/lovable-uploads/015f209e-04d1-4f5e-b773-0d2bfac5623f.png"
+            alt="Just Featured"
+            className="h-8 cursor-pointer magnetic"
             onClick={() => navigate('/')}
-          >
-            Just Featured
-          </h1>
+          />
           <div className="hidden sm:inline-flex glass-card rounded-full px-4 py-2">
             <span className="text-sm font-semibold" style={{ color: '#FF6B9D' }}>355+ Publications</span>
           </div>
