@@ -46,22 +46,29 @@ export const Checkout = () => {
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [packageType, setPackageType] = useState<'starter' | 'custom'>('custom');
+  const [selectedStarterPublication, setSelectedStarterPublication] = useState<any>(null);
 
   useEffect(() => {
     // Get selected publications from navigation state
     const selectedPublications = location.state?.selectedPublications || [];
     const type = location.state?.packageType || 'custom';
+    const starterPub = location.state?.selectedStarterPublication;
     
     setPackageType(type);
     
-    if (type === 'starter') {
+    if (type === 'starter' && starterPub) {
+      setSelectedStarterPublication(starterPub);
       setItems([{
         id: 'starter-package',
-        name: 'Starter Package',
+        name: `Starter Package - ${starterPub.name}`,
         price: 9700, // $97.00
         category: 'Package Deal',
-        tat_days: 10
+        tat_days: 3
       }]);
+    } else if (type === 'starter' && !starterPub) {
+      // Redirect to starter selection if no publication selected
+      navigate('/starter-selection');
+      return;
     } else {
       setItems(selectedPublications);
     }
@@ -263,14 +270,22 @@ export const Checkout = () => {
                   {packageType === 'starter' ? (
                     <div className="bg-gradient-hero text-white p-4 rounded-lg">
                       <Badge className="bg-warning text-warning-foreground mb-2">
-                        Most Popular
+                        Starter Package
                       </Badge>
-                      <h3 className="font-bold text-lg">Starter Package</h3>
+                      <h3 className="font-bold text-lg">
+                        {selectedStarterPublication ? selectedStarterPublication.name : 'Starter Package'}
+                      </h3>
                       <p className="text-white/90 text-sm mb-3">Perfect for first-time users</p>
+                      {selectedStarterPublication && (
+                        <div className="mb-3 text-sm text-white/80">
+                          <p><strong>Category:</strong> {selectedStarterPublication.category}</p>
+                          <p><strong>Description:</strong> {selectedStarterPublication.description}</p>
+                        </div>
+                      )}
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center">
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          3 guaranteed publications
+                          1 guaranteed publication
                         </div>
                         <div className="flex items-center">
                           <CheckCircle className="h-4 w-4 mr-2" />
@@ -278,7 +293,7 @@ export const Checkout = () => {
                         </div>
                         <div className="flex items-center">
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          7-14 day turnaround
+                          3-day turnaround
                         </div>
                         <div className="flex items-center">
                           <CheckCircle className="h-4 w-4 mr-2" />

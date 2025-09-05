@@ -49,7 +49,12 @@ export const Hero = () => {
               🎯 BROWSE 355+ PUBLICATIONS →
             </Button>
             <div className="text-lg text-muted-foreground">Or start with our</div>
-            <Button variant="outline" size="lg" className="text-lg px-8">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="text-lg px-8"
+              onClick={() => navigate('/starter-selection')}
+            >
               $97 Starter Package
             </Button>
           </div>

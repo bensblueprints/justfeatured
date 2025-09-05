@@ -643,6 +643,78 @@ export const PUBLICATIONS: Publication[] = [
     tier: 'standard',
     popularity: 58,
     is_active: true
+  },
+  
+  // Starter Package Publications ($97 each when part of starter package)
+  {
+    id: 'starter-1',
+    name: 'USA News',
+    type: 'starter',
+    category: 'News & Media',
+    price: 15000, // $150 regular price
+    tat_days: 3,
+    description: 'National news publication with broad coverage',
+    features: ['National reach', 'News authority', 'Quick turnaround', 'Broad audience'],
+    website_url: 'https://usanews.com',
+    tier: 'starter',
+    popularity: 75,
+    is_active: true
+  },
+  {
+    id: 'starter-2',
+    name: 'New York Review',
+    type: 'starter',
+    category: 'News & Media',
+    price: 15000, // $150 regular price
+    tat_days: 3,
+    description: 'New York-focused news and review publication',
+    features: ['NYC coverage', 'Editorial content', 'Cultural focus', 'Metro reach'],
+    website_url: 'https://newyorkreview.com',
+    tier: 'starter',
+    popularity: 72,
+    is_active: true
+  },
+  {
+    id: 'starter-3',
+    name: 'CEO Times',
+    type: 'starter',
+    category: 'Business & Finance',
+    price: 15000, // $150 regular price
+    tat_days: 3,
+    description: 'Executive and business leadership publication',
+    features: ['Business leadership', 'Executive focus', 'Corporate news', 'Industry insights'],
+    website_url: 'https://ceotimes.com',
+    tier: 'starter',
+    popularity: 78,
+    is_active: true
+  },
+  {
+    id: 'starter-4',
+    name: 'Biz Weekly',
+    type: 'starter',
+    category: 'Business & Finance',
+    price: 15000, // $150 regular price
+    tat_days: 3,
+    description: 'Weekly business news and analysis',
+    features: ['Business news', 'Weekly format', 'Market analysis', 'SMB focus'],
+    website_url: 'https://bizweekly.com',
+    tier: 'starter',
+    popularity: 73,
+    is_active: true
+  },
+  {
+    id: 'starter-5',
+    name: "Women's Insider",
+    type: 'starter',
+    category: 'Lifestyle & Culture',
+    price: 15000, // $150 regular price
+    tat_days: 3,
+    description: 'Women-focused news and lifestyle publication',
+    features: ['Women\'s content', 'Lifestyle focus', 'Professional women', 'Empowerment stories'],
+    website_url: 'https://womensinsider.com',
+    tier: 'starter',
+    popularity: 76,
+    is_active: true
   }
 ];
 

@@ -1,7 +1,7 @@
 export interface Publication {
   id: string;
   name: string;
-  type: 'tier2' | 'premium' | 'tier1' | 'exclusive';
+  type: 'tier2' | 'premium' | 'tier1' | 'exclusive' | 'starter';
   category: string;
   price: number;
   tat_days: number;
