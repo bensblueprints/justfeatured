@@ -51,7 +51,7 @@ export const Hero = () => {
           <div className="text-center mb-12 animate-slide-up" style={{ animationDelay: '0.2s' }}>
             <h1 className="text-5xl md:text-7xl xl:text-8xl font-bold leading-none mb-8">
               Get Featured in <br />
-              <span className="text-gradient animate-gradient-x">
+              <span className="bg-gradient-to-r from-primary via-primary-secondary to-accent bg-clip-text text-transparent font-extrabold drop-shadow-lg">
                 Top News Outlets
               </span>
             </h1>
@@ -89,18 +89,18 @@ export const Hero = () => {
 
           {/* Floating Publication Cards */}
           <div className="relative mb-16 animate-slide-up" style={{ animationDelay: '0.6s' }}>
-            <div className="glass rounded-2xl p-8 mb-8">
-              <h3 className="text-xl font-bold mb-6 text-primary text-center">Featured in 200+ Major News Outlets</h3>
+            <div className="bg-card/90 backdrop-blur-md rounded-2xl p-8 mb-8 border border-primary/20 shadow-premium">
+              <h3 className="text-2xl font-bold mb-6 text-primary text-center drop-shadow-sm">Featured in 200+ Major News Outlets</h3>
               <div className="relative">
-                <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-card to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-card to-transparent z-10 pointer-events-none" />
+                <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-card/90 to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-card/90 to-transparent z-10 pointer-events-none" />
                 
-                <div className="overflow-hidden">
+                <div className="overflow-hidden py-2">
                   <div className="flex animate-scroll whitespace-nowrap">
                     {duplicatedOutlets.map((outlet, index) => (
-                      <div key={index} className="flex items-center space-x-8 text-lg font-semibold text-muted-foreground">
-                        <span className="hover:text-primary transition-colors cursor-pointer">{outlet}</span>
-                        <span>•</span>
+                      <div key={index} className="flex items-center space-x-8 text-xl font-bold">
+                        <span className="text-foreground hover:text-primary transition-colors cursor-pointer drop-shadow-sm">{outlet}</span>
+                        <span className="text-primary/60">•</span>
                       </div>
                     ))}
                   </div>
