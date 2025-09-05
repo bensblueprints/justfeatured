@@ -6,6 +6,7 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { WhyJustFeatured } from "@/components/WhyJustFeatured";
 import { EmailCapture } from "@/components/EmailCapture";
+import { BlogCarousel } from "@/components/BlogCarousel";
 
 export const Home = () => {
   return (
@@ -17,6 +18,7 @@ export const Home = () => {
       <HowItWorks />
       <TestimonialsSection />
       <WhyJustFeatured />
+      <BlogCarousel />
       <EmailCapture />
       
       {/* Footer */}
