@@ -155,11 +155,17 @@ export const Hero = () => {
                 className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
                 style={{ filter: 'brightness(0) saturate(100%) invert(75%) sepia(46%) saturate(356%) hue-rotate(297deg) brightness(106%) contrast(103%)' }}
               />
-              {["USA News", "ABC", "CBS", "FOX", "CNBC"].map((outlet, index) => (
+              <img 
+                src="/lovable-uploads/cnbc-logo.png" 
+                alt="CNBC" 
+                className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
+                style={{ filter: 'brightness(0) saturate(100%) invert(75%) sepia(46%) saturate(356%) hue-rotate(297deg) brightness(106%) contrast(103%)' }}
+              />
+              {["USA News", "ABC", "CBS", "FOX"].map((outlet, index) => (
                 <div 
                   key={outlet}
                   className="text-2xl font-bold hover:text-white transition-colors cursor-pointer magnetic"
-                  style={{ animationDelay: `${1 + (index + 3) * 0.1}s`, color: '#FFB6C1' }}
+                  style={{ animationDelay: `${1 + (index + 4) * 0.1}s`, color: '#FFB6C1' }}
                 >
                   {outlet}
                 </div>
