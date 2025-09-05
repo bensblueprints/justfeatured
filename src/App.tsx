@@ -10,6 +10,7 @@ import { ReviewBoard } from "./pages/ReviewBoard";
 import { Publications } from "./pages/Publications";
 import { Checkout } from "./pages/Checkout";
 import { Auth } from "./pages/Auth";
+import { BlogPost } from "./pages/BlogPost";
 import StarterSelection from "./pages/StarterSelection";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
@@ -25,6 +26,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/blog/trust-factor" element={<BlogPost />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/post-checkout" element={<PostCheckout />} />
           <Route path="/review-board/:id" element={<ReviewBoard />} />

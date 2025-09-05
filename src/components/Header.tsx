@@ -47,6 +47,13 @@ export const Header = () => {
             Publications
           </button>
           <button 
+            onClick={() => handleNavigation('/blog/trust-factor')}
+            className="transition-all duration-300 font-medium magnetic"
+            style={{ color: '#475569' }}
+          >
+            Blog
+          </button>
+          <button 
             onClick={() => handleNavigation('#pricing')}
             className="transition-all duration-300 font-medium magnetic"
             style={{ color: '#475569' }}
