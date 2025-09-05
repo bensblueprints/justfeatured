@@ -5,7 +5,7 @@ export const TestimonialsSection = () => {
     {
       name: "Marissa",
       quote: "In Less Than a Week, I was Featured in FOX, ABC, NBC, & CBS! I highly recommend to anybody looking to build their brand and grow their company.",
-      image: "/lovable-uploads/d825cc93-8f58-43b8-817c-ed9d0120a045.png"
+      image: "/lovable-uploads/2788bde6-9ec5-4cc5-8442-bcd3383393a7.png"
     },
     {
       name: "John Bryson", 
