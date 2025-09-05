@@ -16,18 +16,6 @@ export const TestimonialsSection = () => {
       name: "MJ Wolfe",
       quote: "In less than a week, got me featured in tons of news outlets, including Fox, ABC, NBC, & CBS. Highly recommend them to anyone.",
       image: "/lovable-uploads/dedc5ba0-daef-4725-9682-26579e752f96.png"
-    },
-    {
-      name: "Paul Loubao",
-      quote: "They've been fantastic, professional. They did what they promised. They gave me an article on different outlets like Fox and CNBC."
-    },
-    {
-      name: "Lawrence Bierria", 
-      quote: "In under a week, they were able to do something I struggled to do for months, which was get published in news outlets."
-    },
-    {
-      name: "Adam Levine",
-      quote: "They got me featured in NBC, CBS, and Associated Press. I don't think you'll find a company that could compete with what they're offering."
     }
   ];
 
