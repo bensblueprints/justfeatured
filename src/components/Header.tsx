@@ -25,17 +25,17 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-50" style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(147, 51, 234, 0.1)' }}>
-      <div className="container-premium py-6 flex items-center justify-between">
+      <div className="container py-6 flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <h1 
             className="text-3xl font-bold cursor-pointer magnetic tracking-tight"
-            style={{ color: '#0F172A' }}
+            style={{ color: '#2D3748' }}
             onClick={() => navigate('/')}
           >
             Just Featured
           </h1>
-          <div className="hidden sm:inline-flex glass rounded-full px-4 py-2">
-            <span className="text-sm font-semibold text-accent">355+ Publications</span>
+          <div className="hidden sm:inline-flex glass-card rounded-full px-4 py-2">
+            <span className="text-sm font-semibold" style={{ color: '#FF6B9D' }}>355+ Publications</span>
           </div>
         </div>
         
@@ -92,14 +92,12 @@ export const Header = () => {
               Login
             </Button>
           )}
-          <Button 
-            variant="premium" 
-            size="sm"
+          <button 
+            className="cta-primary magnetic"
             onClick={() => handleNavigation('/publications')}
-            className="magnetic"
           >
             Get Featured ✨
-          </Button>
+          </button>
         </div>
       </div>
     </header>
