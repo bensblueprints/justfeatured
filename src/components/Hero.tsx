@@ -18,7 +18,7 @@ export const Hero = () => {
     <section className="hero-section relative min-h-screen overflow-hidden">
       {/* Hero Background Image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-contain bg-center bg-no-repeat"
         style={{ backgroundImage: `url(/lovable-uploads/56a4de88-d3dd-40d5-bf84-5cb0e1c6c25c.png)` }}
       />
       
