@@ -14,7 +14,8 @@ export const TestimonialsSection = () => {
     },
     {
       name: "MJ Wolfe",
-      quote: "In less than a week, got me featured in tons of news outlets, including Fox, ABC, NBC, & CBS. Highly recommend them to anyone."
+      quote: "In less than a week, got me featured in tons of news outlets, including Fox, ABC, NBC, & CBS. Highly recommend them to anyone.",
+      image: "/lovable-uploads/dedc5ba0-daef-4725-9682-26579e752f96.png"
     },
     {
       name: "Paul Loubao",
