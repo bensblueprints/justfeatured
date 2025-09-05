@@ -34,9 +34,9 @@ export const ProblemSolution = () => {
           </Card>
 
           {/* The Solution */}
-          <Card className="bg-gradient-hero text-white border-primary">
+          <Card className="bg-primary text-primary-foreground border-primary">
             <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-6">The Solution</h3>
+              <h3 className="text-2xl font-bold mb-6 text-primary-foreground">The Solution</h3>
               <div className="space-y-4">
                 {[
                   "Featured in top news outlets",
@@ -45,8 +45,8 @@ export const ProblemSolution = () => {
                   "Lower cost per lead",
                   "Increased sales"
                 ].map((solution, index) => (
-                  <div key={index} className="flex items-center text-white">
-                    <CheckCircle className="h-5 w-5 text-white mr-3 flex-shrink-0" />
+                  <div key={index} className="flex items-center text-primary-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary-foreground mr-3 flex-shrink-0" />
                     <span>{solution}</span>
                   </div>
                 ))}
