@@ -775,80 +775,157 @@ export const Checkout = () => {
                     )}
                   </div>
 
-                  {/* Enhanced CTA Section */}
-                  <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-4 rounded-lg text-center">
-                      <h3 className="font-bold text-lg mb-2 text-primary">STOP SETTLING - GET FEATURED TODAY</h3>
-                      <p className="text-sm text-muted-foreground mb-4">2 MINUTES TO CHANGE EVERYTHING</p>
-                    </div>
-
-                    <Button 
-                      className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold text-lg py-6" 
-                      size="lg"
-                      onClick={handleCheckout}
-                      disabled={isProcessing}
-                    >
-                      <CreditCard className="h-6 w-6 mr-3" />
-                      {isProcessing ? "Processing Your Authority Upgrade..." : "GET STARTED NOW - SECURE YOUR CREDIBILITY"}
-                    </Button>
-
-                    <div className="text-center space-y-2">
-                      <div className="flex items-center justify-center space-x-2">
-                        <Shield className="h-5 w-5 text-success" />
-                        <span className="font-bold text-success">100% CONVERSION GUARANTEE</span>
-                      </div>
-                      <p className="text-sm font-semibold">Stop Struggling and Let Us Build Your Authority!</p>
-                      <p className="text-xs text-muted-foreground">If we can't boost your credibility within 10 days, you get every penny back.</p>
-                      <p className="text-xs text-muted-foreground">Secure payment powered by Stripe</p>
-                    </div>
-
-                    {/* Urgency Section */}
-                    <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
-                      <p className="font-bold text-destructive mb-2">NEVER compete on price again</p>
-                      <p className="font-bold text-destructive mb-2">NEVER lose deals to inferior competitors</p>
-                      <p className="font-bold text-destructive">NEVER struggle for respect in your market</p>
-                    </div>
-
-                    {/* Social Proof */}
-                    <div className="text-center bg-muted/20 p-4 rounded-lg">
-                      <p className="text-sm font-semibold mb-2">We've helped 1,000+ businesses break through credibility barriers</p>
-                      <p className="text-lg font-bold text-primary">YOUR BREAKTHROUGH IS NEXT.</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* What's Included */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">What's Included</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center">
-                      <CheckCircle className="h-4 w-4 mr-2 text-success" />
-                      Professional press release writing
-                    </div>
-                    <div className="flex items-center">
-                      <CheckCircle className="h-4 w-4 mr-2 text-success" />
-                      SEO optimized content
-                    </div>
-                    <div className="flex items-center">
-                      <CheckCircle className="h-4 w-4 mr-2 text-success" />
-                      Publication proof links
-                    </div>
-                    <div className="flex items-center">
-                      <CheckCircle className="h-4 w-4 mr-2 text-success" />
-                      Social media assets
-                    </div>
-                    <div className="flex items-center">
-                      <CheckCircle className="h-4 w-4 mr-2 text-success" />
-                      Email support throughout
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
             </div>
+          </div>
+
+          {/* Checkout Section - Separated and Prominent */}
+          <div className="mt-12 border-t-4 border-primary/30 pt-8">
+            <div className="bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 border-2 border-primary/20 rounded-2xl p-8 shadow-2xl">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-primary mb-3">Complete Your Order</h2>
+                <p className="text-lg text-muted-foreground">Join 1,000+ businesses who've transformed their credibility</p>
+              </div>
+              
+              {/* Order Summary */}
+              <div className="bg-background/90 rounded-xl p-6 mb-8 border border-primary/10 shadow-lg">
+                <h3 className="text-xl font-semibold mb-4 text-center">Your Investment Summary</h3>
+                
+                <div className="space-y-4">
+                  {/* Main Package */}
+                  <div className="flex justify-between items-center p-4 bg-primary/5 rounded-lg border border-primary/20">
+                    <div>
+                      <span className="font-semibold text-lg">Professional PR Feature</span>
+                      <p className="text-sm text-muted-foreground">Premium publication placement</p>
+                    </div>
+                    <span className="text-2xl font-bold text-primary">${packageType === 'starter' ? '97' : (subtotal / 100).toFixed(0)}</span>
+                  </div>
+
+                  {/* Upsells */}
+                  {selectedUpsells.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-accent">Premium Upgrades Added:</p>
+                      {selectedUpsells.map((upsellId) => {
+                        const upsell = upsellOffers.find(u => u.id === upsellId);
+                        return upsell ? (
+                          <div key={upsellId} className="flex justify-between text-sm p-3 bg-accent/5 rounded border border-accent/20">
+                            <span>{upsell.name}</span>
+                            <span className="font-semibold">+${(upsell.discountedPrice / 100).toFixed(0)}</span>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  )}
+
+                  {/* Rush Delivery */}
+                  {rushDelivery && (
+                    <div className="flex justify-between text-sm p-3 bg-warning/10 rounded border border-warning/20">
+                      <span>⚡ 48-Hour Rush Delivery</span>
+                      <span className="font-semibold">+$197</span>
+                    </div>
+                  )}
+
+                  <Separator />
+                  
+                  {/* Total */}
+                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg border-2 border-primary/30">
+                    <span className="text-xl font-bold">Total Investment:</span>
+                    <span className="text-3xl font-bold text-primary">${(total / 100).toFixed(2)}</span>
+                  </div>
+
+                  {totalSavings > 0 && (
+                    <div className="text-center p-3 bg-success/10 rounded-lg border border-success/20">
+                      <p className="text-success font-bold">🎉 You're saving ${(totalSavings / 100).toFixed(2)} with these upgrades!</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Checkout Button */}
+              <div className="space-y-6">
+                <Button 
+                  className="w-full bg-gradient-to-r from-primary via-primary/90 to-accent hover:from-primary/90 hover:via-primary/80 hover:to-accent/90 text-white font-bold text-2xl py-8 rounded-xl shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] transition-all duration-300" 
+                  size="lg"
+                  onClick={handleCheckout}
+                  disabled={isProcessing}
+                >
+                  <CreditCard className="h-8 w-8 mr-4" />
+                  {isProcessing ? "Processing..." : "CHECKOUT →"}
+                </Button>
+
+                {/* Guarantees */}
+                <div className="text-center space-y-3">
+                  <div className="flex items-center justify-center space-x-3">
+                    <Shield className="h-6 w-6 text-success" />
+                    <span className="font-bold text-success text-lg">100% CONVERSION GUARANTEE</span>
+                  </div>
+                  <p className="text-sm font-semibold">Stop Struggling and Let Us Build Your Authority!</p>
+                  <p className="text-xs text-muted-foreground">If we can't boost your credibility within 10 days, you get every penny back.</p>
+                  <p className="text-xs text-muted-foreground">🔒 Secure payment powered by Stripe</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Urgency and Social Proof - Now Separate */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="border-destructive/20 bg-destructive/5">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <h4 className="font-bold text-destructive mb-4">TRANSFORM YOUR RESULTS:</h4>
+                  <div className="space-y-2 text-sm">
+                    <p className="font-bold text-destructive">NEVER compete on price again</p>
+                    <p className="font-bold text-destructive">NEVER lose deals to inferior competitors</p>
+                    <p className="font-bold text-destructive">NEVER struggle for respect in your market</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Social Proof Card */}
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <h4 className="font-bold text-primary mb-4">SOCIAL PROOF:</h4>
+                  <p className="text-sm font-semibold mb-2">We've helped 1,000+ businesses break through credibility barriers</p>
+                  <p className="text-lg font-bold text-primary">YOUR BREAKTHROUGH IS NEXT.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* What's Included Section */}
+          <div className="mt-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">What's Included</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-2 text-success" />
+                    Professional press release writing
+                  </div>
+                  <div className="flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-2 text-success" />
+                    SEO optimized content
+                  </div>
+                  <div className="flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-2 text-success" />
+                    Publication proof links
+                  </div>
+                  <div className="flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-2 text-success" />
+                    Social media assets
+                  </div>
+                  <div className="flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-2 text-success" />
+                    Email support throughout
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* FAQ Section */}
