@@ -427,6 +427,222 @@ export const PUBLICATIONS: Publication[] = [
     tier: 'standard',
     popularity: 93,
     is_active: true
+  },
+
+  // Additional Premium Publications
+  {
+    id: '31',
+    name: 'AP News',
+    type: 'premium',
+    category: 'News & Media',
+    price: 70000, // $700
+    tat_days: 4,
+    description: 'Associated Press - Global news wire service',
+    features: ['Global reach', 'News authority', 'Wire service', 'Credible source'],
+    website_url: 'https://apnews.com',
+    tier: 'premium',
+    popularity: 92,
+    is_active: true
+  },
+  {
+    id: '32',
+    name: 'HackerNoon',
+    type: 'premium',
+    category: 'Technology',
+    price: 80000, // $800
+    tat_days: 7,
+    description: 'Tech publication for hackers, entrepreneurs and tech enthusiasts',
+    features: ['Tech community', 'Developer focus', 'Startup content', 'Programming insights'],
+    website_url: 'https://hackernoon.com',
+    tier: 'premium',
+    popularity: 87,
+    is_active: true
+  },
+  {
+    id: '33',
+    name: 'Business Insider and Yahoo (Press Release)',
+    type: 'premium',
+    category: 'Business & Finance',
+    price: 70000, // $700
+    tat_days: 4,
+    description: 'Combined placement on Business Insider and Yahoo Finance',
+    features: ['Dual placement', 'Business authority', 'Financial audience', 'Press release format'],
+    website_url: 'https://businessinsider.com',
+    tier: 'premium',
+    popularity: 94,
+    is_active: true
+  },
+  {
+    id: '34',
+    name: 'MSN',
+    type: 'tier2',
+    category: 'News & Media',
+    price: 50000, // $500
+    tat_days: 2,
+    description: 'Microsoft Network news portal with massive reach',
+    features: ['Massive audience', 'Microsoft network', 'News aggregation', 'High visibility'],
+    website_url: 'https://msn.com',
+    tier: 'standard',
+    popularity: 94,
+    is_active: true
+  },
+  {
+    id: '35',
+    name: 'Yahoo News/Finance (AccessWire)',
+    type: 'tier1',
+    category: 'Business & Finance',
+    price: 60000, // $600
+    tat_days: 4,
+    description: 'Yahoo News and Finance through AccessWire distribution',
+    features: ['Yahoo distribution', 'Financial audience', 'News reach', 'AccessWire network'],
+    website_url: 'https://finance.yahoo.com',
+    tier: 'tier1',
+    popularity: 93,
+    is_active: true
+  },
+
+  // Mid-tier Publications
+  {
+    id: '36',
+    name: 'AllHipHop',
+    type: 'tier2',
+    category: 'Music & Entertainment',
+    price: 40000, // $400
+    tat_days: 3,
+    description: 'Leading hip hop and urban culture publication',
+    features: ['Hip hop authority', 'Urban culture', 'Music industry', 'Entertainment focus'],
+    website_url: 'https://allhiphop.com',
+    tier: 'standard',
+    popularity: 73,
+    is_active: true
+  },
+  {
+    id: '37',
+    name: 'Patch.com',
+    type: 'tier2',
+    category: 'News & Media',
+    price: 40000, // $400
+    tat_days: 4,
+    description: 'Local news network covering communities nationwide',
+    features: ['Local news', 'Community focus', 'Regional coverage', 'Neighborhood stories'],
+    website_url: 'https://patch.com',
+    tier: 'standard',
+    popularity: 91,
+    is_active: true
+  },
+  {
+    id: '38',
+    name: 'Magnetic Mag',
+    type: 'tier2',
+    category: 'Music & Entertainment',
+    price: 40000, // $400
+    tat_days: 3,
+    description: 'Electronic dance music and DJ culture publication',
+    features: ['EDM focus', 'DJ culture', 'Music industry', 'Electronic music'],
+    website_url: 'https://magneticmag.com',
+    tier: 'standard',
+    popularity: 75,
+    is_active: true
+  },
+  {
+    id: '39',
+    name: 'Tech Bullion',
+    type: 'tier2',
+    category: 'Technology',
+    price: 20000, // $200
+    tat_days: 7,
+    description: 'Technology news and business insights',
+    features: ['Tech news', 'Business technology', 'Innovation coverage', 'Industry analysis'],
+    website_url: 'https://techbullion.com',
+    tier: 'standard',
+    popularity: 63,
+    is_active: true
+  },
+  {
+    id: '40',
+    name: 'Market Business News',
+    type: 'tier2',
+    category: 'Business & Finance',
+    price: 25000, // $250
+    tat_days: 3,
+    description: 'Business and market analysis publication',
+    features: ['Market analysis', 'Business insights', 'Financial news', 'Market trends'],
+    website_url: 'https://marketbusinessnews.com',
+    tier: 'standard',
+    popularity: 71,
+    is_active: true
+  },
+
+  // Standard Tier Publications
+  {
+    id: '41',
+    name: 'Self Growth',
+    type: 'tier2',
+    category: 'Lifestyle & Culture',
+    price: 16000, // $160
+    tat_days: 1,
+    description: 'Personal development and self-improvement publication',
+    features: ['Personal development', 'Self-improvement', 'Lifestyle content', 'Growth mindset'],
+    website_url: 'https://selfgrowth.com',
+    tier: 'standard',
+    popularity: 63,
+    is_active: true
+  },
+  {
+    id: '42',
+    name: 'Vents Magazine',
+    type: 'tier2',
+    category: 'Lifestyle & Culture',
+    price: 16000, // $160
+    tat_days: 2,
+    description: 'Lifestyle and culture magazine',
+    features: ['Lifestyle content', 'Culture coverage', 'Entertainment news', 'Fashion trends'],
+    website_url: 'https://ventsmagazine.com',
+    tier: 'standard',
+    popularity: 64,
+    is_active: true
+  },
+  {
+    id: '43',
+    name: 'Medium',
+    type: 'tier2',
+    category: 'News & Media',
+    price: 15000, // $150
+    tat_days: 1,
+    description: 'Popular publishing platform for thought leadership',
+    features: ['Publishing platform', 'Thought leadership', 'Professional content', 'Engaged audience'],
+    website_url: 'https://medium.com',
+    tier: 'standard',
+    popularity: 95,
+    is_active: true
+  },
+  {
+    id: '44',
+    name: 'Daily Scanner',
+    type: 'tier2',
+    category: 'News & Media',
+    price: 15000, // $150
+    tat_days: 1,
+    description: 'Daily news and current events publication',
+    features: ['Daily news', 'Current events', 'Breaking news', 'News analysis'],
+    website_url: 'https://dailyscanner.com',
+    tier: 'standard',
+    popularity: 67,
+    is_active: true
+  },
+  {
+    id: '45',
+    name: 'HipHopSince1987',
+    type: 'tier2',
+    category: 'Music & Entertainment',
+    price: 15000, // $150
+    tat_days: 3,
+    description: 'Hip hop culture and music publication',
+    features: ['Hip hop culture', 'Music coverage', 'Urban lifestyle', 'Artist features'],
+    website_url: 'https://hiphopsince1987.com',
+    tier: 'standard',
+    popularity: 58,
+    is_active: true
   }
 ];
 
