@@ -845,7 +845,7 @@ export const Checkout = () => {
               {/* Checkout Button */}
               <div className="space-y-6">
                 <Button 
-                  className="w-full bg-gradient-to-r from-primary via-primary/90 to-accent hover:from-primary/90 hover:via-primary/80 hover:to-accent/90 text-white font-bold text-2xl py-8 rounded-xl shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] transition-all duration-300" 
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-bold text-2xl py-8 rounded-xl shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] transition-all duration-300" 
                   size="lg"
                   onClick={handleCheckout}
                   disabled={isProcessing}
