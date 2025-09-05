@@ -7,11 +7,11 @@ const StarterSelection = () => {
   const navigate = useNavigate();
 
   const handleSelectionComplete = (selectedPublication: Publication) => {
-    // Navigate to checkout with the selected publication
+    // Navigate to checkout with the selected publication as an array
     navigate('/checkout', {
       state: {
         packageType: 'starter',
-        selectedStarterPublication: selectedPublication,
+        selectedStarterPublications: [selectedPublication], // Convert to array
         selectedPublications: []
       }
     });
