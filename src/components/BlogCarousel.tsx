@@ -73,6 +73,8 @@ export const BlogCarousel = () => {
   const handlePostClick = (postId: number) => {
     if (postId === 1) {
       navigate('/blog/trust-factor');
+    } else if (postId === 2) {
+      navigate('/blog/social-proof');
     }
     // Other blog posts can be added here in the future
   };
