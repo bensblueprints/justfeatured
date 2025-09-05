@@ -4,7 +4,8 @@ export const TestimonialsSection = () => {
   const testimonials = [
     {
       name: "Marissa",
-      quote: "In Less Than a Week, I was Featured in FOX, ABC, NBC, & CBS! I highly recommend to anybody looking to build their brand and grow their company."
+      quote: "In Less Than a Week, I was Featured in FOX, ABC, NBC, & CBS! I highly recommend to anybody looking to build their brand and grow their company.",
+      image: "/lovable-uploads/d825cc93-8f58-43b8-817c-ed9d0120a045.png"
     },
     {
       name: "John Bryson", 
@@ -45,8 +46,18 @@ export const TestimonialsSection = () => {
             <Card key={index} className="bg-gradient-card">
               <CardContent className="p-6">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-muted rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-xl font-bold">{testimonial.name.charAt(0)}</span>
+                  <div className="w-16 h-16 rounded-full mx-auto mb-4 overflow-hidden">
+                    {testimonial.image ? (
+                      <img 
+                        src={testimonial.image} 
+                        alt={`${testimonial.name} testimonial`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-muted flex items-center justify-center">
+                        <span className="text-xl font-bold">{testimonial.name.charAt(0)}</span>
+                      </div>
+                    )}
                   </div>
                   <h3 className="font-bold mb-4">{testimonial.name}</h3>
                   <p className="text-muted-foreground italic">"{testimonial.quote}"</p>
