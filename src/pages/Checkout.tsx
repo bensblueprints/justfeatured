@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ShoppingCart, CreditCard, Shield, CheckCircle, Star, TrendingUp, Zap } from "lucide-react";
+import { ShoppingCart, CreditCard, Shield, CheckCircle, Star, TrendingUp, Zap, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { PUBLICATIONS } from "@/data/publications";
@@ -53,7 +53,19 @@ export const Checkout = () => {
   const [availableStarterPubs] = useState(() => 
     PUBLICATIONS.filter(pub => pub.type === 'starter')
   );
+
+  // Rush delivery pricing - $197 flat fee
+  const rushDeliveryPrice = 19700; // $197
+  const rushDeliveryItem = {
+    id: 'rush-delivery',
+    name: '⚡ 48-Hour Rush Delivery',
+    price: rushDeliveryPrice,
+    category: 'Priority Service',
+    tat_days: 2,
+    isUpsell: true
+  };
   const [selectedUpsells, setSelectedUpsells] = useState<string[]>([]);
+  const [rushDelivery, setRushDelivery] = useState(false);
 
   // Define upsell offers
   const upsellOffers = [
@@ -183,6 +195,16 @@ export const Checkout = () => {
     }
   };
 
+  const handleRushDeliveryToggle = (checked: boolean) => {
+    setRushDelivery(checked);
+    
+    if (checked) {
+      setItems(prev => [...prev, rushDeliveryItem]);
+    } else {
+      setItems(prev => prev.filter(item => item.id !== 'rush-delivery'));
+    }
+  };
+
   const subtotal = items.reduce((sum, item) => sum + item.price, 0);
   const totalSavings = selectedUpsells.reduce((sum, upsellId) => {
     const upsell = upsellOffers.find(u => u.id === upsellId);
@@ -222,7 +244,8 @@ export const Checkout = () => {
           customerInfo,
           packageType,
           selectedStarterPublications: packageType === 'starter' ? selectedStarterPublications : undefined,
-          selectedUpsells: selectedUpsells.length > 0 ? selectedUpsells : undefined
+          selectedUpsells: selectedUpsells.length > 0 ? selectedUpsells : undefined,
+          rushDelivery
         }
       });
 
@@ -450,12 +473,63 @@ export const Checkout = () => {
                     </div>
                   )}
 
-                  {/* Upsells Section */}
+                  {/* Rush Delivery Upsell - Prominent Position */}
+                  <div className="bg-gradient-to-r from-warning/20 to-accent/20 border-2 border-warning/50 rounded-xl p-4 shadow-luxury">
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="rush-delivery"
+                        checked={rushDelivery}
+                        onCheckedChange={handleRushDeliveryToggle}
+                        className="h-5 w-5"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <Clock className="h-5 w-5 text-warning" />
+                          <Label htmlFor="rush-delivery" className="font-bold text-lg cursor-pointer">
+                            ⚡ 48-Hour Rush Delivery
+                          </Label>
+                          <Badge className="bg-warning text-black font-bold animate-pulse">
+                            PRIORITY
+                          </Badge>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold">
+                            <span className="line-through text-muted-foreground">Normal: 5-10 business days</span>
+                            <span className="ml-2 text-warning">→ Rush: 48 hours guaranteed!</span>
+                          </p>
+                          <div className="flex items-center space-x-4 text-xs">
+                            <div className="flex items-center">
+                              <CheckCircle className="h-3 w-3 mr-1 text-success" />
+                              Priority queue processing
+                            </div>
+                            <div className="flex items-center">
+                              <CheckCircle className="h-3 w-3 mr-1 text-success" />
+                              Same-day press release writing
+                            </div>
+                            <div className="flex items-center">
+                              <CheckCircle className="h-3 w-3 mr-1 text-success" />
+                              48-hour publication guarantee
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-warning">
+                          +$197
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          One-time fee
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Other Upsells Section */}
                   <div className="space-y-4">
                     <Separator />
                     <div className="flex items-center space-x-2">
                       <TrendingUp className="h-5 w-5 text-accent" />
-                      <h3 className="text-lg font-bold">🔥 Exclusive Checkout Offers</h3>
+                      <h3 className="text-lg font-bold">🔥 Additional Premium Upgrades</h3>
                     </div>
                     
                     {upsellOffers.map(upsell => (
