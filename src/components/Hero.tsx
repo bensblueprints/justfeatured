@@ -161,15 +161,6 @@ export const Hero = () => {
                 className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
                 style={{ filter: 'brightness(0.8) contrast(1.2)' }}
               />
-              {["USA News", "ABC", "CBS", "FOX"].map((outlet, index) => (
-                <div 
-                  key={outlet}
-                  className="text-2xl font-bold hover:text-white transition-colors cursor-pointer magnetic"
-                  style={{ animationDelay: `${1 + (index + 4) * 0.1}s`, color: '#FFB6C1' }}
-                >
-                  {outlet}
-                </div>
-              ))}
             </div>
           </div>
         </div>
