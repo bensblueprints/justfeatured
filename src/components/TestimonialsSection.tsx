@@ -9,7 +9,8 @@ export const TestimonialsSection = () => {
     },
     {
       name: "John Bryson", 
-      quote: "Startup here in Atlanta. They got us featured in Fox, NBC, ABC, CBS, the list goes on. Definitely worth every penny."
+      quote: "Startup here in Atlanta. They got us featured in Fox, NBC, ABC, CBS, the list goes on. Definitely worth every penny.",
+      image: "/lovable-uploads/d67272ed-5e4e-43d7-9b83-5292aed1e0c3.png"
     },
     {
       name: "MJ Wolfe",
