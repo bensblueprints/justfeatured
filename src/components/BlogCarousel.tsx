@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const blogPosts = [
   {
@@ -67,6 +68,15 @@ const blogPosts = [
 ];
 
 export const BlogCarousel = () => {
+  const navigate = useNavigate();
+
+  const handlePostClick = (postId: number) => {
+    if (postId === 1) {
+      navigate('/blog/trust-factor');
+    }
+    // Other blog posts can be added here in the future
+  };
+
   return (
     <section className="py-20 bg-gradient-to-br from-background via-background to-muted/20">
       <div className="container mx-auto px-4">
@@ -94,14 +104,17 @@ export const BlogCarousel = () => {
               {blogPosts.map((post) => (
                 <CarouselItem key={post.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                   <Card className="h-full bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-lg transition-all duration-300 group">
-                    <div className="aspect-video w-full bg-gradient-to-br from-primary/10 to-primary/5 rounded-t-lg mb-4 relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
-                      <div className="absolute bottom-4 left-4">
-                        <Badge variant="secondary" className="text-xs">
-                          {post.category}
-                        </Badge>
-                      </div>
-                    </div>
+                     <div 
+                       className="aspect-video w-full bg-gradient-to-br from-primary/10 to-primary/5 rounded-t-lg mb-4 relative overflow-hidden cursor-pointer hover:from-primary/15 hover:to-primary/8 transition-all duration-300"
+                       onClick={() => handlePostClick(post.id)}
+                     >
+                       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
+                       <div className="absolute bottom-4 left-4">
+                         <Badge variant="secondary" className="text-xs">
+                           {post.category}
+                         </Badge>
+                       </div>
+                     </div>
                     
                     <CardHeader className="pb-3">
                       <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
