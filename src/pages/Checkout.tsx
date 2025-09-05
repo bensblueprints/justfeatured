@@ -125,7 +125,7 @@ export const Checkout = () => {
         const starterItems = starterPubs.map((pub: any, index: number) => ({
           id: `starter-${pub.id}`,
           name: pub.name,
-          price: index === 0 ? 9700 : 4700, // First publication $97, additional $47 each
+          price: index === 0 ? 9700 : 8700, // First publication $97, additional $87 each (discounted from $97)
           category: 'Starter Package',
           tat_days: 3
         }));
@@ -154,7 +154,7 @@ export const Checkout = () => {
       const starterItems = newSelection.map((pub, index) => ({
         id: `starter-${pub.id}`,
         name: pub.name,
-        price: index === 0 ? 9700 : 4700, // First $97, additional $47 each
+        price: index === 0 ? 9700 : 8700, // First $97, additional $87 each (discounted from $97)
         category: 'Starter Package',
         tat_days: 3
       }));
@@ -167,7 +167,7 @@ export const Checkout = () => {
       const starterItems = newSelection.map((pub, index) => ({
         id: `starter-${pub.id}`,
         name: pub.name,
-        price: index === 0 ? 9700 : 4700,
+        price: index === 0 ? 9700 : 8700, // First $97, additional $87 each (discounted from $97)
         category: 'Starter Package',
         tat_days: 3
       }));
@@ -413,7 +413,7 @@ export const Checkout = () => {
                           Starter Package Special
                         </Badge>
                         <h3 className="font-bold text-lg mb-2">
-                          Select Your Publications (1st: $97, Additional: $47 each)
+                          Select Your Publications (1st: $97, Additional: <span className="line-through">$97</span> $87 each)
                         </h3>
                         <p className="text-white/90 text-sm mb-4">Choose multiple publications from our starter collection</p>
                       </div>
@@ -437,7 +437,12 @@ export const Checkout = () => {
                               <p className="font-bold">
                                 {selectedStarterPublications.length === 0 || 
                                  selectedStarterPublications.findIndex(p => p.id === pub.id) === 0 
-                                  ? '$97' : '$47'}
+                                  ? '$97' : (
+                                    <span>
+                                      <span className="line-through text-muted-foreground text-sm">$97</span>
+                                      <span className="ml-1 text-success">$87</span>
+                                    </span>
+                                  )}
                               </p>
                             </div>
                           </div>
@@ -450,7 +455,14 @@ export const Checkout = () => {
                           {selectedStarterPublications.map((pub, index) => (
                             <div key={pub.id} className="flex justify-between text-sm">
                               <span>{pub.name}</span>
-                              <span className="font-semibold">{index === 0 ? '$97' : '$47'}</span>
+                              <span className="font-semibold">
+                                {index === 0 ? '$97' : (
+                                  <span>
+                                    <span className="line-through text-muted-foreground">$97</span>
+                                    <span className="ml-1 text-success">$87</span>
+                                  </span>
+                                )}
+                              </span>
                             </div>
                           ))}
                         </div>
