@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,24 +16,27 @@ import { FileUp, Building, User, Mail, Phone, Globe, Briefcase } from "lucide-re
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { INDUSTRY_SECTORS, PRESS_RELEASE_TONES, type IndustrySector, type PressReleaseTone } from "@/types/press-release";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
-interface FormData {
-  company_name: string;
-  industry_sector: IndustrySector | "";
-  contact_person_name: string;
-  email: string;
-  phone_number: string;
-  company_website: string;
-  business_description: string;
-  recent_achievements: string;
-  key_products_services: string;
-  target_audience: string;
-  preferred_tone: PressReleaseTone;
-  important_dates: string;
-  additional_notes: string;
-  write_own_release: boolean;
-  custom_press_release: string;
-}
+const formSchema = z.object({
+  company_name: z.string().min(1, "Company name is required"),
+  industry_sector: z.string().min(1, "Industry sector is required"),
+  contact_person_name: z.string().min(1, "Contact person name is required"),
+  email: z.string().email("Valid email is required"),
+  phone_number: z.string().min(1, "Phone number is required"),
+  company_website: z.string().optional(),
+  business_description: z.string().min(1, "Business description is required"),
+  recent_achievements: z.string().optional(),
+  key_products_services: z.string().optional(),
+  target_audience: z.string().optional(),
+  preferred_tone: z.enum(["professional", "casual", "technical", "inspirational"]),
+  important_dates: z.string().optional(),
+  additional_notes: z.string().optional(),
+  write_own_release: z.boolean(),
+  custom_press_release: z.string().optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export const PostCheckout = () => {
   const navigate = useNavigate();
@@ -49,37 +55,42 @@ export const PostCheckout = () => {
     documents: []
   });
 
-  const [formData, setFormData] = useState<FormData>({
-    company_name: "",
-    industry_sector: "",
-    contact_person_name: "",
-    email: "",
-    phone_number: "",
-    company_website: "",
-    business_description: "",
-    recent_achievements: "",
-    key_products_services: "",
-    target_audience: "",
-    preferred_tone: "professional",
-    important_dates: "",
-    additional_notes: "",
-    write_own_release: false,
-    custom_press_release: ""
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      company_name: "",
+      industry_sector: "",
+      contact_person_name: "",
+      email: "",
+      phone_number: "",
+      company_website: "",
+      business_description: "",
+      recent_achievements: "",
+      key_products_services: "",
+      target_audience: "",
+      preferred_tone: "professional",
+      important_dates: "",
+      additional_notes: "",
+      write_own_release: false,
+      custom_press_release: ""
+    },
   });
+
+  const formData = form.watch();
 
   useEffect(() => {
     const getCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/");
+        navigate("/auth");
         return;
       }
       setUser(user);
-      setFormData(prev => ({ ...prev, email: user.email || "" }));
+      form.setValue("email", user.email || "");
     };
 
     getCurrentUser();
-  }, [navigate]);
+  }, [navigate, form]);
 
   useEffect(() => {
     // Calculate progress based on required fields
@@ -87,16 +98,15 @@ export const PostCheckout = () => {
       'company_name', 'industry_sector', 'contact_person_name', 
       'email', 'phone_number', 'business_description'
     ];
-    const filledFields = requiredFields.filter(field => formData[field as keyof FormData]);
+    const filledFields = requiredFields.filter(field => {
+      const value = formData[field as keyof FormData];
+      return value && value.toString().trim() !== "";
+    });
     const hasLogo = files.logo !== null;
     const totalRequired = requiredFields.length + 1; // +1 for logo
     const totalFilled = filledFields.length + (hasLogo ? 1 : 0);
     setProgress((totalFilled / totalRequired) * 100);
   }, [formData, files.logo]);
-
-  const handleInputChange = (field: keyof FormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
 
   const handleFileUpload = (type: 'logo' | 'supportingImages' | 'documents', file: File | File[]) => {
     if (type === 'logo' && file instanceof File) {
@@ -180,13 +190,11 @@ export const PostCheckout = () => {
     await Promise.all(uploads);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user || !formData.industry_sector) {
+  const onSubmit = async (data: FormData) => {
+    if (!user) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please log in to continue",
         variant: "destructive"
       });
       return;
@@ -204,29 +212,45 @@ export const PostCheckout = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase
+      const submitData = {
+        user_id: user.id,
+        order_id: searchParams.get('session_id') || undefined,
+        company_name: data.company_name,
+        industry_sector: data.industry_sector as IndustrySector,
+        contact_person_name: data.contact_person_name,
+        email: data.email,
+        phone_number: data.phone_number,
+        company_website: data.company_website || undefined,
+        business_description: data.business_description,
+        recent_achievements: data.recent_achievements || undefined,
+        key_products_services: data.key_products_services || undefined,
+        target_audience: data.target_audience || undefined,
+        preferred_tone: data.preferred_tone,
+        important_dates: data.important_dates || undefined,
+        additional_notes: data.additional_notes || undefined,
+        write_own_release: data.write_own_release,
+        custom_press_release: data.custom_press_release || undefined,
+      };
+
+      const { data: insertData, error } = await supabase
         .from('post_checkout_info')
-        .insert({
-          user_id: user.id,
-          order_id: searchParams.get('session_id') || undefined,
-          ...formData,
-          industry_sector: formData.industry_sector as IndustrySector
-        })
+        .insert(submitData)
         .select()
         .single();
 
       if (error) throw error;
 
       // Upload files
-      await uploadFiles(data.id);
+      await uploadFiles(insertData.id);
 
       toast({
         title: "Information Submitted Successfully!",
         description: "We'll start working on your press release and notify you when it's ready for review."
       });
 
-      navigate(`/review-board/${data.id}`);
+      navigate(`/review-board/${insertData.id}`);
     } catch (error: any) {
+      console.error("Submission error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to submit information",
@@ -238,7 +262,14 @@ export const PostCheckout = () => {
   };
 
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -263,351 +294,427 @@ export const PostCheckout = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Company Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building className="w-5 h-5" />
-                  Company Information
-                </CardTitle>
-                <CardDescription>
-                  Basic information about your company
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="company_name">Company Name *</Label>
-                    <Input
-                      id="company_name"
-                      value={formData.company_name}
-                      onChange={(e) => handleInputChange('company_name', e.target.value)}
-                      placeholder="Your Company Name"
-                      required
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              {/* Company Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="w-5 h-5" />
+                    Company Information
+                  </CardTitle>
+                  <CardDescription>
+                    Basic information about your company
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="company_name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Company Name *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Your Company Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="industry_sector"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Industry *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select your industry" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {INDUSTRY_SECTORS.map((sector) => (
+                                <SelectItem key={sector.value} value={sector.value}>
+                                  {sector.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="industry_sector">Industry *</Label>
-                    <Select
-                      value={formData.industry_sector}
-                      onValueChange={(value) => handleInputChange('industry_sector', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select your industry" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {INDUSTRY_SECTORS.map((sector) => (
-                          <SelectItem key={sector.value} value={sector.value}>
-                            {sector.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="contact_person">Contact Person *</Label>
-                    <Input
-                      id="contact_person"
-                      value={formData.contact_person_name}
-                      onChange={(e) => handleInputChange('contact_person_name', e.target.value)}
-                      placeholder="Your full name"
-                      required
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="contact_person_name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contact Person *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Your full name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="phone_number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="+1 (555) 123-4567" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="phone">Phone Number *</Label>
-                    <Input
-                      id="phone"
-                      value={formData.phone_number}
-                      onChange={(e) => handleInputChange('phone_number', e.target.value)}
-                      placeholder="+1 (555) 123-4567"
-                      required
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="email">Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      placeholder="contact@company.com"
-                      required
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email *</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="contact@company.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="company_website"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Website</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://www.company.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="website">Website</Label>
-                    <Input
-                      id="website"
-                      value={formData.company_website}
-                      onChange={(e) => handleInputChange('company_website', e.target.value)}
-                      placeholder="https://www.company.com"
-                    />
-                  </div>
-                </div>
 
-                <div>
-                  <Label htmlFor="description">Business Description *</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.business_description}
-                    onChange={(e) => handleInputChange('business_description', e.target.value)}
-                    placeholder="Briefly describe what your business does..."
-                    maxLength={500}
-                    required
+                  <FormField
+                    control={form.control}
+                    name="business_description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Business Description *</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Briefly describe what your business does..." 
+                            maxLength={500}
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          {field.value?.length || 0}/500 characters
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {formData.business_description.length}/500 characters
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Press Release Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Press Release Information</CardTitle>
-                <CardDescription>
-                  Details to help us craft your perfect press release
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="achievements">Recent Achievements & News</Label>
-                  <Textarea
-                    id="achievements"
-                    value={formData.recent_achievements}
-                    onChange={(e) => handleInputChange('recent_achievements', e.target.value)}
-                    placeholder="Share your recent milestones, achievements, or newsworthy events..."
-                    maxLength={2000}
+              {/* Press Release Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Press Release Information</CardTitle>
+                  <CardDescription>
+                    Details to help us craft your perfect press release
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="recent_achievements"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Recent Achievements & News</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Share your recent milestones, achievements, or newsworthy events..." 
+                            maxLength={2000}
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          {field.value?.length || 0}/2000 characters
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {formData.recent_achievements.length}/2000 characters
-                  </p>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="products">Key Products/Services</Label>
-                    <Textarea
-                      id="products"
-                      value={formData.key_products_services}
-                      onChange={(e) => handleInputChange('key_products_services', e.target.value)}
-                      placeholder="What are your main offerings?"
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="key_products_services"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Key Products/Services</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="What are your main offerings?" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="target_audience"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Target Audience</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Who is your ideal customer or reader?" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="audience">Target Audience</Label>
-                    <Textarea
-                      id="audience"
-                      value={formData.target_audience}
-                      onChange={(e) => handleInputChange('target_audience', e.target.value)}
-                      placeholder="Who is your ideal customer or reader?"
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="preferred_tone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Preferred Tone</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {PRESS_RELEASE_TONES.map((tone) => (
+                                <SelectItem key={tone.value} value={tone.value}>
+                                  {tone.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="important_dates"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Important Dates/Deadlines</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Any specific dates to mention or deadlines?" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="additional_notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Additional Notes</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Any other details or special requests?" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Content Choice */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Content Creation Option</CardTitle>
+                  <CardDescription>
+                    Choose how you'd like to handle your press release content
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="write_own_release"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <RadioGroup
+                            value={field.value ? "own" : "justfeatured"}
+                            onValueChange={(value) => field.onChange(value === "own")}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="justfeatured" id="justfeatured" />
+                              <Label htmlFor="justfeatured" className="flex-1">
+                                <div>
+                                  <div className="font-medium">Have JustFeatured write it</div>
+                                  <div className="text-sm text-muted-foreground">
+                                    Our expert writers will craft your press release (Estimated delivery: 5-7 business days)
+                                  </div>
+                                </div>
+                              </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="own" id="own" />
+                              <Label htmlFor="own" className="flex-1">
+                                <div>
+                                  <div className="font-medium">Write my own press release</div>
+                                  <div className="text-sm text-muted-foreground">
+                                    Provide your own press release content for review and distribution
+                                  </div>
+                                </div>
+                              </Label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {formData.write_own_release && (
+                    <FormField
+                      control={form.control}
+                      name="custom_press_release"
+                      render={({ field }) => (
+                        <FormItem className="mt-4">
+                          <FormLabel>Your Press Release</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Paste your press release content here..." 
+                              maxLength={5000}
+                              className="min-h-[200px]"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            {field.value?.length || 0}/5000 characters
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* File Uploads */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileUp className="w-5 h-5" />
+                    File Uploads
+                  </CardTitle>
+                  <CardDescription>
+                    Upload your company logo and any supporting materials
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div>
-                    <Label htmlFor="tone">Preferred Tone</Label>
-                    <Select
-                      value={formData.preferred_tone}
-                      onValueChange={(value) => handleInputChange('preferred_tone', value as PressReleaseTone)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {PRESS_RELEASE_TONES.map((tone) => (
-                          <SelectItem key={tone.value} value={tone.value}>
-                            {tone.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="dates">Important Dates/Deadlines</Label>
+                    <Label htmlFor="logo">Company Logo *</Label>
                     <Input
-                      id="dates"
-                      value={formData.important_dates}
-                      onChange={(e) => handleInputChange('important_dates', e.target.value)}
-                      placeholder="Any specific dates to mention or deadlines?"
+                      id="logo"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileUpload('logo', file);
+                      }}
+                      required
                     />
+                    {files.logo && (
+                      <p className="text-sm text-green-600 mt-1">
+                        ✓ {files.logo.name} uploaded
+                      </p>
+                    )}
                   </div>
-                </div>
 
-                <div>
-                  <Label htmlFor="notes">Additional Notes</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.additional_notes}
-                    onChange={(e) => handleInputChange('additional_notes', e.target.value)}
-                    placeholder="Any other details or special requests?"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Content Choice */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Content Creation Option</CardTitle>
-                <CardDescription>
-                  Choose how you'd like to handle your press release content
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup
-                  value={formData.write_own_release ? "own" : "justfeatured"}
-                  onValueChange={(value) => handleInputChange('write_own_release', value === "own")}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="justfeatured" id="justfeatured" />
-                    <Label htmlFor="justfeatured" className="flex-1">
-                      <div>
-                        <div className="font-medium">Have JustFeatured write it</div>
-                        <div className="text-sm text-muted-foreground">
-                          Our expert writers will craft your press release (Estimated delivery: 5-7 business days)
-                        </div>
-                      </div>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="own" id="own" />
-                    <Label htmlFor="own" className="flex-1">
-                      <div>
-                        <div className="font-medium">Write my own press release</div>
-                        <div className="text-sm text-muted-foreground">
-                          Provide your own press release content for review and distribution
-                        </div>
-                      </div>
-                    </Label>
-                  </div>
-                </RadioGroup>
-
-                {formData.write_own_release && (
-                  <div className="mt-4">
-                    <Label htmlFor="custom_release">Your Press Release</Label>
-                    <Textarea
-                      id="custom_release"
-                      value={formData.custom_press_release}
-                      onChange={(e) => handleInputChange('custom_press_release', e.target.value)}
-                      placeholder="Paste your press release content here..."
-                      maxLength={5000}
-                      className="min-h-[200px]"
+                  <div>
+                    <Label htmlFor="images">Supporting Images (Optional)</Label>
+                    <Input
+                      id="images"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        const fileArray = Array.from(e.target.files || []);
+                        if (fileArray.length > 0) handleFileUpload('supportingImages', fileArray);
+                      }}
                     />
                     <p className="text-sm text-muted-foreground mt-1">
-                      {formData.custom_press_release.length}/5000 characters
+                      Maximum 5 images. These will be included with your press release.
                     </p>
+                    {files.supportingImages.length > 0 && (
+                      <div className="mt-2">
+                        {files.supportingImages.map((file, index) => (
+                          <p key={index} className="text-sm text-green-600">
+                            ✓ {file.name}
+                          </p>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
 
-            {/* File Uploads */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileUp className="w-5 h-5" />
-                  File Uploads
-                </CardTitle>
-                <CardDescription>
-                  Upload your company logo and any supporting materials
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="logo">Company Logo *</Label>
-                  <Input
-                    id="logo"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload('logo', file);
-                    }}
-                    required
-                  />
-                  {files.logo && (
-                    <p className="text-sm text-green-600 mt-1">
-                      ✓ {files.logo.name} uploaded
+                  <div>
+                    <Label htmlFor="documents">Supporting Documents (Optional)</Label>
+                    <Input
+                      id="documents"
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      multiple
+                      onChange={(e) => {
+                        const fileArray = Array.from(e.target.files || []);
+                        if (fileArray.length > 0) handleFileUpload('documents', fileArray);
+                      }}
+                    />
+                    <p className="text-sm text-muted-foreground mt-1">
+                      PDF or Word documents only. These provide additional context for our writers.
                     </p>
-                  )}
-                </div>
+                    {files.documents.length > 0 && (
+                      <div className="mt-2">
+                        {files.documents.map((file, index) => (
+                          <p key={index} className="text-sm text-green-600">
+                            ✓ {file.name}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
 
-                <div>
-                  <Label htmlFor="images">Supporting Images (Optional)</Label>
-                  <Input
-                    id="images"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={(e) => {
-                      const fileArray = Array.from(e.target.files || []);
-                      if (fileArray.length > 0) handleFileUpload('supportingImages', fileArray);
-                    }}
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Maximum 5 images. These will be included with your press release.
-                  </p>
-                  {files.supportingImages.length > 0 && (
-                    <div className="mt-2">
-                      {files.supportingImages.map((file, index) => (
-                        <p key={index} className="text-sm text-green-600">
-                          ✓ {file.name}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="documents">Supporting Documents (Optional)</Label>
-                  <Input
-                    id="documents"
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    multiple
-                    onChange={(e) => {
-                      const fileArray = Array.from(e.target.files || []);
-                      if (fileArray.length > 0) handleFileUpload('documents', fileArray);
-                    }}
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    PDF or Word documents only. These provide additional context for our writers.
-                  </p>
-                  {files.documents.length > 0 && (
-                    <div className="mt-2">
-                      {files.documents.map((file, index) => (
-                        <p key={index} className="text-sm text-green-600">
-                          ✓ {file.name}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="flex justify-center">
-              <Button 
-                type="submit" 
-                size="lg" 
-                disabled={loading || progress < 100}
-                className="min-w-[200px]"
-              >
-                {loading ? "Submitting..." : "Submit Information"}
-              </Button>
-            </div>
-          </form>
+              <div className="flex justify-center">
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  disabled={loading || progress < 100}
+                  className="min-w-[200px]"
+                >
+                  {loading ? "Submitting..." : "Submit Information"}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
       </div>
     </div>
