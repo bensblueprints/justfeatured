@@ -65,22 +65,32 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
 
             {/* Logo Display */}
             <div className="flex justify-center mb-4">
-              {logo ? (
-                <img
-                  src={logo}
-                  alt={`${publication.name} logo`}
-                  className="w-20 h-20 object-contain rounded-lg bg-white/10 p-2"
-                  onError={(e) => {
-                    // Fallback to Google favicon service if brand logo fails
-                    const target = e.target as HTMLImageElement;
-                    target.src = BrandFetchService.getFallbackLogo(publication.website_url);
-                  }}
-                />
-              ) : (
-                <div className="w-20 h-20 bg-muted/20 rounded-lg flex items-center justify-center">
-                  <div className="animate-pulse w-10 h-10 bg-muted rounded"></div>
-                </div>
-              )}
+              <img
+                src={logo || BrandFetchService.getFallbackLogo(publication.website_url)}
+                alt={`${publication.name} logo`}
+                className="w-20 h-20 object-contain rounded-lg bg-white/10 p-2"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  const fallbacks = BrandFetchService.getMultipleFallbackLogos(publication.website_url);
+                  const currentIndex = fallbacks.indexOf(target.src);
+                  const nextIndex = currentIndex + 1;
+                  
+                  if (nextIndex < fallbacks.length) {
+                    target.src = fallbacks[nextIndex];
+                  } else {
+                    // Final fallback - show placeholder with publication initial
+                    target.style.display = 'none';
+                    const placeholder = target.nextElementSibling as HTMLElement;
+                    if (placeholder) placeholder.style.display = 'flex';
+                  }
+                }}
+              />
+              <div 
+                className="w-20 h-20 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg items-center justify-center text-lg font-bold text-primary hidden"
+                style={{ display: 'none' }}
+              >
+                {publication.name.charAt(0).toUpperCase()}
+              </div>
             </div>
 
             <div className="text-center">

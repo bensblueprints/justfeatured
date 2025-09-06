@@ -111,11 +111,29 @@ export class BrandFetchService {
   }
 
   /**
-   * Get logo with fallback support
+   * Get logo with fallback support - always returns a logo URL
    */
   static async getLogoWithFallback(websiteUrl: string): Promise<string> {
-    const logo = await this.fetchLogo(websiteUrl);
-    return logo || this.getFallbackLogo(websiteUrl);
+    try {
+      const logo = await this.fetchLogo(websiteUrl);
+      return logo || this.getFallbackLogo(websiteUrl);
+    } catch (error) {
+      console.warn(`Error in getLogoWithFallback for ${websiteUrl}:`, error);
+      return this.getFallbackLogo(websiteUrl);
+    }
+  }
+
+  /**
+   * Get multiple fallback options for better reliability
+   */
+  static getMultipleFallbackLogos(websiteUrl: string): string[] {
+    const domain = this.extractDomain(websiteUrl);
+    return [
+      `https://www.google.com/s2/favicons?domain=${domain}&sz=64`,
+      `https://favicon.yandex.net/favicon/${domain}`,
+      `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
+      `https://logo.clearbit.com/${domain}?size=64&fallback=true`,
+    ];
   }
 
   /**
