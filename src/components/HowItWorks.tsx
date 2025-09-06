@@ -52,13 +52,13 @@ export const HowItWorks = () => {
         <div className="text-center space-y-4">
           <div className="flex flex-col-reverse sm:flex-row-reverse gap-4 justify-center">
             <Button 
-              variant="hero" 
+              variant="outline" 
               size="lg"
               onClick={() => navigate('/publications')}
             >
-              Choose Your Publications →
+              Browse all publications
             </Button>
-            <Button variant="outline" size="lg">
+            <Button variant="hero" size="lg">
               Start with <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span> Package
             </Button>
           </div>
