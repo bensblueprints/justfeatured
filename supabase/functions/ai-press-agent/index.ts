@@ -15,11 +15,15 @@ serve(async (req) => {
   }
 
   try {
+    console.log('AI Press Agent function called');
+    
     if (!openAIApiKey) {
+      console.error('OPENAI_API_KEY is not set');
       throw new Error('OPENAI_API_KEY is not set');
     }
 
     const { budget, businessType, industry, goals, targetAudience } = await req.json();
+    console.log('Request data:', { budget, businessType, industry, goals, targetAudience });
 
     const systemPrompt = `You are an expert press release strategist. Your job is to analyze a client's budget and business needs to recommend the optimal mix of publications for maximum PR impact.
 
@@ -72,6 +76,8 @@ Provide a strategic recommendation including specific budget allocation, number 
       }),
     });
 
+    console.log('Making OpenAI API request...');
+    
     if (!response.ok) {
       const errorData = await response.json();
       console.error('OpenAI API error:', errorData);
@@ -79,7 +85,10 @@ Provide a strategic recommendation including specific budget allocation, number 
     }
 
     const data = await response.json();
+    console.log('OpenAI response data:', data);
     const recommendation = data.choices[0].message.content;
+
+    console.log('Generated recommendation:', recommendation);
 
     return new Response(JSON.stringify({ 
       recommendation,
