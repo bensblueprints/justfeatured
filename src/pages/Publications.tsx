@@ -2,13 +2,14 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { PublicationCard } from "@/components/PublicationCard";
+import { AIPresAgentDialog } from "@/components/AIPresAgentDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, ShoppingCart, Filter } from "lucide-react";
+import { Search, ShoppingCart, Filter, DollarSign, Building } from "lucide-react";
 import { PUBLICATIONS } from "@/data/publications";
 import { Publication, CartItem } from "@/types";
 
@@ -19,6 +20,8 @@ export const Publications = () => {
   const [sortBy, setSortBy] = useState("popularity");
   const [activeTab, setActiveTab] = useState("all");
   const [visibleCount, setVisibleCount] = useState(18);
+  const [priceRange, setPriceRange] = useState<string>("all");
+  const [industryFilter, setIndustryFilter] = useState<string>("all");
   
   const LOAD_MORE_COUNT = 18;
 
@@ -30,11 +33,34 @@ export const Publications = () => {
       filtered = filtered.filter(pub => pub.type === activeTab);
     }
 
+    // Filter by price range
+    if (priceRange !== "all") {
+      const ranges = {
+        "under-1000": [0, 100000], // Under $1,000
+        "1000-5000": [100000, 500000], // $1,000 - $5,000
+        "5000-15000": [500000, 1500000], // $5,000 - $15,000
+        "15000-50000": [1500000, 5000000], // $15,000 - $50,000
+        "over-50000": [5000000, Infinity] // Over $50,000
+      };
+      
+      const [min, max] = ranges[priceRange as keyof typeof ranges] || [0, Infinity];
+      filtered = filtered.filter(pub => pub.price >= min && pub.price < max);
+    }
+
+    // Filter by industry/category
+    if (industryFilter !== "all") {
+      filtered = filtered.filter(pub => 
+        pub.category.toLowerCase().includes(industryFilter.toLowerCase()) ||
+        pub.location?.toLowerCase().includes(industryFilter.toLowerCase())
+      );
+    }
+
     // Filter by search
     if (searchTerm) {
       filtered = filtered.filter(pub =>
         pub.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.category.toLowerCase().includes(searchTerm.toLowerCase())
+        pub.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pub.location?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -54,12 +80,12 @@ export const Publications = () => {
     });
 
     return filtered;
-  }, [searchTerm, sortBy, activeTab]);
+  }, [searchTerm, sortBy, activeTab, priceRange, industryFilter]);
 
   // Reset visible count when filters change
   useMemo(() => {
     setVisibleCount(18);
-  }, [searchTerm, sortBy, activeTab]);
+  }, [searchTerm, sortBy, activeTab, priceRange, industryFilter]);
 
   const visiblePublications = filteredPublications.slice(0, visibleCount);
   const hasMorePublications = visibleCount < filteredPublications.length;
@@ -96,13 +122,18 @@ export const Publications = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Publications Marketplace
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Choose from {PUBLICATIONS.length}+ premium publications to get your story featured
-          </p>
+        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+              Publications Marketplace
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              Choose from {PUBLICATIONS.length}+ premium publications to get your story featured
+            </p>
+          </div>
+          <div className="mt-4 md:mt-0">
+            <AIPresAgentDialog />
+          </div>
         </div>
 
         {/* Filters */}
@@ -128,6 +159,52 @@ export const Publications = () => {
                 <SelectItem value="price-low">Price: Low to High</SelectItem>
                 <SelectItem value="price-high">Price: High to Low</SelectItem>
                 <SelectItem value="name">Name A-Z</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Additional Filters Row */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Select value={priceRange} onValueChange={setPriceRange}>
+              <SelectTrigger className="w-[200px]">
+                <DollarSign className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Price Range" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border border-border shadow-lg z-50">
+                <SelectItem value="all">All Prices</SelectItem>
+                <SelectItem value="under-1000">Under $1,000</SelectItem>
+                <SelectItem value="1000-5000">$1,000 - $5,000</SelectItem>
+                <SelectItem value="5000-15000">$5,000 - $15,000</SelectItem>
+                <SelectItem value="15000-50000">$15,000 - $50,000</SelectItem>
+                <SelectItem value="over-50000">Over $50,000</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={industryFilter} onValueChange={setIndustryFilter}>
+              <SelectTrigger className="w-[200px]">
+                <Building className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Industry/Location" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border border-border shadow-lg z-50">
+                <SelectItem value="all">All Industries</SelectItem>
+                <SelectItem value="tech">Technology</SelectItem>
+                <SelectItem value="news">News & Media</SelectItem>
+                <SelectItem value="business">Business & Finance</SelectItem>
+                <SelectItem value="lifestyle">Lifestyle & Culture</SelectItem>
+                <SelectItem value="entertainment">Entertainment</SelectItem>
+                <SelectItem value="music">Music</SelectItem>
+                <SelectItem value="sports">Sports</SelectItem>
+                <SelectItem value="crypto">Cryptocurrency</SelectItem>
+                <SelectItem value="fashion">Fashion</SelectItem>
+                <SelectItem value="real estate">Real Estate</SelectItem>
+                <SelectItem value="global">Global</SelectItem>
+                <SelectItem value="united states">United States</SelectItem>
+                <SelectItem value="california">California</SelectItem>
+                <SelectItem value="new york">New York</SelectItem>
+                <SelectItem value="texas">Texas</SelectItem>
+                <SelectItem value="uk">United Kingdom</SelectItem>
+                <SelectItem value="canada">Canada</SelectItem>
+                <SelectItem value="australia">Australia</SelectItem>
               </SelectContent>
             </Select>
           </div>
