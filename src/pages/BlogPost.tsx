@@ -52,6 +52,15 @@ export const BlogPost = () => {
             </div>
           </header>
 
+          {/* Hero Image */}
+          <div className="mb-12">
+            <img 
+              src="/lovable-uploads/586d1b85-eed9-42f8-b086-aa86b5d7292f.png" 
+              alt="Professional businessman with glowing shield representing trust and security in business" 
+              className="w-full h-64 md:h-80 object-cover rounded-lg shadow-lg"
+            />
+          </div>
+
           {/* Article Content */}
           <div className="space-y-8 text-foreground leading-relaxed">
             <section>
