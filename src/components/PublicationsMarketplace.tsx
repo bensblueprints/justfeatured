@@ -82,7 +82,7 @@ export const PublicationsMarketplace = () => {
                     <img
                       src={logos[publication.id]}
                       alt={`${publication.name} logo`}
-                      className="w-16 h-16 object-contain rounded-lg bg-white/10 p-2"
+                      className="w-24 h-24 object-contain rounded-lg bg-white/10 p-3"
                       onError={(e) => {
                         // Fallback to Google favicon service if brand logo fails
                         const target = e.target as HTMLImageElement;
@@ -90,8 +90,8 @@ export const PublicationsMarketplace = () => {
                       }}
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-muted/20 rounded-lg flex items-center justify-center">
-                      <div className="animate-pulse w-8 h-8 bg-muted rounded"></div>
+                    <div className="w-24 h-24 bg-muted/20 rounded-lg flex items-center justify-center">
+                      <div className="animate-pulse w-12 h-12 bg-muted rounded"></div>
                     </div>
                   )}
                 </div>
