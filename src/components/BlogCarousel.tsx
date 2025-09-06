@@ -13,7 +13,7 @@ const blogPosts = [
     readTime: "5 min read",
     author: "Sarah Mitchell",
     date: "Dec 15, 2024",
-    image: "/api/placeholder/400/240"
+    image: "/lovable-uploads/586d1b85-eed9-42f8-b086-aa86b5d7292f.png"
   },
   {
     id: 2,
@@ -107,9 +107,14 @@ export const BlogCarousel = () => {
                 <CarouselItem key={post.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                   <Card className="h-full bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-lg transition-all duration-300 group">
                      <div 
-                       className="aspect-video w-full bg-gradient-to-br from-primary/10 to-primary/5 rounded-t-lg mb-4 relative overflow-hidden cursor-pointer hover:from-primary/15 hover:to-primary/8 transition-all duration-300"
+                       className="aspect-video w-full rounded-t-lg mb-4 relative overflow-hidden cursor-pointer group-hover:scale-105 transition-all duration-300"
                        onClick={() => handlePostClick(post.id)}
                      >
+                       <img 
+                         src={post.image} 
+                         alt={post.title}
+                         className="w-full h-full object-cover"
+                       />
                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
                        <div className="absolute bottom-4 left-4">
                          <Badge variant="secondary" className="text-xs">
