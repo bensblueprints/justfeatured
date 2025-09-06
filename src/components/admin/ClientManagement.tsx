@@ -20,7 +20,8 @@ import {
   Phone, 
   Calendar,
   FileText,
-  Plus
+  Plus,
+  Upload
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -225,6 +226,14 @@ export const ClientManagement = () => {
                             onSuccess={fetchClients}
                           />
                         )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => navigate(`/media-upload/${item.client.id}`)}
+                        >
+                          <Upload className="w-3 h-3 mr-1" />
+                          Media
+                        </Button>
                         <Button
                           size="sm"
                           variant="outline"

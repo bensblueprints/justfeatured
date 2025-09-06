@@ -11,6 +11,7 @@ import {
   XCircle, 
   Plus,
   Eye,
+  Upload,
   Building,
   Calendar
 } from "lucide-react";
@@ -173,15 +174,6 @@ export const Dashboard = () => {
                 <Plus className="w-4 h-4 mr-2" />
                 New Press Release
               </Button>
-              {['admin', 'super_admin', 'editor'].includes(userRole) && (
-                <Button 
-                  onClick={() => navigate('/admin-upload')}
-                  variant="outline"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Upload for Client
-                </Button>
-              )}
             </div>
           </div>
         </div>
@@ -231,6 +223,14 @@ export const Dashboard = () => {
                     </div>
                     <div className="flex items-center space-x-3">
                       {getStatusBadge(item.pressRelease?.status)}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/media-upload/${item.checkoutInfo.id}`)}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Media
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
