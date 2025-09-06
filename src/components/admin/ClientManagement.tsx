@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { type PostCheckoutInfo, type PressRelease } from "@/types/press-release";
 import { CreatePressReleaseDialog } from "@/components/CreatePressReleaseDialog";
+import { useAuth } from "@/components/AuthWrapper";
 
 interface ClientWithPressRelease {
   client: PostCheckoutInfo;
@@ -36,14 +37,33 @@ interface ClientWithPressRelease {
 export const ClientManagement = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [clients, setClients] = useState<ClientWithPressRelease[]>([]);
   const [filteredClients, setFilteredClients] = useState<ClientWithPressRelease[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [userRole, setUserRole] = useState<string>('customer');
 
   useEffect(() => {
+    const getUserRole = async () => {
+      if (!user) return;
+      
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .order('role', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (roleData) {
+        setUserRole(roleData.role);
+      }
+    };
+
+    getUserRole();
     fetchClients();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const filtered = clients.filter(item => 
@@ -224,6 +244,7 @@ export const ClientManagement = () => {
                           <CreatePressReleaseDialog 
                             checkoutInfoId={item.client.id}
                             onSuccess={fetchClients}
+                            userRole={userRole}
                           />
                         )}
                         <Button

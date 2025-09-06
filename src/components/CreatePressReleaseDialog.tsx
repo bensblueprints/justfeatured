@@ -20,9 +20,10 @@ import { Plus } from "lucide-react";
 interface CreatePressReleaseDialogProps {
   checkoutInfoId: string;
   onSuccess: () => void;
+  userRole?: string;
 }
 
-export const CreatePressReleaseDialog = ({ checkoutInfoId, onSuccess }: CreatePressReleaseDialogProps) => {
+export const CreatePressReleaseDialog = ({ checkoutInfoId, onSuccess, userRole }: CreatePressReleaseDialogProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
@@ -34,6 +35,16 @@ export const CreatePressReleaseDialog = ({ checkoutInfoId, onSuccess }: CreatePr
       toast({
         title: "Error",
         description: "Please fill in both title and content",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check if user has permission to create press releases
+    if (!['admin', 'super_admin', 'editor'].includes(userRole || '')) {
+      toast({
+        title: "Permission denied",
+        description: "You don't have permission to create press releases",
         variant: "destructive"
       });
       return;
