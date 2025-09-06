@@ -7,19 +7,24 @@ import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { WhyJustFeatured } from "@/components/WhyJustFeatured";
 import { EmailCapture } from "@/components/EmailCapture";
 import { BlogCarousel } from "@/components/BlogCarousel";
+import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 
 export const Home = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <Hero />
-      <ProblemSolution />
-      <PublicationsMarketplace />
-      <HowItWorks />
-      <TestimonialsSection />
-      <WhyJustFeatured />
-      <BlogCarousel />
-      <EmailCapture />
+      <ProtectedInteraction>
+        <div>
+          <Hero />
+          <ProblemSolution />
+          <PublicationsMarketplace />
+          <HowItWorks />
+          <TestimonialsSection />
+          <WhyJustFeatured />
+          <BlogCarousel />
+          <EmailCapture />
+        </div>
+      </ProtectedInteraction>
       
       {/* Footer */}
       <footer className="py-8 bg-background border-t border-border">

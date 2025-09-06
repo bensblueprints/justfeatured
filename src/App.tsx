@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import { AuthWrapper } from "@/components/AuthWrapper";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -22,34 +24,41 @@ import AdminUpload from "./pages/AdminUpload";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <CountdownTimer />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/blog/trust-factor" element={<BlogPost />} />
-          <Route path="/blog/social-proof" element={<SocialProofBlogPost />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/media-upload/:id" element={<MediaUpload />} />
-          <Route path="/post-checkout" element={<PostCheckout />} />
-          <Route path="/review-board/:id" element={<ReviewBoard />} />
-          <Route path="/publications" element={<Publications />} />
-          <Route path="/starter-selection" element={<StarterSelection />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/admin-upload" element={<AdminUpload />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const { AuthGuardComponent } = useAuthGuard();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AuthWrapper>
+          <BrowserRouter>
+            <CountdownTimer />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/blog/trust-factor" element={<BlogPost />} />
+              <Route path="/blog/social-proof" element={<SocialProofBlogPost />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/media-upload/:id" element={<MediaUpload />} />
+              <Route path="/post-checkout" element={<PostCheckout />} />
+              <Route path="/review-board/:id" element={<ReviewBoard />} />
+              <Route path="/publications" element={<Publications />} />
+              <Route path="/starter-selection" element={<StarterSelection />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
+              <Route path="/admin-upload" element={<AdminUpload />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <AuthGuardComponent />
+          </BrowserRouter>
+        </AuthWrapper>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, ShoppingCart, Filter, DollarSign, Building } from "lucide-react";
 import { PUBLICATIONS } from "@/data/publications";
 import { Publication, CartItem } from "@/types";
+import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 
 export const Publications = () => {
   const navigate = useNavigate();
@@ -132,7 +133,11 @@ export const Publications = () => {
             </p>
           </div>
           <div className="mt-4 md:mt-0">
-            <AIPresAgentDialog />
+            <ProtectedInteraction>
+              <div>
+                <AIPresAgentDialog />
+              </div>
+            </ProtectedInteraction>
           </div>
         </div>
 
@@ -247,12 +252,15 @@ export const Publications = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
               {visiblePublications.map((publication) => (
-                <PublicationCard
-                  key={publication.id}
-                  publication={publication}
-                  selected={selectedPublications.includes(publication.id)}
-                  onSelectionChange={(selected) => handleSelectionChange(publication.id, selected)}
-                />
+                <ProtectedInteraction key={publication.id}>
+                  <div>
+                    <PublicationCard
+                      publication={publication}
+                      selected={selectedPublications.includes(publication.id)}
+                      onSelectionChange={(selected) => handleSelectionChange(publication.id, selected)}
+                    />
+                  </div>
+                </ProtectedInteraction>
               ))}
             </div>
 
@@ -324,40 +332,42 @@ export const Publications = () => {
                       </div>
 
                       <div className="space-y-3">
-                        <Button 
-                          variant="hero" 
-                          className="w-full" 
-                          size="lg"
-                          onClick={() => navigate('/checkout', { 
-                            state: { 
-                              selectedPublications: selectedPublications.map(id => {
-                                const pub = PUBLICATIONS.find(p => p.id === id);
-                                return pub ? {
-                                  id: pub.id,
-                                  name: pub.name,
-                                  price: pub.price,
-                                  category: pub.category,
-                                  tat_days: pub.tat_days
-                                } : null;
-                              }).filter(Boolean),
-                              packageType: 'custom'
-                            }
-                          })}
-                        >
-                          Proceed to Checkout
-                        </Button>
+                        <ProtectedInteraction action={() => navigate('/checkout', { 
+                          state: { 
+                            selectedPublications: selectedPublications.map(id => {
+                              const pub = PUBLICATIONS.find(p => p.id === id);
+                              return pub ? {
+                                id: pub.id,
+                                name: pub.name,
+                                price: pub.price,
+                                category: pub.category,
+                                tat_days: pub.tat_days
+                              } : null;
+                            }).filter(Boolean),
+                            packageType: 'custom'
+                          }
+                        })}>
+                          <Button 
+                            variant="hero" 
+                            className="w-full" 
+                            size="lg"
+                          >
+                            Proceed to Checkout
+                          </Button>
+                        </ProtectedInteraction>
                         
-                        <Button 
-                          variant="outline" 
-                          className="w-full"
-                          onClick={() => navigate('/checkout', { 
-                            state: { 
-                              packageType: 'starter'
-                            }
-                          })}
-                        >
-                          Get <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span> Starter Package
-                        </Button>
+                        <ProtectedInteraction action={() => navigate('/checkout', { 
+                          state: { 
+                            packageType: 'starter'
+                          }
+                        })}>
+                          <Button 
+                            variant="outline" 
+                            className="w-full"
+                          >
+                            Get <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span> Starter Package
+                          </Button>
+                        </ProtectedInteraction>
                         
                         <div className="text-center">
                           <Badge variant="secondary">

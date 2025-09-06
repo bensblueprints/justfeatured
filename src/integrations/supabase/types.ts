@@ -227,6 +227,67 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          additional_notes: string | null
+          business_description: string | null
+          company_name: string | null
+          company_website: string | null
+          contact_person_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          important_dates: string | null
+          industry_sector: Database["public"]["Enums"]["industry_sector"] | null
+          key_products_services: string | null
+          phone_number: string | null
+          recent_achievements: string | null
+          target_audience: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_notes?: string | null
+          business_description?: string | null
+          company_name?: string | null
+          company_website?: string | null
+          contact_person_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          important_dates?: string | null
+          industry_sector?:
+            | Database["public"]["Enums"]["industry_sector"]
+            | null
+          key_products_services?: string | null
+          phone_number?: string | null
+          recent_achievements?: string | null
+          target_audience?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_notes?: string | null
+          business_description?: string | null
+          company_name?: string | null
+          company_website?: string | null
+          contact_person_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          important_dates?: string | null
+          industry_sector?:
+            | Database["public"]["Enums"]["industry_sector"]
+            | null
+          key_products_services?: string | null
+          phone_number?: string | null
+          recent_achievements?: string | null
+          target_audience?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       review_comments: {
         Row: {
           content: string
