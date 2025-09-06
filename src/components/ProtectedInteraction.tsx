@@ -1,5 +1,6 @@
 import { ReactElement, cloneElement } from 'react';
 import { useEmailCapture } from '@/hooks/useEmailCapture';
+import { useAuth } from '@/components/AuthWrapper';
 import { EmailCollectionPopup } from '@/components/EmailCollectionPopup';
 
 interface ProtectedInteractionProps {
@@ -9,10 +10,19 @@ interface ProtectedInteractionProps {
 }
 
 export const ProtectedInteraction = ({ children, action, source = 'protected_interaction' }: ProtectedInteractionProps) => {
+  const { user } = useAuth();
   const { isPopupOpen, currentSource, triggerEmailCapture, closePopup, handleEmailSubmitted } = useEmailCapture();
 
   const handleClick = (originalClick?: () => void) => {
     const actionToExecute = action || originalClick || (() => {});
+    
+    // If user is authenticated, execute action immediately
+    if (user) {
+      actionToExecute();
+      return;
+    }
+    
+    // Otherwise, trigger email capture
     triggerEmailCapture(actionToExecute, source);
   };
 
