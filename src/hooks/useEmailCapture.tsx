@@ -5,14 +5,29 @@ export const useEmailCapture = () => {
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const [currentSource, setCurrentSource] = useState<string>('');
 
+  const hasSubmittedEmail = () => {
+    return localStorage.getItem('email_submitted') === 'true';
+  };
+
+  const markEmailSubmitted = () => {
+    localStorage.setItem('email_submitted', 'true');
+  };
+
   const triggerEmailCapture = useCallback((action: () => void, source: string) => {
+    // If user has already submitted email, execute action immediately
+    if (hasSubmittedEmail()) {
+      action();
+      return;
+    }
+    
     setPendingAction(() => action);
     setCurrentSource(source);
     setIsPopupOpen(true);
   }, []);
 
   const handleEmailSubmitted = useCallback(() => {
-    // Execute the pending action after email is collected
+    // Mark email as submitted and execute the pending action
+    markEmailSubmitted();
     if (pendingAction) {
       pendingAction();
       setPendingAction(null);
@@ -30,6 +45,7 @@ export const useEmailCapture = () => {
     currentSource,
     triggerEmailCapture,
     handleEmailSubmitted,
-    closePopup
+    closePopup,
+    hasSubmittedEmail
   };
 };
