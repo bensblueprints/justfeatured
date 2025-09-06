@@ -3,15 +3,41 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { PUBLICATIONS } from "@/data/publications";
 import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { BrandFetchService } from "@/utils/brandFetch";
 
 export const PublicationsMarketplace = () => {
   const navigate = useNavigate();
+  const [logos, setLogos] = useState<Record<string, string>>({});
 
   // Get starter package publications
   const popularPublications = PUBLICATIONS
     .filter(pub => pub.is_active && pub.type === 'starter')
     .sort((a, b) => b.popularity - a.popularity)
     .slice(0, 8);
+
+  // Fetch logos on component mount
+  useEffect(() => {
+    const fetchLogos = async () => {
+      const logoPromises = popularPublications.map(async (pub) => {
+        const logoUrl = await BrandFetchService.getLogoWithFallback(pub.website_url);
+        return { id: pub.id, logoUrl };
+      });
+
+      const logoResults = await Promise.allSettled(logoPromises);
+      const logoMap: Record<string, string> = {};
+
+      logoResults.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          logoMap[result.value.id] = result.value.logoUrl;
+        }
+      });
+
+      setLogos(logoMap);
+    };
+
+    fetchLogos();
+  }, []);
 
   const formatPrice = (price: number) => {
     if (price >= 1000000) {
@@ -50,6 +76,26 @@ export const PublicationsMarketplace = () => {
           {popularPublications.map((publication) => (
             <Card key={publication.id} className={`${getTierColor(publication.type)} transition-all duration-200 hover:shadow-lg hover:scale-105`}>
               <CardHeader className="text-center">
+                {/* Logo Display */}
+                <div className="flex justify-center mb-4">
+                  {logos[publication.id] ? (
+                    <img
+                      src={logos[publication.id]}
+                      alt={`${publication.name} logo`}
+                      className="w-16 h-16 object-contain rounded-lg bg-white/10 p-2"
+                      onError={(e) => {
+                        // Fallback to Google favicon service if brand logo fails
+                        const target = e.target as HTMLImageElement;
+                        target.src = BrandFetchService.getFallbackLogo(publication.website_url);
+                      }}
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-muted/20 rounded-lg flex items-center justify-center">
+                      <div className="animate-pulse w-8 h-8 bg-muted rounded"></div>
+                    </div>
+                  )}
+                </div>
+                
                 <div className="flex items-center justify-between mb-2">
                   <Badge variant="secondary" className="text-xs">
                     {publication.type.toUpperCase()}
