@@ -1,0 +1,118 @@
+/* Import Quill styles */
+@import 'react-quill/dist/quill.snow.css';
+
+/* Custom Quill editor styles */
+.ql-editor {
+  min-height: 400px !important;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ql-toolbar {
+  border-top: 1px solid #e2e8f0 !important;
+  border-left: 1px solid #e2e8f0 !important;
+  border-right: 1px solid #e2e8f0 !important;
+  border-bottom: none !important;
+}
+
+.ql-container {
+  border-left: 1px solid #e2e8f0 !important;
+  border-right: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-top: none !important;
+}
+
+.ql-editor.ql-blank::before {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Dark mode support for Quill editor */
+@media (prefers-color-scheme: dark) {
+  .ql-toolbar {
+    background-color: hsl(var(--background));
+    border-color: hsl(var(--border)) !important;
+  }
+  
+  .ql-container {
+    background-color: hsl(var(--background));
+    border-color: hsl(var(--border)) !important;
+    color: hsl(var(--foreground));
+  }
+  
+  .ql-editor {
+    color: hsl(var(--foreground));
+  }
+  
+  .ql-picker-label {
+    color: hsl(var(--foreground));
+  }
+  
+  .ql-stroke {
+    stroke: hsl(var(--foreground));
+  }
+  
+  .ql-fill {
+    fill: hsl(var(--foreground));
+  }
+}
+
+/* Ensure proper styling for headers in the editor */
+.ql-editor h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.67em 0;
+}
+
+.ql-editor h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.83em 0;
+}
+
+.ql-editor h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin: 1em 0;
+}
+
+.ql-editor h4 {
+  font-size: 1em;
+  font-weight: bold;
+  margin: 1.33em 0;
+}
+
+.ql-editor h5 {
+  font-size: 0.83em;
+  font-weight: bold;
+  margin: 1.67em 0;
+}
+
+.ql-editor h6 {
+  font-size: 0.67em;
+  font-weight: bold;
+  margin: 2.33em 0;
+}
+
+/* Style lists properly */
+.ql-editor ul, .ql-editor ol {
+  padding-left: 1.5em;
+}
+
+.ql-editor blockquote {
+  border-left: 4px solid hsl(var(--border));
+  margin: 1em 0;
+  padding-left: 1em;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Style links */
+.ql-editor a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
+
+.ql-editor a:hover {
+  color: hsl(var(--primary));
+  opacity: 0.8;
+}
