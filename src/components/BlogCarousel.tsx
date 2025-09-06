@@ -23,7 +23,7 @@ const blogPosts = [
     readTime: "7 min read",
     author: "David Chen",
     date: "Dec 12, 2024",
-    image: "/api/placeholder/400/240"
+    image: "/lovable-uploads/5f972722-fa21-4e4d-a4ac-cd519164016d.png"
   },
   {
     id: 3,
