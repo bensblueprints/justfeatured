@@ -10,11 +10,6 @@ export const CountdownTimer = () => {
     const initTimer = () => {
       const TIMER_DURATION = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
       const COOKIE_NAME = 'countdown_start_time';
-      const DISMISSED_COOKIE = 'countdown_dismissed';
-      
-      // Check if user dismissed the timer
-      const isDismissed = document.cookie.includes(`${DISMISSED_COOKIE}=true`);
-      if (isDismissed) return;
 
       let startTime = getCookie(COOKIE_NAME);
       
