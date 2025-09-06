@@ -66,12 +66,7 @@ const quillModules = {
   ],
   clipboard: {
     matchVisual: false,
-    matchers: [
-      // Allow pasting HTML content while preserving formatting
-      ['*', (node: any, delta: any) => {
-        return delta;
-      }]
-    ]
+    dangerouslyPasteHTML: true
   }
 };
 
