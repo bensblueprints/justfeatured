@@ -32,8 +32,8 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <AuthWrapper>
-          <BrowserRouter>
+        <BrowserRouter>
+          <AuthWrapper>
             <CountdownTimer />
             <Routes>
               <Route path="/" element={<Home />} />
@@ -54,8 +54,8 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
             <AuthGuardComponent />
-          </BrowserRouter>
-        </AuthWrapper>
+          </AuthWrapper>
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );
