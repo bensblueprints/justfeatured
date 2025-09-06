@@ -91,11 +91,11 @@ export const CountdownTimer = () => {
 
   return (
     <div 
-      className="fixed top-0 left-0 right-0 z-[9999] bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 shadow-lg"
-      style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, backgroundColor: '#dc2626' }}
+      className="fixed bottom-0 left-0 right-0 z-[9999] bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-4 shadow-lg"
+      style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9999, backgroundColor: '#dc2626' }}
     >
-      <div className="container mx-auto flex items-center justify-center relative">
-        <div className="flex items-center space-x-2 text-center">
+      <div className="container mx-auto flex items-center justify-between">
+        <div className="flex items-center space-x-2">
           <span className="text-sm font-medium">🔥 Limited Time Offer:</span>
           <span className="text-lg font-bold">
             {String(timeLeft.hours).padStart(2, '0')}:
@@ -104,13 +104,22 @@ export const CountdownTimer = () => {
           </span>
           <span className="text-sm">left to claim $97 instead of $497!</span>
         </div>
-        <button
-          onClick={handleDismiss}
-          className="absolute right-0 p-1 hover:bg-red-800 rounded"
-          aria-label="Dismiss countdown"
-        >
-          <X size={16} />
-        </button>
+        
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => window.location.href = '/starter-selection'}
+            className="bg-white text-red-600 px-6 py-2 rounded-full font-bold hover:bg-gray-100 transition-colors"
+          >
+            Get Featured ✨
+          </button>
+          <button
+            onClick={handleDismiss}
+            className="p-1 hover:bg-red-800 rounded"
+            aria-label="Dismiss countdown"
+          >
+            <X size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );

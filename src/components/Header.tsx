@@ -24,7 +24,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky z-50" style={{ top: '64px', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(147, 51, 234, 0.1)' }}>
+    <header className="sticky top-0 z-50" style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(147, 51, 234, 0.1)' }}>
       <div className="container py-6 flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <img 
