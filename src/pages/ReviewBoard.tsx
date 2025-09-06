@@ -62,7 +62,7 @@ export const ReviewBoard = () => {
         .eq('user_id', user.id)
         .order('role', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       
       if (roleData) {
         setUserRole(roleData.role);

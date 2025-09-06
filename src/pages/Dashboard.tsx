@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeText } from "@/lib/security";
 import { type PostCheckoutInfo, type PressRelease } from "@/types/press-release";
+import { CreatePressReleaseDialog } from "@/components/CreatePressReleaseDialog";
 
 interface DashboardItem {
   checkoutInfo: PostCheckoutInfo;
@@ -258,9 +259,15 @@ export const Dashboard = () => {
                       <>
                         <Separator />
                         <div className="text-center py-4">
-                          <p className="text-muted-foreground text-sm">
+                          <p className="text-muted-foreground text-sm mb-4">
                             Press release not yet created. Our team will start working on it soon.
                           </p>
+                          {['admin', 'super_admin', 'editor'].includes(userRole) && (
+                            <CreatePressReleaseDialog 
+                              checkoutInfoId={item.checkoutInfo.id}
+                              onSuccess={() => window.location.reload()}
+                            />
+                          )}
                         </div>
                       </>
                     )}
