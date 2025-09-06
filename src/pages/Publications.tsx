@@ -18,9 +18,9 @@ export const Publications = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("popularity");
   const [activeTab, setActiveTab] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(18);
   
-  const ITEMS_PER_PAGE = 18;
+  const LOAD_MORE_COUNT = 18;
 
   const filteredPublications = useMemo(() => {
     let filtered = PUBLICATIONS;
@@ -56,11 +56,13 @@ export const Publications = () => {
     return filtered;
   }, [searchTerm, sortBy, activeTab]);
 
-  const totalPages = Math.ceil(filteredPublications.length / ITEMS_PER_PAGE);
-  const paginatedPublications = filteredPublications.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  // Reset visible count when filters change
+  useMemo(() => {
+    setVisibleCount(18);
+  }, [searchTerm, sortBy, activeTab]);
+
+  const visiblePublications = filteredPublications.slice(0, visibleCount);
+  const hasMorePublications = visibleCount < filteredPublications.length;
 
   const selectedTotal = useMemo(() => {
     return selectedPublications.reduce((total, id) => {
@@ -99,7 +101,7 @@ export const Publications = () => {
             Publications Marketplace
           </h1>
           <p className="text-xl text-muted-foreground">
-            Choose from 355+ premium publications to get your story featured
+            Choose from {PUBLICATIONS.length}+ premium publications to get your story featured
           </p>
         </div>
 
@@ -121,7 +123,7 @@ export const Publications = () => {
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border border-border shadow-lg z-50">
                 <SelectItem value="popularity">Popularity</SelectItem>
                 <SelectItem value="price-low">Price: Low to High</SelectItem>
                 <SelectItem value="price-high">Price: High to Low</SelectItem>
@@ -157,12 +159,17 @@ export const Publications = () => {
           <div className="flex-1">
             <div className="mb-6 flex items-center justify-between">
               <p className="text-muted-foreground">
-                Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredPublications.length)} of {filteredPublications.length} publications
+                Showing {visiblePublications.length} of {filteredPublications.length} publications
               </p>
+              {hasMorePublications && (
+                <p className="text-sm text-muted-foreground">
+                  {filteredPublications.length - visibleCount} more available
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-              {paginatedPublications.map((publication) => (
+              {visiblePublications.map((publication) => (
                 <PublicationCard
                   key={publication.id}
                   publication={publication}
@@ -172,49 +179,25 @@ export const Publications = () => {
               ))}
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center space-x-2">
+            {/* Load More Button */}
+            {hasMorePublications && (
+              <div className="flex justify-center mb-8">
                 <Button
                   variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
+                  size="lg"
+                  onClick={() => setVisibleCount(prev => prev + LOAD_MORE_COUNT)}
+                  className="min-w-[200px]"
                 >
-                  Previous
+                  Load More Publications ({filteredPublications.length - visibleCount} remaining)
                 </Button>
-                
-                <div className="flex space-x-1">
-                  {[...Array(totalPages)].map((_, index) => {
-                    const page = index + 1;
-                    if (
-                      page === 1 ||
-                      page === totalPages ||
-                      (page >= currentPage - 2 && page <= currentPage + 2)
-                    ) {
-                      return (
-                        <Button
-                          key={page}
-                          variant={currentPage === page ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setCurrentPage(page)}
-                        >
-                          {page}
-                        </Button>
-                      );
-                    } else if (page === currentPage - 3 || page === currentPage + 3) {
-                      return <span key={page} className="px-2">...</span>;
-                    }
-                    return null;
-                  })}
-                </div>
+              </div>
+            )}
 
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
+            {!hasMorePublications && filteredPublications.length > 18 && (
+              <div className="text-center py-4 mb-8">
+                <p className="text-muted-foreground">
+                  You've viewed all {filteredPublications.length} publications. Try adjusting your filters to see different results.
+                </p>
               </div>
             )}
           </div>
