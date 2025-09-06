@@ -280,7 +280,7 @@ export const Checkout = () => {
           <p className="text-muted-foreground mb-8">Please select publications to continue with checkout.</p>
           <div className="space-x-4">
             <Button onClick={() => navigate('/starter-selection')} variant="hero">
-              $97 Starter Package
+              <span className="line-through text-gray-300">$497</span> <span className="text-green-300">$97</span> Starter Package
             </Button>
             <Button onClick={() => navigate('/publications')} variant="outline">
               Browse All Publications
@@ -342,7 +342,7 @@ export const Checkout = () => {
               </div>
             </div>
             <div className="text-center">
-              <p className="text-xl font-bold mb-2">One investment of $97. We handle everything. Guaranteed results.</p>
+              <p className="text-xl font-bold mb-2">One investment of <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span>. We handle everything. Guaranteed results.</p>
               <Badge className="bg-success text-success-foreground text-lg px-4 py-2">
                 100% Money Back Promise
               </Badge>
@@ -552,7 +552,7 @@ export const Checkout = () => {
                           Starter Package Special
                         </Badge>
                         <h3 className="font-bold text-lg mb-2">
-                          Select Your Publications (1st: $97, Additional: <span className="line-through">$97</span> $87 each)
+                          Select Your Publications (1st: <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span>, Additional: <span className="line-through">$497</span> $87 each)
                         </h3>
                         <p className="text-white/90 text-sm mb-4">Choose multiple publications from our starter collection</p>
                       </div>
@@ -576,9 +576,14 @@ export const Checkout = () => {
                               <p className="font-bold">
                                 {selectedStarterPublications.length === 0 || 
                                  selectedStarterPublications.findIndex(p => p.id === pub.id) === 0 
-                                  ? '$97' : (
+                                  ? (
                                     <span>
-                                      <span className="line-through text-muted-foreground text-sm">$97</span>
+                                      <span className="line-through text-muted-foreground text-sm">$497</span>
+                                      <span className="ml-1 text-green-600">$97</span>
+                                    </span>
+                                  ) : (
+                                    <span>
+                                      <span className="line-through text-muted-foreground text-sm">$497</span>
                                       <span className="ml-1 text-success">$87</span>
                                     </span>
                                   )}
@@ -595,9 +600,14 @@ export const Checkout = () => {
                             <div key={pub.id} className="flex justify-between text-sm">
                               <span>{pub.name}</span>
                               <span className="font-semibold">
-                                {index === 0 ? '$97' : (
+                                {index === 0 ? (
                                   <span>
-                                    <span className="line-through text-muted-foreground">$97</span>
+                                    <span className="line-through text-muted-foreground">$497</span>
+                                    <span className="ml-1 text-green-600">$97</span>
+                                  </span>
+                                ) : (
+                                  <span>
+                                    <span className="line-through text-muted-foreground">$497</span>
                                     <span className="ml-1 text-success">$87</span>
                                   </span>
                                 )}

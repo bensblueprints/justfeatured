@@ -204,7 +204,7 @@ export const SocialProofBlogPost = () => {
                 The challenge? Traditional PR agencies often charge $5,000–$10,000/month with no guarantee of placement. That has kept press coverage out of reach for small businesses, coaches, and entrepreneurs.
               </p>
               <p className="mb-6">
-                But it doesn't have to be that way. At Just Featured, we make press coverage accessible to everyone—with guaranteed publication starting at just $97. That means you can leverage the power of social proof without draining your budget.
+                But it doesn't have to be that way. At Just Featured, we make press coverage accessible to everyone—with guaranteed publication starting at just <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span>. That means you can leverage the power of social proof without draining your budget.
               </p>
             </section>
 
@@ -229,7 +229,7 @@ export const SocialProofBlogPost = () => {
                   onClick={() => navigate('/starter-selection')}
                   className="group bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white px-8 py-6 text-lg font-semibold"
                 >
-                  👉 Get Featured in Top News Outlets Starting at $97
+                  👉 Get Featured in Top News Outlets Starting at <span className="line-through text-gray-300">$497</span> <span className="text-green-300">$97</span>
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>

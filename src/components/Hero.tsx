@@ -67,7 +67,7 @@ export const Hero = () => {
             <p className="hero-subtitle text-xl md:text-2xl mb-10 max-w-4xl mx-auto leading-relaxed">
               We'll write an article for your business and get you featured in premium news publications. 
               <span className="font-semibold block mt-2" style={{ color: '#FFFFFF' }}>
-                Guaranteed placement starting at just $97.
+                Guaranteed placement starting at just <span className="line-through text-gray-400">$497</span> <span className="text-green-400">$97</span>.
               </span>
             </p>
           </div>
@@ -79,7 +79,7 @@ export const Hero = () => {
               className="cta-primary group relative overflow-hidden"
             >
               <span className="relative z-10 flex items-center">
-                🎯 GET STARTED FOR $97
+                🎯 GET STARTED FOR <span className="line-through text-gray-400 mx-1">$497</span> <span className="text-green-400">$97</span>
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </span>
             </button>

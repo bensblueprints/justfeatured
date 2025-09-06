@@ -198,7 +198,7 @@ export const BlogPost = () => {
                 </ol>
               </div>
               <p className="mb-4">
-                Best of all, you don't need a PR budget. Packages start at just $97, with guaranteed placement or your money back.
+                Best of all, you don't need a PR budget. Packages start at just <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span>, with guaranteed placement or your money back.
               </p>
               <p className="font-semibold">It's fast, affordable, and proven.</p>
             </section>
@@ -240,7 +240,7 @@ export const BlogPost = () => {
                   onClick={() => navigate('/starter-selection')}
                   className="group bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white px-8 py-6 text-lg font-semibold"
                 >
-                  👉 Get Featured for Just $97
+                  👉 Get Featured for Just <span className="line-through text-gray-300">$497</span> <span className="text-green-300">$97</span>
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>

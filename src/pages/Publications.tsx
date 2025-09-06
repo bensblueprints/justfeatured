@@ -296,12 +296,12 @@ export const Publications = () => {
                             }
                           })}
                         >
-                          Get $97 Starter Package
+                          Get <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span> Starter Package
                         </Button>
                         
                         <div className="text-center">
                           <Badge variant="secondary">
-                            💡 Save with our $97 starter package
+                            💡 Save with our <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span> starter package
                           </Badge>
                         </div>
                       </div>

@@ -59,7 +59,7 @@ export const HowItWorks = () => {
               Choose Your Publications →
             </Button>
             <Button variant="outline" size="lg">
-              Start with $97 Package
+              Start with <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span> Package
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">

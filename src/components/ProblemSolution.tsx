@@ -63,7 +63,7 @@ export const ProblemSolution = () => {
             That's why we'll write an article for your business and get you featured in a top-tier news outlet, just like we've done for over 1,000 other businesses...
           </p>
           <p className="text-xl font-semibold mt-6">
-            We'll handle everything for a one-time payment starting at $97, guaranteed.
+            We'll handle everything for a one-time payment starting at <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span>, guaranteed.
           </p>
         </div>
       </div>

@@ -36,7 +36,7 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
           <div className="text-center mb-12">
             <Badge className="bg-warning text-warning-foreground mb-4">
               <Star className="h-3 w-3 mr-1" />
-              Starter Package - $97
+              Starter Package - <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span>
             </Badge>
             <h1 className="text-4xl font-bold text-foreground mb-4">
               Choose Your Publication
