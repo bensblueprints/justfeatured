@@ -91,8 +91,8 @@ export const CountdownTimer = () => {
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-[9999] bg-gradient-to-r from-red-600 to-red-700 text-white py-3 sm:py-4 px-2 sm:px-4 shadow-lg"
-      style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9999, backgroundColor: '#dc2626' }}
+      className="fixed bottom-0 left-0 right-0 z-[9998] bg-gradient-to-r from-red-600 to-red-700 text-white py-3 sm:py-4 px-2 sm:px-4 shadow-lg"
+      style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9998, backgroundColor: '#dc2626' }}
     >
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
         <div className="flex items-center space-x-1 sm:space-x-2 text-center sm:text-left">
