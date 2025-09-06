@@ -64,12 +64,12 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
             </div>
 
             {/* Logo Display */}
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex justify-center mb-4">
               {logo ? (
                 <img
                   src={logo}
                   alt={`${publication.name} logo`}
-                  className="w-12 h-12 object-contain rounded-lg bg-white/10 p-1.5"
+                  className="w-20 h-20 object-contain rounded-lg bg-white/10 p-2"
                   onError={(e) => {
                     // Fallback to Google favicon service if brand logo fails
                     const target = e.target as HTMLImageElement;
@@ -77,18 +77,19 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
                   }}
                 />
               ) : (
-                <div className="w-12 h-12 bg-muted/20 rounded-lg flex items-center justify-center">
-                  <div className="animate-pulse w-6 h-6 bg-muted rounded"></div>
+                <div className="w-20 h-20 bg-muted/20 rounded-lg flex items-center justify-center">
+                  <div className="animate-pulse w-10 h-10 bg-muted rounded"></div>
                 </div>
               )}
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold mb-0">{publication.name}</h3>
-                <p className="text-sm text-muted-foreground">{publication.category}</p>
-              </div>
+            </div>
+
+            <div className="text-center">
+              <h3 className="text-lg font-semibold mb-1">{publication.name}</h3>
+              <p className="text-sm text-muted-foreground mb-2">{publication.category}</p>
             </div>
             
             {publication.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
+              <p className="text-sm text-muted-foreground line-clamp-2 text-center">
                 {publication.description}
               </p>
             )}
