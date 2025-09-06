@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Star, TrendingUp, Zap, Sparkles, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 
 export const Hero = () => {
   const navigate = useNavigate();
@@ -74,23 +75,25 @@ export const Hero = () => {
 
           {/* Premium CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            <button 
-              onClick={() => navigate("/starter-selection")}
-              className="cta-primary group relative overflow-hidden"
-            >
-              <span className="relative z-10 flex items-center">
-                🎯 GET STARTED FOR <span className="line-through text-gray-400 mx-1">$497</span> <span className="text-green-400">$97</span>
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </button>
+            <ProtectedInteraction action={() => navigate("/starter-selection")}>
+              <button 
+                className="cta-primary group relative overflow-hidden"
+              >
+                <span className="relative z-10 flex items-center">
+                  🎯 GET STARTED FOR <span className="line-through text-gray-400 mx-1">$497</span> <span className="text-green-400">$97</span>
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </button>
+            </ProtectedInteraction>
             
-            <button 
-              onClick={() => navigate("/publications")}
-              className="bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 hover:border-white/50 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 group shadow-lg hover:shadow-xl"
-            >
-              355+ PREMIUM PUBLICATIONS
-              <Sparkles className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
-            </button>
+            <ProtectedInteraction action={() => navigate("/publications")}>
+              <button 
+                className="bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 hover:border-white/50 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 group shadow-lg hover:shadow-xl"
+              >
+                355+ PREMIUM PUBLICATIONS
+                <Sparkles className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
+              </button>
+            </ProtectedInteraction>
           </div>
 
           {/* Floating Publication Cards */}
