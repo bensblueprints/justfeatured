@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/badge";
 export const PublicationsMarketplace = () => {
   const navigate = useNavigate();
 
-  // Get the most popular publications across all tiers
+  // Get starter package publications
   const popularPublications = PUBLICATIONS
-    .filter(pub => pub.is_active)
+    .filter(pub => pub.is_active && pub.type === 'starter')
     .sort((a, b) => b.popularity - a.popularity)
     .slice(0, 8);
 
