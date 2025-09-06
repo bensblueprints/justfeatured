@@ -159,13 +159,24 @@ export const Dashboard = () => {
                 Manage your press releases and track their progress
               </p>
             </div>
-            <Button 
-              onClick={() => navigate('/post-checkout')}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              New Press Release
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => navigate('/post-checkout')}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Press Release
+              </Button>
+              {['admin', 'super_admin', 'editor'].includes(userRole) && (
+                <Button 
+                  onClick={() => navigate('/admin-upload')}
+                  variant="outline"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Upload for Client
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

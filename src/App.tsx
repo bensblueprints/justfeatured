@@ -15,6 +15,7 @@ import { SocialProofBlogPost } from "./pages/SocialProofBlogPost";
 import StarterSelection from "./pages/StarterSelection";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
+import AdminUpload from "./pages/AdminUpload";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/starter-selection" element={<StarterSelection />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/admin-upload" element={<AdminUpload />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
