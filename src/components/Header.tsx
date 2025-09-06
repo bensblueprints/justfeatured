@@ -40,7 +40,7 @@ export const Header = () => {
           </div>
         </div>
         
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden lg:flex items-center space-x-8">
           <button 
             onClick={() => handleNavigation('/publications')}
             className="transition-all duration-300 font-medium magnetic"
@@ -74,15 +74,16 @@ export const Header = () => {
         <div className="flex items-center space-x-4">
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2"
+            className="lg:hidden p-2 z-50 relative bg-white/80 backdrop-blur-sm rounded-lg border border-primary/20 hover:bg-white/90 transition-all duration-200"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle mobile menu"
+            style={{ color: '#475569' }}
           >
             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
 
           {/* Desktop auth and CTA */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-4">
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -123,7 +124,7 @@ export const Header = () => {
 
       {/* Mobile menu overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg border-b border-primary/10 shadow-lg">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg border-b border-primary/10 shadow-lg z-40">
           <div className="container py-4 space-y-4">
             <nav className="space-y-4">
               <button 
