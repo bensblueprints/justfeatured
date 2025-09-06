@@ -100,7 +100,7 @@ export const Header = () => {
           )}
           <button 
             className="cta-primary magnetic"
-            onClick={() => handleNavigation('/publications')}
+            onClick={() => handleNavigation('/starter-selection')}
           >
             Get Featured ✨
           </button>
