@@ -50,7 +50,7 @@ export const HowItWorks = () => {
         </div>
 
         <div className="text-center space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col-reverse sm:flex-row-reverse gap-4 justify-center">
             <Button 
               variant="hero" 
               size="lg"
