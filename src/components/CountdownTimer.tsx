@@ -11,23 +11,31 @@ export const CountdownTimer = () => {
       const TIMER_DURATION = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
       const COOKIE_NAME = 'countdown_start_time';
 
+      console.log('CountdownTimer: Initializing timer');
       let startTime = getCookie(COOKIE_NAME);
+      console.log('CountdownTimer: startTime from cookie:', startTime);
       
       if (!startTime) {
         // First visit - set start time
         startTime = Date.now().toString();
         setCookie(COOKIE_NAME, startTime, 7); // Cookie expires in 7 days
+        console.log('CountdownTimer: Set new startTime:', startTime);
       }
       
       const start = parseInt(startTime);
       const endTime = start + TIMER_DURATION;
       const now = Date.now();
       
+      console.log('CountdownTimer: start:', start, 'endTime:', endTime, 'now:', now);
+      console.log('CountdownTimer: Time remaining (ms):', endTime - now);
+      
       if (now >= endTime) {
+        console.log('CountdownTimer: Timer expired');
         setIsExpired(true);
         return;
       }
       
+      console.log('CountdownTimer: Setting visible to true');
       setIsVisible(true);
       
       const updateTimer = () => {
@@ -74,7 +82,12 @@ export const CountdownTimer = () => {
     setCookie('countdown_dismissed', 'true', 7);
   };
 
-  if (!isVisible || isExpired) return null;
+  console.log('CountdownTimer render: isVisible:', isVisible, 'isExpired:', isExpired, 'timeLeft:', timeLeft);
+  
+  if (!isVisible || isExpired) {
+    console.log('CountdownTimer: Not rendering - isVisible:', isVisible, 'isExpired:', isExpired);
+    return null;
+  }
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 shadow-lg">
