@@ -91,24 +91,24 @@ export const CountdownTimer = () => {
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-[9999] bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-4 shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-[9999] bg-gradient-to-r from-red-600 to-red-700 text-white py-3 sm:py-4 px-2 sm:px-4 shadow-lg"
       style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9999, backgroundColor: '#dc2626' }}
     >
-      <div className="container mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium">🔥 Limited Time Offer:</span>
-          <span className="text-lg font-bold">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
+        <div className="flex items-center space-x-1 sm:space-x-2 text-center sm:text-left">
+          <span className="text-xs sm:text-sm font-medium">🔥 Limited Time:</span>
+          <span className="text-base sm:text-lg font-bold">
             {String(timeLeft.hours).padStart(2, '0')}:
             {String(timeLeft.minutes).padStart(2, '0')}:
             {String(timeLeft.seconds).padStart(2, '0')}
           </span>
-          <span className="text-sm">left to claim $97 instead of $497!</span>
+          <span className="text-xs sm:text-sm">left to claim $97 instead of $497!</span>
         </div>
         
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           <button
             onClick={() => window.location.href = '/starter-selection'}
-            className="bg-white text-red-600 px-6 py-2 rounded-full font-bold hover:bg-gray-100 transition-colors"
+            className="bg-white text-red-600 px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-sm sm:text-base font-bold hover:bg-gray-100 transition-colors"
           >
             Get Featured ✨
           </button>
@@ -117,7 +117,7 @@ export const CountdownTimer = () => {
             className="p-1 hover:bg-red-800 rounded"
             aria-label="Dismiss countdown"
           >
-            <X size={16} />
+            <X size={14} className="sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>
