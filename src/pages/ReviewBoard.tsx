@@ -120,8 +120,14 @@ export const ReviewBoard = () => {
         .limit(1)
         .maybeSingle();
       
+      console.log('ReviewBoard - User role data:', roleData); // Debug log
+      
       if (roleData) {
         setUserRole(roleData.role);
+        console.log('ReviewBoard - Setting user role:', roleData.role); // Debug log
+      } else {
+        console.log('ReviewBoard - No role found, setting to customer'); // Debug log
+        setUserRole('customer');
       }
     };
 
@@ -129,7 +135,11 @@ export const ReviewBoard = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (!id || !user) return;
+    // Don't fetch data until we have both user and userRole
+    if (!id || !user || !userRole) {
+      console.log('ReviewBoard - Waiting for user data:', { id, user: !!user, userRole });
+      return;
+    }
 
     const fetchData = async () => {
       try {
@@ -139,23 +149,32 @@ export const ReviewBoard = () => {
           .select('*')
           .eq('id', id);
 
+        // Only restrict to user's own records if they're NOT an admin
         if (!['admin', 'super_admin', 'editor'].includes(userRole)) {
           checkoutQuery = checkoutQuery.eq('user_id', user.id);
         }
 
+        console.log('Fetching checkout info for user role:', userRole); // Debug log
+
         const { data: checkoutData, error: checkoutError } = await checkoutQuery.maybeSingle();
 
-        if (checkoutError) throw checkoutError;
+        if (checkoutError) {
+          console.error('Checkout error:', checkoutError);
+          throw checkoutError;
+        }
+        
         if (!checkoutData) {
+          console.log('No checkout data found for ID:', id);
           toast({
-            title: "Access denied",
-            description: "You don't have permission to access this press release",
+            title: "Not found",
+            description: "Press release not found or you don't have permission to access it",
             variant: "destructive"
           });
           navigate('/dashboard');
           return;
         }
 
+        console.log('Checkout data found:', checkoutData); // Debug log
         setCheckoutInfo(checkoutData);
 
         // Fetch press release
@@ -209,7 +228,18 @@ export const ReviewBoard = () => {
       }
     };
 
-    fetchData();
+    // Only fetch data after both user and userRole are available
+    if (userRole && userRole !== 'customer') {
+      // For admin users, proceed immediately
+      fetchData();
+    } else if (userRole === 'customer') {
+      // For customers, also proceed
+      fetchData();
+    } else if (userRole) {
+      // Role is set but not recognized
+      fetchData();
+    }
+    // If userRole is not set yet, wait for it
   }, [id, user, userRole, navigate, toast]);
 
   const canEdit = () => {

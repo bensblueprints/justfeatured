@@ -149,11 +149,11 @@ export const Dashboard = () => {
     );
   }
 
-  // Redirect admin users to admin dashboard
-  if (['admin', 'super_admin', 'editor'].includes(userRole)) {
-    navigate('/admin-dashboard');
-    return null;
-  }
+  // Allow admin users to access customer dashboard too (don't auto-redirect)
+  // if (['admin', 'super_admin', 'editor'].includes(userRole)) {
+  //   navigate('/admin-dashboard');
+  //   return null;
+  // }
 
   return (
     <div className="min-h-screen bg-background">
