@@ -229,14 +229,6 @@ export const ClientManagement = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => navigate(`/media-upload/${item.client.id}`)}
-                        >
-                          <Upload className="w-3 h-3 mr-1" />
-                          Media
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
                           onClick={() => navigate(`/review-board/${item.client.id}`)}
                         >
                           <Eye className="w-3 h-3 mr-1" />

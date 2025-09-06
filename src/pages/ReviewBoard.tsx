@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
 import { 
   MessageSquare, 
   CheckCircle, 
@@ -15,7 +16,13 @@ import {
   Download,
   Edit,
   Eye,
-  Send
+  Send,
+  Upload,
+  Image,
+  Building,
+  X,
+  ArrowLeft,
+  Save
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +34,24 @@ import {
   type ApprovalHistory,
   type ReviewStatus 
 } from "@/types/press-release";
+
+interface FileUpload {
+  file: File;
+  preview: string;
+  uploading: boolean;
+  uploaded: boolean;
+  error?: string;
+  storageId?: string;
+}
+
+interface FileAttachment {
+  id: string;
+  file_name: string;
+  file_type: string;
+  storage_path: string;
+  is_logo: boolean;
+  created_at: string;
+}
 
 interface ReviewBoardProps {}
 
@@ -46,6 +71,12 @@ export const ReviewBoard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState("");
   const [editedTitle, setEditedTitle] = useState("");
+
+  // Media upload states
+  const [logo, setLogo] = useState<FileUpload | null>(null);
+  const [images, setImages] = useState<(FileUpload | null)[]>([null, null]);
+  const [existingAttachments, setExistingAttachments] = useState<FileAttachment[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -120,6 +151,17 @@ export const ReviewBoard = () => {
 
           setApprovalHistory(historyData || []);
         }
+
+        // Fetch existing file attachments
+        const { data: attachmentsData } = await supabase
+          .from('file_attachments')
+          .select('*')
+          .eq('post_checkout_info_id', id)
+          .order('created_at', { ascending: false });
+
+        if (attachmentsData) {
+          setExistingAttachments(attachmentsData);
+        }
       } catch (error: any) {
         toast({
           title: "Error",
@@ -176,6 +218,196 @@ export const ReviewBoard = () => {
       supabase.removeChannel(commentsChannel);
     };
   }, [id, user, toast]);
+
+  // Media upload functions
+  const createFileUpload = (file: File): FileUpload => ({
+    file,
+    preview: URL.createObjectURL(file),
+    uploading: false,
+    uploaded: false
+  });
+
+  const handleLogoUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload an image file for the logo",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      toast({
+        title: "File too large",
+        description: "Logo must be under 5MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLogo(createFileUpload(file));
+  }, [toast]);
+
+  const handleImageUpload = useCallback((index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload an image file",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      toast({
+        title: "File too large",
+        description: "Images must be under 10MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setImages(prev => {
+      const newImages = [...prev];
+      newImages[index] = createFileUpload(file);
+      return newImages;
+    });
+  }, [toast]);
+
+  const removeFile = (type: 'logo' | 'image', index?: number) => {
+    if (type === 'logo') {
+      if (logo?.preview) URL.revokeObjectURL(logo.preview);
+      setLogo(null);
+    } else if (index !== undefined) {
+      setImages(prev => {
+        const newImages = [...prev];
+        if (newImages[index]?.preview) {
+          URL.revokeObjectURL(newImages[index]!.preview);
+        }
+        newImages[index] = null;
+        return newImages;
+      });
+    }
+  };
+
+  const uploadFile = async (fileUpload: FileUpload, bucketName: string, isLogo: boolean = false): Promise<string | null> => {
+    try {
+      const fileExt = fileUpload.file.name.split('.').pop();
+      const fileName = `${checkoutInfo!.id}_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, fileUpload.file);
+
+      if (uploadError) throw uploadError;
+
+      // Save file attachment record
+      const { error: dbError } = await supabase
+        .from('file_attachments')
+        .insert({
+          post_checkout_info_id: checkoutInfo!.id,
+          file_name: fileUpload.file.name,
+          file_type: fileUpload.file.type,
+          file_size: fileUpload.file.size,
+          storage_path: filePath,
+          is_logo: isLogo
+        });
+
+      if (dbError) throw dbError;
+
+      return filePath;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
+  };
+
+  const handleUploadFiles = async () => {
+    const filesToUpload = [
+      ...(logo ? [{ file: logo, isLogo: true }] : []),
+      ...images.filter(img => img !== null).map(img => ({ file: img!, isLogo: false }))
+    ];
+
+    if (filesToUpload.length === 0) {
+      toast({
+        title: "No files selected",
+        description: "Please select at least one file to upload",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      // Upload logo
+      if (logo) {
+        setLogo(prev => prev ? { ...prev, uploading: true } : null);
+        await uploadFile(logo, 'company-logos', true);
+        setLogo(prev => prev ? { ...prev, uploading: false, uploaded: true } : null);
+      }
+
+      // Upload images
+      for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        if (image) {
+          setImages(prev => {
+            const newImages = [...prev];
+            if (newImages[i]) {
+              newImages[i] = { ...newImages[i]!, uploading: true };
+            }
+            return newImages;
+          });
+          
+          await uploadFile(image, 'press-attachments', false);
+          
+          setImages(prev => {
+            const newImages = [...prev];
+            if (newImages[i]) {
+              newImages[i] = { ...newImages[i]!, uploading: false, uploaded: true };
+            }
+            return newImages;
+          });
+        }
+      }
+
+      // Refresh attachments
+      const { data: attachmentsData } = await supabase
+        .from('file_attachments')
+        .select('*')
+        .eq('post_checkout_info_id', checkoutInfo!.id)
+        .order('created_at', { ascending: false });
+
+      if (attachmentsData) {
+        setExistingAttachments(attachmentsData);
+      }
+
+      // Clear upload states
+      setLogo(null);
+      setImages([null, null]);
+
+      toast({
+        title: "Upload successful",
+        description: "All files have been uploaded successfully"
+      });
+    } catch (error: any) {
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload files",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const addComment = async () => {
     if (!newComment.trim() || !pressRelease || !user) return;
@@ -538,6 +770,184 @@ export const ReviewBoard = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
+              {/* Media Upload Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center">
+                    <Upload className="w-5 h-5 mr-2" />
+                    Media Assets
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Existing Attachments */}
+                  {existingAttachments.length > 0 && (
+                    <div>
+                      <h4 className="font-medium mb-2">Uploaded Files</h4>
+                      <div className="space-y-2">
+                        {existingAttachments.map((attachment) => (
+                          <div key={attachment.id} className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                            <div className="flex items-center space-x-2">
+                              {attachment.is_logo ? (
+                                <Building className="w-4 h-4 text-primary" />
+                              ) : (
+                                <Image className="w-4 h-4 text-primary" />
+                              )}
+                              <div>
+                                <p className="text-sm font-medium">{attachment.file_name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {attachment.is_logo ? "Logo" : "Image"}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <Separator className="my-4" />
+                    </div>
+                  )}
+
+                  {/* Logo Upload */}
+                  <div>
+                    <h4 className="font-medium mb-2 flex items-center">
+                      <Building className="w-4 h-4 mr-1" />
+                      Company Logo
+                    </h4>
+                    {logo ? (
+                      <div className="relative group">
+                        <img 
+                          src={logo.preview} 
+                          alt="Logo preview" 
+                          className="w-full h-20 object-contain bg-gray-50 rounded-lg border"
+                        />
+                        {logo.uploading && (
+                          <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                          </div>
+                        )}
+                        {logo.uploaded && (
+                          <div className="absolute top-1 right-1">
+                            <CheckCircle className="w-4 h-4 text-green-500 bg-white rounded-full" />
+                          </div>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                          onClick={() => removeFile('logo')}
+                          disabled={logo.uploading}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-1">{logo.file.name}</p>
+                      </div>
+                    ) : (
+                      <label className="block cursor-pointer">
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary/50 transition-colors">
+                          <Building className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                          <p className="text-sm font-medium">Upload Logo</p>
+                          <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB</p>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
+                  </div>
+
+                  {/* Images Upload */}
+                  <div>
+                    <h4 className="font-medium mb-2 flex items-center">
+                      <Image className="w-4 h-4 mr-1" />
+                      Supporting Images
+                    </h4>
+                    <div className="space-y-3">
+                      {images.map((image, index) => (
+                        <div key={index}>
+                          {image ? (
+                            <div className="relative group">
+                              <img 
+                                src={image.preview} 
+                                alt={`Image ${index + 1} preview`} 
+                                className="w-full h-20 object-cover bg-gray-50 rounded-lg border"
+                              />
+                              {image.uploading && (
+                                <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                                </div>
+                              )}
+                              {image.uploaded && (
+                                <div className="absolute top-1 right-1">
+                                  <CheckCircle className="w-4 h-4 text-green-500 bg-white rounded-full" />
+                                </div>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                                onClick={() => removeFile('image', index)}
+                                disabled={image.uploading}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                              <p className="text-xs text-muted-foreground mt-1">{image.file.name}</p>
+                            </div>
+                          ) : (
+                            <label className="block cursor-pointer">
+                              <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center hover:border-primary/50 transition-colors h-20 flex flex-col justify-center">
+                                <Image className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
+                                <p className="text-xs font-medium">Image {index + 1}</p>
+                              </div>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload(index)}
+                                className="hidden"
+                              />
+                            </label>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Upload Actions */}
+                  {(logo || images.some(Boolean)) && (
+                    <div className="pt-4 border-t">
+                      {uploading && (
+                        <div className="mb-3">
+                          <Progress value={50} className="h-2" />
+                          <p className="text-xs text-muted-foreground mt-1">Uploading files...</p>
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm"
+                          variant="outline" 
+                          onClick={() => {
+                            setLogo(null);
+                            setImages([null, null]);
+                          }}
+                          disabled={uploading}
+                        >
+                          Clear
+                        </Button>
+                        <Button 
+                          size="sm"
+                          onClick={handleUploadFiles}
+                          disabled={uploading}
+                          className="flex-1"
+                        >
+                          {uploading ? "Uploading..." : "Upload Files"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
               {/* Comments */}
               <Card>
                 <CardHeader>
@@ -619,6 +1029,33 @@ export const ReviewBoard = () => {
                       </p>
                     )}
                   </ScrollArea>
+                </CardContent>
+              </Card>
+
+              {/* Client Info Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Client Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium">{checkoutInfo.contact_person_name}</p>
+                    <p className="text-xs text-muted-foreground">Contact Person</p>
+                  </div>
+                  <div>
+                    <p className="text-sm">{checkoutInfo.email}</p>
+                    <p className="text-xs text-muted-foreground">Email</p>
+                  </div>
+                  <div>
+                    <p className="text-sm">{checkoutInfo.phone_number}</p>
+                    <p className="text-xs text-muted-foreground">Phone</p>
+                  </div>
+                  {checkoutInfo.company_website && (
+                    <div>
+                      <p className="text-sm">{checkoutInfo.company_website}</p>
+                      <p className="text-xs text-muted-foreground">Website</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

@@ -226,14 +226,6 @@ export const Dashboard = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/media-upload/${item.checkoutInfo.id}`)}
-                      >
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload Media
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
                         onClick={() => navigate(`/review-board/${item.checkoutInfo.id}`)}
                       >
                         <Eye className="w-4 h-4 mr-2" />
