@@ -1,37 +1,35 @@
 import { useState, useCallback } from 'react';
 
-interface UseEmailCaptureProps {
-  defaultSource?: string;
-}
-
-export const useEmailCapture = ({ defaultSource = 'unknown' }: UseEmailCaptureProps = {}) => {
+export const useEmailCapture = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [currentSource, setCurrentSource] = useState(defaultSource);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+  const [currentSource, setCurrentSource] = useState<string>('');
 
-  const triggerEmailCapture = useCallback((action?: () => void, source?: string) => {
-    setCurrentSource(source || defaultSource);
+  const triggerEmailCapture = useCallback((action: () => void, source: string) => {
     setPendingAction(() => action);
+    setCurrentSource(source);
     setIsPopupOpen(true);
-  }, [defaultSource]);
+  }, []);
+
+  const handleEmailSubmitted = useCallback(() => {
+    // Execute the pending action after email is collected
+    if (pendingAction) {
+      pendingAction();
+      setPendingAction(null);
+    }
+  }, [pendingAction]);
 
   const closePopup = useCallback(() => {
     setIsPopupOpen(false);
     setPendingAction(null);
+    setCurrentSource('');
   }, []);
-
-  const onEmailSubmitted = useCallback(() => {
-    // Execute the pending action after email is collected
-    if (pendingAction) {
-      pendingAction();
-    }
-  }, [pendingAction]);
 
   return {
     isPopupOpen,
     currentSource,
     triggerEmailCapture,
-    closePopup,
-    onEmailSubmitted
+    handleEmailSubmitted,
+    closePopup
   };
 };

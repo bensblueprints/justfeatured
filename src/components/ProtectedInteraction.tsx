@@ -9,7 +9,7 @@ interface ProtectedInteractionProps {
 }
 
 export const ProtectedInteraction = ({ children, action, source = 'protected_interaction' }: ProtectedInteractionProps) => {
-  const { isPopupOpen, currentSource, triggerEmailCapture, closePopup, onEmailSubmitted } = useEmailCapture({ defaultSource: source });
+  const { isPopupOpen, currentSource, triggerEmailCapture, closePopup, handleEmailSubmitted } = useEmailCapture();
 
   const handleClick = (originalClick?: () => void) => {
     const actionToExecute = action || originalClick || (() => {});
@@ -31,7 +31,7 @@ export const ProtectedInteraction = ({ children, action, source = 'protected_int
       <EmailCollectionPopup
         isOpen={isPopupOpen}
         onClose={closePopup}
-        onEmailSubmitted={onEmailSubmitted}
+        onEmailSubmitted={handleEmailSubmitted}
         source={currentSource}
         title="Get Featured in Top Publications"
         description="Join thousands of entrepreneurs who've transformed their businesses with media coverage. Get exclusive access to our premium publication network."
