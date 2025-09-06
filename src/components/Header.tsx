@@ -35,9 +35,6 @@ export const Header = () => {
             className="h-8 cursor-pointer magnetic"
             onClick={() => navigate('/')}
           />
-          <div className="hidden sm:inline-flex glass-card rounded-full px-4 py-2">
-            <span className="text-sm font-semibold" style={{ color: '#FF6B9D' }}>355+ Publications</span>
-          </div>
         </div>
         
         <nav className="hidden lg:flex items-center space-x-8">
