@@ -148,15 +148,21 @@ export const Dashboard = () => {
     );
   }
 
+  // Redirect admin users to admin dashboard
+  if (['admin', 'super_admin', 'editor'].includes(userRole)) {
+    navigate('/admin-dashboard');
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="bg-white border-b border-border">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Press Release Dashboard</h1>
+              <h1 className="text-3xl font-bold text-foreground">My Press Releases</h1>
               <p className="text-muted-foreground mt-1">
-                Manage your press releases and track their progress
+                Track the progress of your press releases
               </p>
             </div>
             <div className="flex gap-2">
