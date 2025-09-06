@@ -108,7 +108,7 @@ export const CountdownTimer = () => {
         <div className="flex items-center space-x-2 sm:space-x-3">
           <button
             onClick={() => window.location.href = '/starter-selection'}
-            className="bg-white text-red-600 px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-sm sm:text-base font-bold hover:bg-gray-100 transition-colors"
+            className="bg-white text-red-600 px-3 sm:px-6 py-1 sm:py-2 rounded-full text-xs sm:text-base font-bold hover:bg-gray-100 transition-colors"
           >
             Get Featured ✨
           </button>

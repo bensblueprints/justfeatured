@@ -2,13 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthWrapper";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Menu, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 
 export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleNavigation = (path: string) => {
     if (location.pathname === '/' && path.startsWith('#')) {
@@ -70,42 +72,149 @@ export const Header = () => {
         </nav>
 
         <div className="flex items-center space-x-4">
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="glass" size="sm" className="flex items-center space-x-2">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">{user.email}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="glass border-white/20">
-                <DropdownMenuItem onClick={() => navigate('/dashboard')}>
-                  Dashboard
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={signOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button 
-              variant="glass" 
-              size="sm"
-              onClick={() => navigate('/auth')}
-              className="magnetic"
-            >
-              Login
-            </Button>
-          )}
-          <button 
-            className="cta-primary magnetic"
-            onClick={() => handleNavigation('/starter-selection')}
+          {/* Mobile menu button */}
+          <button
+            className="md:hidden p-2"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle mobile menu"
           >
-            Get Featured ✨
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
+
+          {/* Desktop auth and CTA */}
+          <div className="hidden md:flex items-center space-x-4">
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="glass" size="sm" className="flex items-center space-x-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline">{user.email}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="glass border-white/20">
+                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                variant="glass" 
+                size="sm"
+                onClick={() => navigate('/auth')}
+                className="magnetic"
+              >
+                Login
+              </Button>
+            )}
+            <button 
+              className="cta-primary magnetic"
+              onClick={() => handleNavigation('/starter-selection')}
+            >
+              Get Featured ✨
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile menu overlay */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg border-b border-primary/10 shadow-lg">
+          <div className="container py-4 space-y-4">
+            <nav className="space-y-4">
+              <button 
+                onClick={() => {
+                  handleNavigation('/publications');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left py-2 px-4 rounded-lg hover:bg-primary/5 transition-colors font-medium"
+                style={{ color: '#475569' }}
+              >
+                Publications
+              </button>
+              <button 
+                onClick={() => {
+                  handleNavigation('/blog/trust-factor');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left py-2 px-4 rounded-lg hover:bg-primary/5 transition-colors font-medium"
+                style={{ color: '#475569' }}
+              >
+                Blog
+              </button>
+              <button 
+                onClick={() => {
+                  handleNavigation('#pricing');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left py-2 px-4 rounded-lg hover:bg-primary/5 transition-colors font-medium"
+                style={{ color: '#475569' }}
+              >
+                Pricing
+              </button>
+              <button 
+                onClick={() => {
+                  handleNavigation('#testimonials');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left py-2 px-4 rounded-lg hover:bg-primary/5 transition-colors font-medium"
+                style={{ color: '#475569' }}
+              >
+                Reviews
+              </button>
+            </nav>
+            
+            <div className="border-t border-primary/10 pt-4 space-y-3">
+              {user ? (
+                <>
+                  <button
+                    onClick={() => {
+                      navigate('/dashboard');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left py-2 px-4 rounded-lg hover:bg-primary/5 transition-colors font-medium"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => {
+                      signOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center w-full py-2 px-4 rounded-lg hover:bg-primary/5 transition-colors font-medium"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    navigate('/auth');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left py-2 px-4 rounded-lg hover:bg-primary/5 transition-colors font-medium"
+                >
+                  Login
+                </button>
+              )}
+              <button 
+                className="cta-primary w-full text-center"
+                onClick={() => {
+                  handleNavigation('/starter-selection');
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                Get Featured ✨
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
