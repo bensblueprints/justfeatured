@@ -45,6 +45,7 @@ export const ReviewBoard = () => {
   const [newComment, setNewComment] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState("");
+  const [editedTitle, setEditedTitle] = useState("");
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -99,6 +100,7 @@ export const ReviewBoard = () => {
         if (pressReleaseData) {
           setPressRelease(pressReleaseData);
           setEditedContent(pressReleaseData.content);
+          setEditedTitle(pressReleaseData.title);
 
           // Fetch comments
           const { data: commentsData } = await supabase
@@ -146,6 +148,7 @@ export const ReviewBoard = () => {
           if (payload.eventType === 'UPDATE') {
             setPressRelease(payload.new as PressRelease);
             setEditedContent(payload.new.content);
+            setEditedTitle(payload.new.title);
           }
         }
       )
@@ -246,6 +249,7 @@ export const ReviewBoard = () => {
       const { error } = await supabase
         .from('press_releases')
         .update({ 
+          title: editedTitle,
           content: editedContent,
           word_count: wordCount,
           version_number: pressRelease.version_number + 1
@@ -393,23 +397,36 @@ export const ReviewBoard = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="mb-4">
-                      <h2 className="text-2xl font-bold">{pressRelease.title}</h2>
-                    </div>
-                    
                     {isEditing && canEdit() ? (
                       <div className="space-y-4">
-                        <Textarea
-                          value={editedContent}
-                          onChange={(e) => setEditedContent(e.target.value)}
-                          className="min-h-[400px] font-mono text-sm"
-                        />
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Title</label>
+                          <input
+                            type="text"
+                            value={editedTitle}
+                            onChange={(e) => setEditedTitle(e.target.value)}
+                            className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            placeholder="Press release title..."
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Content</label>
+                          <Textarea
+                            value={editedContent}
+                            onChange={(e) => setEditedContent(e.target.value)}
+                            className="min-h-[400px] font-mono text-sm"
+                            placeholder="Press release content..."
+                          />
+                        </div>
                         <div className="flex gap-2">
-                          <Button onClick={saveContent}>Save Changes</Button>
+                          <Button onClick={saveContent} disabled={!editedTitle.trim() || !editedContent.trim()}>
+                            Save Changes
+                          </Button>
                           <Button 
                             variant="outline" 
                             onClick={() => {
                               setEditedContent(pressRelease.content);
+                              setEditedTitle(pressRelease.title);
                               setIsEditing(false);
                             }}
                           >
@@ -418,11 +435,16 @@ export const ReviewBoard = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="prose max-w-none">
-                        <div 
-                          className="whitespace-pre-wrap"
-                          dangerouslySetInnerHTML={{ __html: sanitizeContent(pressRelease.content) }}
-                        />
+                      <div>
+                        <div className="mb-6">
+                          <h2 className="text-2xl font-bold leading-tight">{pressRelease.title}</h2>
+                        </div>
+                        <div className="prose max-w-none">
+                          <div 
+                            className="whitespace-pre-wrap leading-relaxed"
+                            dangerouslySetInnerHTML={{ __html: sanitizeContent(pressRelease.content) }}
+                          />
+                        </div>
                       </div>
                     )}
                     
