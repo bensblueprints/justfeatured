@@ -1,20 +1,22 @@
 import { ReactElement, cloneElement } from 'react';
-import { useAuthGuard } from '@/hooks/useAuthGuard';
+import { useEmailCapture } from '@/hooks/useEmailCapture';
+import { EmailCollectionPopup } from '@/components/EmailCollectionPopup';
 
 interface ProtectedInteractionProps {
   children: ReactElement;
   action?: () => void;
+  source?: string;
 }
 
-export const ProtectedInteraction = ({ children, action }: ProtectedInteractionProps) => {
-  const { requireAuth } = useAuthGuard();
+export const ProtectedInteraction = ({ children, action, source = 'protected_interaction' }: ProtectedInteractionProps) => {
+  const { isPopupOpen, currentSource, triggerEmailCapture, closePopup, onEmailSubmitted } = useEmailCapture({ defaultSource: source });
 
   const handleClick = (originalClick?: () => void) => {
     const actionToExecute = action || originalClick || (() => {});
-    requireAuth(actionToExecute);
+    triggerEmailCapture(actionToExecute, source);
   };
 
-  // Clone the child element and add the protected click handler
+  // Clone the child element and add the email capture click handler
   const enhancedChild = cloneElement(children, {
     onClick: (e: React.MouseEvent) => {
       e.preventDefault();
@@ -23,5 +25,17 @@ export const ProtectedInteraction = ({ children, action }: ProtectedInteractionP
     },
   });
 
-  return enhancedChild;
+  return (
+    <>
+      {enhancedChild}
+      <EmailCollectionPopup
+        isOpen={isPopupOpen}
+        onClose={closePopup}
+        onEmailSubmitted={onEmailSubmitted}
+        source={currentSource}
+        title="Get Featured in Top Publications"
+        description="Join thousands of entrepreneurs who've transformed their businesses with media coverage. Get exclusive access to our premium publication network."
+      />
+    </>
+  );
 };

@@ -75,7 +75,7 @@ export const Hero = () => {
 
           {/* Premium CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            <ProtectedInteraction action={() => navigate("/starter-selection")}>
+            <ProtectedInteraction action={() => navigate("/starter-selection")} source="hero_get_started_button">
               <button 
                 className="cta-primary group relative overflow-hidden"
               >
@@ -86,7 +86,7 @@ export const Hero = () => {
               </button>
             </ProtectedInteraction>
             
-            <ProtectedInteraction action={() => navigate("/publications")}>
+            <ProtectedInteraction action={() => navigate("/publications")} source="hero_publications_button">
               <button 
                 className="bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 hover:border-white/50 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 group shadow-lg hover:shadow-xl"
               >
