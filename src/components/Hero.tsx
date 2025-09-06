@@ -96,7 +96,7 @@ export const Hero = () => {
           {/* Floating Publication Cards */}
           <div className="relative mb-16 animate-slide-up" style={{ animationDelay: '0.6s' }}>
             <div className="glass-card rounded-2xl p-8 mb-8">
-              <h3 className="text-xl font-bold mb-6 text-center" style={{ color: '#FF6B9D' }}>Featured in 200+ Major News Outlets</h3>
+              <h3 className="text-xl font-bold mb-6 text-center text-white">Featured in 200+ Major News Outlets</h3>
               <div className="relative">
                 <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-current to-transparent z-10 pointer-events-none opacity-20" />
                 <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-current to-transparent z-10 pointer-events-none opacity-20" />
@@ -105,8 +105,8 @@ export const Hero = () => {
                   <div className="flex animate-scroll whitespace-nowrap">
                     {duplicatedOutlets.map((outlet, index) => (
                       <div key={index} className="flex items-center space-x-8 text-lg font-semibold">
-                        <span className="hover:text-white transition-colors cursor-pointer" style={{ color: '#FFB6C1' }}>{outlet}</span>
-                        <span style={{ color: '#FFB6C1' }}>•</span>
+                        <span className="hover:text-white transition-colors cursor-pointer text-blue-200">{outlet}</span>
+                        <span className="text-blue-200">•</span>
                       </div>
                     ))}
                   </div>
