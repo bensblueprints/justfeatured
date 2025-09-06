@@ -10,6 +10,7 @@ export const PREMIUM_PUBLICATIONS: Publication[] = [
     tat_days: 30,
     description: 'Premium global business and financial news publication',
     features: ['Global reach', 'Financial authority', 'Business leaders readership'],
+    website_url: 'https://www.bloomberg.com',
     tier: 'exclusive',
     popularity: 94,
     is_active: true,
@@ -31,6 +32,7 @@ export const PREMIUM_PUBLICATIONS: Publication[] = [
     tat_days: 28,
     description: 'Premium business publication with guaranteed impressions',
     features: ['500,000 guaranteed impressions', 'Business authority', 'Executive readership'],
+    website_url: 'https://www.wsj.com',
     tier: 'exclusive',
     popularity: 93,
     is_active: true,
@@ -48,6 +50,7 @@ export const PREMIUM_PUBLICATIONS: Publication[] = [
     type: 'tier1',
     category: 'Lifestyle',
     price: 6000000, // $60,000
+    website_url: 'https://techcrunch.com',
     tat_days: 21,
     description: 'Leading technology publication with social media amplification',
     features: ['Tech industry authority', 'Social media post included', 'Global reach'],

@@ -27,7 +27,11 @@ export class BrandFetchService {
   /**
    * Extract domain from a website URL
    */
-  private static extractDomain(url: string): string {
+  private static extractDomain(url: string | undefined): string {
+    if (!url) {
+      return '';
+    }
+    
     try {
       const domain = new URL(url).hostname;
       return domain.replace('www.', '');
@@ -65,8 +69,15 @@ export class BrandFetchService {
   /**
    * Fetch brand logo for a given website URL
    */
-  static async fetchLogo(websiteUrl: string): Promise<string | null> {
+  static async fetchLogo(websiteUrl: string | undefined): Promise<string | null> {
+    if (!websiteUrl) {
+      return null;
+    }
+    
     const domain = this.extractDomain(websiteUrl);
+    if (!domain) {
+      return null;
+    }
     
     // Check cache first
     if (this.logoCache.has(domain)) {
@@ -103,8 +114,15 @@ export class BrandFetchService {
   /**
    * Generate fallback logo URL using external services
    */
-  static getFallbackLogo(websiteUrl: string): string {
+  static getFallbackLogo(websiteUrl: string | undefined): string {
+    if (!websiteUrl) {
+      return `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" fill="#f3f4f6"/><text x="32" y="32" text-anchor="middle" dy="0.3em" font-family="Arial" font-size="24" fill="#6b7280">?</text></svg>')}`;
+    }
+    
     const domain = this.extractDomain(websiteUrl);
+    if (!domain) {
+      return `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" fill="#f3f4f6"/><text x="32" y="32" text-anchor="middle" dy="0.3em" font-family="Arial" font-size="24" fill="#6b7280">?</text></svg>')}`;
+    }
     
     // Use favicon service as fallback
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
@@ -113,7 +131,7 @@ export class BrandFetchService {
   /**
    * Get logo with fallback support - always returns a logo URL
    */
-  static async getLogoWithFallback(websiteUrl: string): Promise<string> {
+  static async getLogoWithFallback(websiteUrl: string | undefined): Promise<string> {
     try {
       const logo = await this.fetchLogo(websiteUrl);
       return logo || this.getFallbackLogo(websiteUrl);
@@ -126,8 +144,16 @@ export class BrandFetchService {
   /**
    * Get multiple fallback options for better reliability
    */
-  static getMultipleFallbackLogos(websiteUrl: string): string[] {
+  static getMultipleFallbackLogos(websiteUrl: string | undefined): string[] {
+    if (!websiteUrl) {
+      return [`data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" fill="#f3f4f6"/><text x="32" y="32" text-anchor="middle" dy="0.3em" font-family="Arial" font-size="24" fill="#6b7280">?</text></svg>')}`];
+    }
+    
     const domain = this.extractDomain(websiteUrl);
+    if (!domain) {
+      return [`data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" fill="#f3f4f6"/><text x="32" y="32" text-anchor="middle" dy="0.3em" font-family="Arial" font-size="24" fill="#6b7280">?</text></svg>')}`];
+    }
+    
     return [
       `https://www.google.com/s2/favicons?domain=${domain}&sz=64`,
       `https://favicon.yandex.net/favicon/${domain}`,
