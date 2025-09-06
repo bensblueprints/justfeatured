@@ -4,6 +4,8 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox";
 import { ExternalLink, Clock, Star } from "lucide-react";
 import { Publication } from "@/types";
+import { useState, useEffect } from "react";
+import { BrandFetchService } from "@/utils/brandFetch";
 
 interface PublicationCardProps {
   publication: Publication;
@@ -12,6 +14,20 @@ interface PublicationCardProps {
 }
 
 export const PublicationCard = ({ publication, selected, onSelectionChange }: PublicationCardProps) => {
+  const [logo, setLogo] = useState<string>('');
+
+  // Fetch logo on component mount
+  useEffect(() => {
+    const fetchLogo = async () => {
+      if (publication.website_url) {
+        const logoUrl = await BrandFetchService.getLogoWithFallback(publication.website_url);
+        setLogo(logoUrl);
+      }
+    };
+
+    fetchLogo();
+  }, [publication.website_url]);
+
   const getTierColor = (type: string) => {
     switch (type) {
       case 'tier2': return 'bg-secondary text-secondary-foreground';
@@ -46,9 +62,30 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
                 {publication.popularity}
               </div>
             </div>
-            
-            <h3 className="text-lg font-semibold mb-1">{publication.name}</h3>
-            <p className="text-sm text-muted-foreground mb-2">{publication.category}</p>
+
+            {/* Logo Display */}
+            <div className="flex items-center gap-3 mb-3">
+              {logo ? (
+                <img
+                  src={logo}
+                  alt={`${publication.name} logo`}
+                  className="w-12 h-12 object-contain rounded-lg bg-white/10 p-1.5"
+                  onError={(e) => {
+                    // Fallback to Google favicon service if brand logo fails
+                    const target = e.target as HTMLImageElement;
+                    target.src = BrandFetchService.getFallbackLogo(publication.website_url);
+                  }}
+                />
+              ) : (
+                <div className="w-12 h-12 bg-muted/20 rounded-lg flex items-center justify-center">
+                  <div className="animate-pulse w-6 h-6 bg-muted rounded"></div>
+                </div>
+              )}
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold mb-0">{publication.name}</h3>
+                <p className="text-sm text-muted-foreground">{publication.category}</p>
+              </div>
+            </div>
             
             {publication.description && (
               <p className="text-sm text-muted-foreground line-clamp-2">
