@@ -66,22 +66,40 @@ export const AdminDashboard = () => {
         .limit(1)
         .maybeSingle();
       
+      console.log('User role data:', roleData); // Debug log
+      
       if (roleData) {
         setUserRole(roleData.role);
-      }
-
-      // Check if user is admin
-      if (!roleData || !['admin', 'super_admin', 'editor'].includes(roleData.role)) {
+        console.log('Setting user role:', roleData.role); // Debug log
+        
+        // Check if user is admin after setting the role
+        if (!['admin', 'super_admin', 'editor'].includes(roleData.role)) {
+          toast({
+            title: "Access Denied",
+            description: "You don't have permission to access the admin dashboard",
+            variant: "destructive"
+          });
+          navigate("/dashboard");
+          return;
+        }
+      } else {
+        // No role found, redirect to regular dashboard
+        console.log('No role found for user, redirecting to dashboard'); // Debug log
+        toast({
+          title: "Access Denied", 
+          description: "You don't have permission to access the admin dashboard",
+          variant: "destructive"
+        });
         navigate("/dashboard");
         return;
       }
     };
 
     getCurrentUser();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !userRole || userRole === 'customer') return;
 
     const fetchStats = async () => {
       try {
@@ -132,7 +150,7 @@ export const AdminDashboard = () => {
     };
 
     fetchStats();
-  }, [user, toast]);
+  }, [user, userRole, toast]);
 
   if (loading) {
     return (
