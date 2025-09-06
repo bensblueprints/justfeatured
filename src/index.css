@@ -22,6 +22,8 @@ All colors MUST be HSL.
     --primary: 213 94% 68%; /* #3B82F6 vibrant blue */
     --primary-dark: 217 91% 60%; /* #2563EB darker blue */
     --primary-light: 214 95% 93%; /* #DBEAFE very light blue */
+    --primary-secondary: 220 60% 50%; /* #1E40AF secondary blue */
+    --primary-hover: 217 91% 60%; /* #2563EB hover blue */
     --primary-foreground: 0 0% 100%;
 
     /* Secondary: Trust Blue Palette */
@@ -33,6 +35,7 @@ All colors MUST be HSL.
     /* Accent: Complementary Blue */
     --accent: 200 98% 39%; /* #0891B2 cyan-blue accent */
     --accent-light: 197 71% 73%; /* #67E8F9 light cyan */
+    --accent-hover: 200 98% 32%; /* #0E7490 darker cyan-blue for hover */
     --accent-foreground: 0 0% 100%;
 
     --muted: 220 14% 96%;
