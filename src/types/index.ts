@@ -13,6 +13,21 @@ export interface Publication {
   tier: string;
   popularity: number;
   is_active: boolean;
+  // New detailed fields
+  da_score?: number;
+  dr_score?: number;
+  timeline?: string;
+  location?: string;
+  guaranteed_placement?: boolean;
+  dofollow_link?: boolean;
+  social_media_post?: boolean;
+  homepage_placement?: boolean;
+  dedicated_article?: boolean;
+  press_release_distribution?: boolean;
+  author_byline?: boolean;
+  image_inclusion?: boolean;
+  video_inclusion?: boolean;
+  placement_type?: 'discreet' | 'branded' | 'standard';
 }
 
 export interface Customer {

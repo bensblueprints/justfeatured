@@ -1,5 +1,6 @@
 import { Publication } from '../types';
 import { EXTENDED_PUBLICATIONS } from './publications-extended';
+import { PREMIUM_PUBLICATIONS } from './premium-publications';
 
 export const PUBLICATIONS: Publication[] = [
   // Exclusive ($1000+)
@@ -1041,7 +1042,8 @@ export const PUBLICATIONS: Publication[] = [
     popularity: 76,
     is_active: true
   },
-  ...EXTENDED_PUBLICATIONS
+  ...EXTENDED_PUBLICATIONS,
+  ...PREMIUM_PUBLICATIONS
 ];
 
 export const getPublicationsByType = (type?: string) => {

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ExternalLink, Clock, Star } from "lucide-react";
+import { ExternalLink, Clock, Star, CheckCircle, Globe, Link as LinkIcon, Home, Users, Image, Play, UserCheck } from "lucide-react";
 import { Publication } from "@/types";
 import { useState, useEffect } from "react";
 import { BrandFetchService } from "@/utils/brandFetch";
@@ -104,20 +104,101 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
       </CardHeader>
 
       <CardContent className="py-0">
-        <div className="space-y-3">
+        <div className="space-y-4">
+          {/* Price and Timeline */}
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold text-primary">
               ${(publication.price / 100).toFixed(0)}
             </span>
             <div className="flex items-center text-sm text-muted-foreground">
               <Clock className="h-4 w-4 mr-1" />
-              {publication.tat_days} days
+              {publication.timeline || `${publication.tat_days} days`}
             </div>
           </div>
 
+          {/* DA/DR Scores */}
+          {(publication.da_score || publication.dr_score) && (
+            <div className="flex gap-4 text-sm">
+              {publication.da_score && (
+                <div className="flex items-center text-muted-foreground">
+                  <span className="font-medium mr-1">DA:</span>
+                  <span className="text-primary font-bold">{publication.da_score}</span>
+                </div>
+              )}
+              {publication.dr_score && (
+                <div className="flex items-center text-muted-foreground">
+                  <span className="font-medium mr-1">DR:</span>
+                  <span className="text-primary font-bold">{publication.dr_score}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Location */}
+          {publication.location && (
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Globe className="h-4 w-4 mr-2" />
+              {publication.location}
+            </div>
+          )}
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-2 gap-1 text-xs">
+            {publication.guaranteed_placement && (
+              <div className="flex items-center text-green-600">
+                <CheckCircle className="h-3 w-3 mr-1" />
+                Guaranteed
+              </div>
+            )}
+            {publication.dofollow_link && (
+              <div className="flex items-center text-blue-600">
+                <LinkIcon className="h-3 w-3 mr-1" />
+                Do-follow
+              </div>
+            )}
+            {publication.homepage_placement && (
+              <div className="flex items-center text-purple-600">
+                <Home className="h-3 w-3 mr-1" />
+                Homepage
+              </div>
+            )}
+            {publication.social_media_post && (
+              <div className="flex items-center text-pink-600">
+                <Users className="h-3 w-3 mr-1" />
+                Social Post
+              </div>
+            )}
+            {publication.image_inclusion && (
+              <div className="flex items-center text-orange-600">
+                <Image className="h-3 w-3 mr-1" />
+                Images
+              </div>
+            )}
+            {publication.video_inclusion && (
+              <div className="flex items-center text-red-600">
+                <Play className="h-3 w-3 mr-1" />
+                Video
+              </div>
+            )}
+            {publication.author_byline && (
+              <div className="flex items-center text-indigo-600">
+                <UserCheck className="h-3 w-3 mr-1" />
+                Byline
+              </div>
+            )}
+            {publication.placement_type && publication.placement_type !== 'standard' && (
+              <div className="flex items-center text-yellow-600 col-span-2">
+                <Badge variant="outline" className="text-xs">
+                  {publication.placement_type}
+                </Badge>
+              </div>
+            )}
+          </div>
+
+          {/* Original Features (if any) */}
           {publication.features && publication.features.length > 0 && (
             <div className="space-y-1">
-              {publication.features.slice(0, 3).map((feature, index) => (
+              {publication.features.slice(0, 2).map((feature, index) => (
                 <div key={index} className="flex items-center text-sm text-muted-foreground">
                   <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2" />
                   {feature}
