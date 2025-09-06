@@ -62,7 +62,14 @@ export const PublicationsMarketplace = () => {
                   {publication.name}
                 </CardTitle>
                 <div className={`text-lg font-bold ${publication.type === 'exclusive' ? 'text-white' : 'text-primary'}`}>
-                  {formatPrice(publication.price)}
+                  {publication.type === 'starter' ? (
+                    <>
+                      <span className="line-through text-muted-foreground text-sm">$497</span>{" "}
+                      <span>$97</span>
+                    </>
+                  ) : (
+                    formatPrice(publication.price)
+                  )}
                 </div>
                 <p className={`text-xs ${publication.type === 'exclusive' ? 'text-white/80' : 'text-muted-foreground'}`}>
                   {publication.tat_days} days delivery
