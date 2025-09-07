@@ -128,12 +128,12 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
                 >
                   <CardHeader className="pb-3">
                     {/* Logo */}
-                    <div className="flex justify-center mb-3">
+                    <div className="flex justify-center mb-4">
                       {logos[publication.id] ? (
                         <img
                           src={logos[publication.id]}
                           alt={`${publication.name} logo`}
-                          className="w-12 h-12 object-contain rounded-lg bg-white/50 p-2"
+                          className="w-20 h-20 object-contain rounded-lg bg-white/50 p-3"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
@@ -143,7 +143,7 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
                         />
                       ) : null}
                       <div 
-                        className="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center text-sm font-bold text-primary"
+                        className="w-20 h-20 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center text-xl font-bold text-primary"
                         style={{ display: logos[publication.id] ? 'none' : 'flex' }}
                       >
                         {publication.name.charAt(0).toUpperCase()}
