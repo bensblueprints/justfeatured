@@ -2,6 +2,7 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ProblemSolution } from "@/components/ProblemSolution";
 import { PublicationsMarketplace } from "@/components/PublicationsMarketplace";
+import { BrandBundlesSection } from "@/components/BrandBundlesSection";
 import { HowItWorks } from "@/components/HowItWorks";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { WhyJustFeatured } from "@/components/WhyJustFeatured";
@@ -18,9 +19,10 @@ export const Home = () => {
           <Hero />
           <ProblemSolution />
           <PublicationsMarketplace />
+          <BrandBundlesSection />
           <HowItWorks />
-          <TestimonialsSection />
           <WhyJustFeatured />
+          <TestimonialsSection />
           <BlogCarousel />
           <EmailCapture />
         </div>
