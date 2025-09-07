@@ -63,7 +63,7 @@ const blogPosts = [
     readTime: "9 min read",
     author: "Dr. James Foster",
     date: "Dec 3, 2024",
-    image: "/api/placeholder/400/240"
+    image: "/lovable-uploads/3f20ab30-d39b-45a5-a2ff-e22bf2a87557.png"
   }
 ];
 
