@@ -30,7 +30,7 @@ export const Header = () => {
       <div className="container py-6 flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <img 
-            src="/lovable-uploads/015f209e-04d1-4f5e-b773-0d2bfac5623f.png"
+            src="/lovable-uploads/48bef6ef-a90c-4a5c-84a3-116d85580bea.png"
             alt="Just Featured"
             className="h-8 cursor-pointer magnetic"
             onClick={() => navigate('/')}

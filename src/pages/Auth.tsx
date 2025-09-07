@@ -183,8 +183,12 @@ export const Auth = () => {
           
           <div className="relative bg-white rounded-lg">
             <CardHeader className="text-center pb-8 pt-10">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Newspaper className="w-8 h-8 text-white" />
+              <div className="flex justify-center mx-auto mb-6">
+                <img 
+                  src="/lovable-uploads/48bef6ef-a90c-4a5c-84a3-116d85580bea.png"
+                  alt="Just Featured"
+                  className="h-12"
+                />
               </div>
               <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                 {isLogin ? 'Welcome Back' : 'Join JustFeatured'}
