@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ExternalLink, Clock, Star, CheckCircle, Globe, Link as LinkIcon, Home, Users, Image, Play, UserCheck } from "lucide-react";
+import { ExternalLink, Clock, Star, CheckCircle, Globe, Link as LinkIcon, Home, Users, Image, Play, UserCheck, X } from "lucide-react";
 import { Publication } from "@/types";
 import { useState, useEffect } from "react";
 import { BrandFetchService } from "@/utils/brandFetch";
@@ -113,77 +113,94 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
         </div>
       </CardHeader>
 
-      <CardContent className="py-0">
-        <div className="space-y-4">
-          {/* Price and Timeline */}
-          <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-primary">
-              ${(publication.price / 100).toFixed(0)}
+      <CardContent className="py-4">
+        <div className="space-y-3">
+          {/* Publication Name & Genre */}
+          <div className="text-center space-y-1">
+            <h3 className="font-semibold text-lg leading-tight">{publication.name}</h3>
+            <Badge variant="outline" className="text-xs">
+              {publication.category}
+            </Badge>
+          </div>
+
+          {/* Price */}
+          <div className="text-center">
+            <span className="text-3xl font-bold text-primary">
+              ${publication.price >= 1000 ? `${(publication.price / 1000).toFixed(0)}k` : publication.price}
             </span>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Clock className="h-4 w-4 mr-1" />
-              {publication.tat_days}
-            </div>
           </div>
 
           {/* DA/DR Scores */}
-          {(publication.da_score || publication.dr_score) && (
-            <div className="flex gap-4 text-sm">
-              {publication.da_score && (
-                <div className="flex items-center text-muted-foreground">
-                  <span className="font-medium mr-1">DA:</span>
-                  <span className="text-primary font-bold">{publication.da_score}</span>
-                </div>
-              )}
-              {publication.dr_score && (
-                <div className="flex items-center text-muted-foreground">
-                  <span className="font-medium mr-1">DR:</span>
-                  <span className="text-primary font-bold">{publication.dr_score}</span>
-                </div>
-              )}
+          <div className="flex justify-center gap-6 text-sm">
+            <div className="text-center">
+              <div className="font-medium text-muted-foreground">DA</div>
+              <div className="text-xl font-bold text-primary">{publication.da_score || 0}</div>
             </div>
-          )}
+            <div className="text-center">
+              <div className="font-medium text-muted-foreground">DR</div>
+              <div className="text-xl font-bold text-primary">{publication.dr_score || 0}</div>
+            </div>
+          </div>
+
+          {/* TAT */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              <span>{publication.tat_days}</span>
+            </div>
+          </div>
 
           {/* Location */}
           {publication.location && (
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Globe className="h-4 w-4 mr-2" />
-              {publication.location}
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+                <Globe className="h-4 w-4" />
+                <span>{publication.location}</span>
+              </div>
             </div>
           )}
 
           {/* Features Grid */}
-          <div className="grid grid-cols-2 gap-1 text-xs">
-            {publication.dofollow_link && (
-              <div className="flex items-center text-blue-600">
-                <LinkIcon className="h-3 w-3 mr-1" />
-                Do-follow
-              </div>
-            )}
-            {publication.sponsored && (
-              <div className="flex items-center text-purple-600">
-                <Badge variant="outline" className="text-xs">
-                  Sponsored
-                </Badge>
-              </div>
-            )}
-            {publication.indexed && (
-              <div className="flex items-center text-green-600">
-                <CheckCircle className="h-3 w-3 mr-1" />
-                Indexed
-              </div>
-            )}
-            {(publication.crypto || publication.health || publication.cbd || publication.gambling || publication.erotic) && (
-              <div className="flex items-center text-orange-600 col-span-2">
-                <div className="flex gap-1 flex-wrap">
-                  {publication.crypto && <Badge variant="outline" className="text-xs">Crypto</Badge>}
-                  {publication.health && <Badge variant="outline" className="text-xs">Health</Badge>}
-                  {publication.cbd && <Badge variant="outline" className="text-xs">CBD</Badge>}
-                  {publication.gambling && <Badge variant="outline" className="text-xs">Gambling</Badge>}
-                  {publication.erotic && <Badge variant="outline" className="text-xs">Adult</Badge>}
-                </div>
-              </div>
-            )}
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {/* Sponsored */}
+            <div className={`flex items-center justify-center gap-1 p-2 rounded ${
+              publication.sponsored ? 'bg-purple-50 text-purple-700' : 'bg-gray-50 text-gray-400'
+            }`}>
+              <span className="font-medium">SPONSORED</span>
+              {publication.sponsored ? <CheckCircle className="h-3 w-3" /> : <X className="h-3 w-3" />}
+            </div>
+
+            {/* Indexed */}
+            <div className={`flex items-center justify-center gap-1 p-2 rounded ${
+              publication.indexed ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-400'
+            }`}>
+              <span className="font-medium">INDEXED</span>
+              {publication.indexed ? <CheckCircle className="h-3 w-3" /> : <X className="h-3 w-3" />}
+            </div>
+
+            {/* Dofollow */}
+            <div className={`flex items-center justify-center gap-1 p-2 rounded ${
+              publication.dofollow_link ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-400'
+            }`}>
+              <span className="font-medium">DOFOLLOW</span>
+              {publication.dofollow_link ? <CheckCircle className="h-3 w-3" /> : <X className="h-3 w-3" />}
+            </div>
+
+            {/* Erotic */}
+            <div className={`flex items-center justify-center gap-1 p-2 rounded ${
+              publication.erotic ? 'bg-red-50 text-red-700' : 'bg-gray-50 text-gray-400'
+            }`}>
+              <span className="font-medium">EROTIC</span>
+              {publication.erotic ? <CheckCircle className="h-3 w-3" /> : <X className="h-3 w-3" />}
+            </div>
+
+            {/* Health */}
+            <div className={`flex items-center justify-center gap-1 p-2 rounded col-span-2 ${
+              publication.health ? 'bg-orange-50 text-orange-700' : 'bg-gray-50 text-gray-400'
+            }`}>
+              <span className="font-medium">HEALTH</span>
+              {publication.health ? <CheckCircle className="h-3 w-3" /> : <X className="h-3 w-3" />}
+            </div>
           </div>
 
           {/* Original Features (if any) */}
