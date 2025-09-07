@@ -316,17 +316,23 @@ export type Database = {
         Row: {
           author_byline: boolean | null
           category: string
+          cbd: boolean | null
           created_at: string
+          crypto: boolean | null
           da_score: number | null
           description: string
           dofollow_link: boolean | null
           dr_score: number | null
+          erotic: boolean | null
           external_id: string
           features: string[]
+          gambling: boolean | null
           guaranteed_placement: boolean | null
+          health: boolean | null
           homepage_placement: boolean | null
           id: string
           image_inclusion: boolean | null
+          indexed: boolean | null
           is_active: boolean | null
           location: string | null
           name: string
@@ -334,10 +340,12 @@ export type Database = {
           popularity: number | null
           price: number
           social_media_post: boolean | null
+          sponsored: boolean | null
           tat_days: number
           tier: string
           timeline: string | null
           type: string
+          update_status: string | null
           updated_at: string
           video_inclusion: boolean | null
           website_url: string | null
@@ -345,17 +353,23 @@ export type Database = {
         Insert: {
           author_byline?: boolean | null
           category: string
+          cbd?: boolean | null
           created_at?: string
+          crypto?: boolean | null
           da_score?: number | null
           description: string
           dofollow_link?: boolean | null
           dr_score?: number | null
+          erotic?: boolean | null
           external_id: string
           features?: string[]
+          gambling?: boolean | null
           guaranteed_placement?: boolean | null
+          health?: boolean | null
           homepage_placement?: boolean | null
           id?: string
           image_inclusion?: boolean | null
+          indexed?: boolean | null
           is_active?: boolean | null
           location?: string | null
           name: string
@@ -363,10 +377,12 @@ export type Database = {
           popularity?: number | null
           price: number
           social_media_post?: boolean | null
+          sponsored?: boolean | null
           tat_days: number
           tier: string
           timeline?: string | null
           type: string
+          update_status?: string | null
           updated_at?: string
           video_inclusion?: boolean | null
           website_url?: string | null
@@ -374,17 +390,23 @@ export type Database = {
         Update: {
           author_byline?: boolean | null
           category?: string
+          cbd?: boolean | null
           created_at?: string
+          crypto?: boolean | null
           da_score?: number | null
           description?: string
           dofollow_link?: boolean | null
           dr_score?: number | null
+          erotic?: boolean | null
           external_id?: string
           features?: string[]
+          gambling?: boolean | null
           guaranteed_placement?: boolean | null
+          health?: boolean | null
           homepage_placement?: boolean | null
           id?: string
           image_inclusion?: boolean | null
+          indexed?: boolean | null
           is_active?: boolean | null
           location?: string | null
           name?: string
@@ -392,10 +414,12 @@ export type Database = {
           popularity?: number | null
           price?: number
           social_media_post?: boolean | null
+          sponsored?: boolean | null
           tat_days?: number
           tier?: string
           timeline?: string | null
           type?: string
+          update_status?: string | null
           updated_at?: string
           video_inclusion?: boolean | null
           website_url?: string | null
