@@ -719,6 +719,84 @@ export const PublicationManagement = () => {
     }
   };
 
+  const handleExportCSV = () => {
+    try {
+      // Create CSV headers
+      const headers = [
+        'Publication Name',
+        'Category',
+        'Tier',
+        'Price',
+        'TAT',
+        'DA Score',
+        'DR Score',
+        'Location',
+        'Website URL',
+        'Dofollow Link',
+        'Sponsored',
+        'Indexed',
+        'Erotic',
+        'Health',
+        'CBD',
+        'Crypto',
+        'Gambling',
+        'Created At',
+        'Updated At'
+      ];
+
+      // Convert publications to CSV format
+      const csvData = filteredPublications.map(pub => [
+        pub.name,
+        pub.category,
+        pub.tier,
+        pub.price,
+        pub.tat_days,
+        pub.da_score || 0,
+        pub.dr_score || 0,
+        pub.location || '',
+        pub.website_url || '',
+        pub.dofollow_link ? 'Y' : 'N',
+        pub.sponsored ? 'Y' : 'N',
+        pub.indexed ? 'Y' : 'N',
+        pub.erotic ? 'Y' : 'N',
+        pub.health ? 'Y' : 'N',
+        pub.cbd ? 'Y' : 'N',
+        pub.crypto ? 'Y' : 'N',
+        pub.gambling ? 'Y' : 'N',
+        pub.created_at || '',
+        pub.updated_at || ''
+      ]);
+
+      // Combine headers and data
+      const csvContent = [headers, ...csvData]
+        .map(row => row.map(cell => `"${cell}"`).join(','))
+        .join('\n');
+
+      // Create and download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `publications_export_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Success",
+        description: `Exported ${filteredPublications.length} publications to CSV`,
+      });
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      toast({
+        title: "Error",
+        description: "Failed to export CSV",
+        variant: "destructive"
+      });
+    }
+  };
+
   const formatPrice = (price: number) => {
     if (price >= 1000) {
       return `$${(price / 1000).toFixed(0)}k`;
@@ -898,6 +976,10 @@ export const PublicationManagement = () => {
             </SelectContent>
           </Select>
         </div>
+        <Button onClick={handleExportCSV} variant="outline">
+          <Download className="h-4 w-4 mr-2" />
+          Export CSV
+        </Button>
       </div>
 
       {/* Publications Table */}
