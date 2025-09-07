@@ -538,47 +538,57 @@ export const PublicationManagement = () => {
       const publicationData = {
         external_id: crypto.randomUUID(),
         name: newPublication.name.trim(),
-        type: newPublication.type,
+        type: newPublication.type || 'standard',
         category: newPublication.category.trim(),
-        price: parseInt(newPublication.price.toString()),
-        tat_days: newPublication.tat_days,
+        price: Math.max(1, parseInt(newPublication.price.toString()) || 1),
+        tat_days: newPublication.tat_days.trim() || '7',
         description: newPublication.description.trim(),
         features: features,
         website_url: newPublication.website_url?.trim() || null,
-        tier: newPublication.tier,
-        da_score: newPublication.da_score > 0 ? parseInt(newPublication.da_score.toString()) : 0,
-        dr_score: newPublication.dr_score > 0 ? parseInt(newPublication.dr_score.toString()) : 0,
+        tier: newPublication.tier || 'standard',
+        da_score: Math.max(0, parseInt(newPublication.da_score?.toString() || '0') || 0),
+        dr_score: Math.max(0, parseInt(newPublication.dr_score?.toString() || '0') || 0),
         location: newPublication.location?.trim() || null,
-        guaranteed_placement: newPublication.guaranteed_placement,
-        dofollow_link: newPublication.dofollow_link,
-        social_media_post: newPublication.social_media_post,
-        homepage_placement: newPublication.homepage_placement,
-        author_byline: newPublication.author_byline,
-        image_inclusion: newPublication.image_inclusion,
-        video_inclusion: newPublication.video_inclusion,
-        placement_type: newPublication.placement_type,
-        sponsored: newPublication.sponsored,
-        indexed: newPublication.indexed,
-        erotic: newPublication.erotic,
-        health: newPublication.health,
-        cbd: newPublication.cbd,
-        crypto: newPublication.crypto,
-        gambling: newPublication.gambling,
+        guaranteed_placement: Boolean(newPublication.guaranteed_placement),
+        dofollow_link: Boolean(newPublication.dofollow_link),
+        social_media_post: Boolean(newPublication.social_media_post),
+        homepage_placement: Boolean(newPublication.homepage_placement),
+        author_byline: Boolean(newPublication.author_byline),
+        image_inclusion: Boolean(newPublication.image_inclusion),
+        video_inclusion: Boolean(newPublication.video_inclusion),
+        placement_type: newPublication.placement_type || 'standard',
+        sponsored: Boolean(newPublication.sponsored),
+        indexed: Boolean(newPublication.indexed),
+        erotic: Boolean(newPublication.erotic),
+        health: Boolean(newPublication.health),
+        cbd: Boolean(newPublication.cbd),
+        crypto: Boolean(newPublication.crypto),
+        gambling: Boolean(newPublication.gambling),
         is_active: true,
         popularity: 0,
       };
 
       console.log('About to insert publication data:', publicationData);
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('publications')
-        .insert([publicationData]);
+        .insert([publicationData])
+        .select();
 
       if (error) {
-        console.error('Supabase error details:', error);
-        console.error('Publication data being sent:', publicationData);
+        console.error('=== DETAILED ERROR DEBUG ===');
+        console.error('Full error object:', JSON.stringify(error, null, 2));
+        console.error('Error message:', error.message);
+        console.error('Error details:', error.details);
+        console.error('Error hint:', error.hint);
+        console.error('Error code:', error.code);
+        console.error('Publication data being sent:', JSON.stringify(publicationData, null, 2));
+        console.error('=== END ERROR DEBUG ===');
+        
         throw error;
       }
+
+      console.log('Publication inserted successfully:', data);
 
       toast({
         title: "Success",
