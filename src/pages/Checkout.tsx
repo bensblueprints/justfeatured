@@ -625,7 +625,7 @@ export const Checkout = () => {
                             <p className="text-xs text-muted-foreground">{item.tat_days} days turnaround</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold">${(item.price / 100).toFixed(0)}</p>
+                            <p className="font-bold">${item.price.toFixed(0)}</p>
                           </div>
                         </div>
                       ))}
@@ -721,13 +721,13 @@ export const Checkout = () => {
                           <div className="text-right">
                             <div className="flex flex-col items-end">
                               <span className="text-sm text-muted-foreground line-through">
-                                ${(upsell.originalPrice / 100).toFixed(0)}
+                                ${upsell.originalPrice.toFixed(0)}
                               </span>
                               <span className="text-lg font-bold text-accent">
-                                ${(upsell.discountedPrice / 100).toFixed(0)}
+                                ${upsell.discountedPrice.toFixed(0)}
                               </span>
                               <span className="text-xs text-success font-semibold">
-                                Save ${(upsell.savings / 100).toFixed(0)}!
+                                Save ${upsell.savings.toFixed(0)}!
                               </span>
                             </div>
                           </div>
@@ -747,7 +747,7 @@ export const Checkout = () => {
                             <p className="text-xs text-muted-foreground">{item.tat_days} days turnaround</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-accent">${(item.price / 100).toFixed(0)}</p>
+                            <p className="font-bold text-accent">${item.price.toFixed(0)}</p>
                           </div>
                         </div>
                       ))}
@@ -759,26 +759,26 @@ export const Checkout = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Subtotal</span>
-                      <span>${(subtotal / 100).toFixed(2)}</span>
+                      <span>${subtotal.toFixed(2)}</span>
                     </div>
                     {totalSavings > 0 && (
                       <div className="flex justify-between text-success font-semibold">
                         <span>Total Savings</span>
-                        <span>-${(totalSavings / 100).toFixed(2)}</span>
+                        <span>-${totalSavings.toFixed(2)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Processing Fee (2.9%)</span>
-                      <span>${(processingFee / 100).toFixed(2)}</span>
+                      <span>${processingFee.toFixed(2)}</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between text-lg font-bold">
                       <span>Total</span>
-                      <span>${(total / 100).toFixed(2)}</span>
+                      <span>${total.toFixed(2)}</span>
                     </div>
                     {totalSavings > 0 && (
                       <p className="text-sm text-success font-semibold text-center">
-                        🎉 You're saving ${(totalSavings / 100).toFixed(2)} with these offers!
+                        🎉 You're saving ${totalSavings.toFixed(2)} with these offers!
                       </p>
                     )}
                   </div>
