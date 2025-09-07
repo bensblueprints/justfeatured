@@ -523,6 +523,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_publication_logo: {
+        Args: { new_logo_url: string; publication_external_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       industry_sector:
