@@ -53,7 +53,7 @@ const blogPosts = [
     readTime: "4 min read",
     author: "Lisa Wang",
     date: "Dec 5, 2024",
-    image: "/api/placeholder/400/240"
+    image: "/lovable-uploads/aa1865c6-aa00-4640-9d80-27ff5fe44181.png"
   },
   {
     id: 6,
