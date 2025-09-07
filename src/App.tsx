@@ -21,6 +21,7 @@ import StarterSelection from "./pages/StarterSelection";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 import AdminUpload from "./pages/AdminUpload";
+import BrandBundles from "./pages/BrandBundles";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/admin-upload" element={<AdminUpload />} />
+              <Route path="/brand-bundles" element={<BrandBundles />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

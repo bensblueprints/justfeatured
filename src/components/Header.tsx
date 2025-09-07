@@ -46,6 +46,13 @@ export const Header = () => {
             Publications
           </button>
           <button 
+            onClick={() => handleNavigation('/brand-bundles')}
+            className="transition-all duration-300 font-medium magnetic"
+            style={{ color: '#475569' }}
+          >
+            Brand Bundles
+          </button>
+          <button 
             onClick={() => handleNavigation('/blog/trust-factor')}
             className="transition-all duration-300 font-medium magnetic"
             style={{ color: '#475569' }}
@@ -133,6 +140,16 @@ export const Header = () => {
                 style={{ color: '#475569' }}
               >
                 Publications
+              </button>
+              <button 
+                onClick={() => {
+                  handleNavigation('/brand-bundles');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left py-2 px-4 rounded-lg hover:bg-primary/5 transition-colors font-medium"
+                style={{ color: '#475569' }}
+              >
+                Brand Bundles
               </button>
               <button 
                 onClick={() => {
