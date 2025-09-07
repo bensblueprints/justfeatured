@@ -568,12 +568,15 @@ export const PublicationManagement = () => {
         popularity: 0,
       };
 
+      console.log('About to insert publication data:', publicationData);
+      
       const { error } = await supabase
         .from('publications')
         .insert([publicationData]);
 
       if (error) {
-        console.error('Supabase error:', error);
+        console.error('Supabase error details:', error);
+        console.error('Publication data being sent:', publicationData);
         throw error;
       }
 
