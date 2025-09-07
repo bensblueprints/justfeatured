@@ -10,7 +10,7 @@ export const PUBLICATIONS: Publication[] = [
     type: 'exclusive',
     category: 'News & Media',
     price: 20000000, // $200,000
-    tat_days: 30,
+    tat_days: "30",
     description: 'Premier global financial news and information platform',
     features: ['Premium placement', 'Global reach', 'Financial authority', 'High circulation'],
     website_url: 'https://bloomberg.com',

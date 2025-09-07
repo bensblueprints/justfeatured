@@ -7,7 +7,7 @@ export const PREMIUM_PUBLICATIONS: Publication[] = [
     type: 'exclusive',
     category: 'News',
     price: 20000000, // $200,000
-    tat_days: 30,
+    tat_days: "30",
     description: 'Premium global business and financial news publication',
     features: ['Global reach', 'Financial authority', 'Business leaders readership'],
     website_url: 'https://www.bloomberg.com',

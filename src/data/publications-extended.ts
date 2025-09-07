@@ -9,7 +9,7 @@ export const EXTENDED_PUBLICATIONS: Publication[] = [
     type: 'tier1',
     category: 'Business & Finance',
     price: 450000, // $4,500
-    tat_days: 7,
+    tat_days: "7",
     description: 'Chicago Business Journal - Leading Chicago business publication',
     features: ['Chicago business', 'Local authority', 'Business networking', 'Market analysis'],
     website_url: 'https://bizjournals.com/chicago',

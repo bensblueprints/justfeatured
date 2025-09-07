@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ClientManagement } from "@/components/admin/ClientManagement";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { PressReleaseManagement } from "@/components/admin/PressReleaseManagement";
+import { PublicationManagement } from "@/components/admin/PublicationManagement";
 
 interface DashboardStats {
   totalClients: number;
@@ -283,7 +284,7 @@ export const AdminDashboard = () => {
 
         {/* Management Tabs */}
         <Tabs defaultValue="clients" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="clients" className="flex items-center">
               <Building className="w-4 h-4 mr-2" />
               Clients
@@ -291,6 +292,10 @@ export const AdminDashboard = () => {
             <TabsTrigger value="press-releases" className="flex items-center">
               <FileText className="w-4 h-4 mr-2" />
               Press Releases
+            </TabsTrigger>
+            <TabsTrigger value="publications" className="flex items-center">
+              <Building className="w-4 h-4 mr-2" />
+              Publications
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center">
               <Users className="w-4 h-4 mr-2" />
@@ -304,6 +309,10 @@ export const AdminDashboard = () => {
 
           <TabsContent value="press-releases" className="mt-6">
             <PressReleaseManagement />
+          </TabsContent>
+
+          <TabsContent value="publications" className="mt-6">
+            <PublicationManagement />
           </TabsContent>
 
           <TabsContent value="users" className="mt-6">

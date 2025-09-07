@@ -1,10 +1,10 @@
 export interface Publication {
   id: string;
   name: string;
-  type: 'tier2' | 'premium' | 'tier1' | 'exclusive' | 'starter';
+  type: 'tier2' | 'premium' | 'tier1' | 'exclusive' | 'starter' | 'standard';
   category: string;
   price: number;
-  tat_days: number;
+  tat_days: string | number;
   description?: string;
   features: string[];
   image_url?: string;
@@ -28,6 +28,17 @@ export interface Publication {
   image_inclusion?: boolean;
   video_inclusion?: boolean;
   placement_type?: 'discreet' | 'branded' | 'standard';
+  // Additional fields from database
+  sponsored?: boolean;
+  indexed?: boolean;
+  erotic?: boolean;
+  health?: boolean;
+  cbd?: boolean;
+  crypto?: boolean;
+  gambling?: boolean;
+  external_id?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Customer {
