@@ -32,7 +32,12 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
     fetchLogo();
   }, [publication.website_url]);
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number | undefined | null) => {
+    // Handle undefined, null, or 0 price
+    if (!price || price === 0) {
+      return "Contact for Price";
+    }
+    
     if (price >= 1000) {
       return `$${(price / 1000).toFixed(0)}k`;
     }
@@ -112,6 +117,10 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
           <div className="text-center">
             <div className="text-4xl font-bold text-primary">
               {formatPrice(publication.price)}
+            </div>
+            {/* Debug info - remove this later */}
+            <div className="text-xs text-gray-400 mt-1">
+              Raw price: {JSON.stringify(publication.price)} ({typeof publication.price})
             </div>
           </div>
 
