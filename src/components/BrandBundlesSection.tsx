@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, TrendingUp, Globe, Award, PenTool, Link, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ProtectedInteraction } from '@/components/ProtectedInteraction';
 
 interface BrandBundle {
   id: string;
@@ -141,9 +142,23 @@ const categoryColors = {
 export const BrandBundlesSection = () => {
   const navigate = useNavigate();
 
-  const handleGetStarted = (bundleId: string) => {
-    // For now, navigate to contact or checkout
-    navigate('/starter-selection');
+  const handleGetStarted = (bundle: BrandBundle) => {
+    // Convert bundle to checkout item format
+    const checkoutItem = {
+      id: bundle.id,
+      name: bundle.name,
+      price: parseFloat(bundle.price.replace('$', '').replace(',', '')),
+      category: bundle.category.charAt(0).toUpperCase() + bundle.category.slice(1),
+      tat_days: '5-7 days' // Default delivery time for brand bundles
+    };
+
+    // Navigate to checkout with the selected bundle
+    navigate('/checkout', {
+      state: {
+        selectedPublications: [checkoutItem],
+        packageType: 'custom'
+      }
+    });
   };
 
   return (
@@ -202,12 +217,13 @@ export const BrandBundlesSection = () => {
                   ))}
                 </div>
                 
-                <Button 
-                  onClick={() => handleGetStarted(bundle.id)}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-0"
-                >
-                  Get Started
-                </Button>
+                <ProtectedInteraction action={() => handleGetStarted(bundle)}>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-0"
+                  >
+                    Get Started
+                  </Button>
+                </ProtectedInteraction>
               </CardContent>
             </Card>
           ))}
