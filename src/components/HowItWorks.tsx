@@ -58,7 +58,11 @@ export const HowItWorks = () => {
             >
               Browse all publications
             </Button>
-            <Button variant="hero" size="lg">
+            <Button 
+              variant="hero" 
+              size="lg"
+              onClick={() => navigate('/starter-selection')}
+            >
               Start with <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span> Package
             </Button>
           </div>
