@@ -55,11 +55,11 @@ export const Publications = () => {
     // Filter by price range
     if (priceRange !== "all") {
       const ranges = {
-        "under-1000": [0, 100000], // Under $1,000
-        "1000-5000": [100000, 500000], // $1,000 - $5,000
-        "5000-15000": [500000, 1500000], // $5,000 - $15,000
-        "15000-50000": [1500000, 5000000], // $15,000 - $50,000
-        "over-50000": [5000000, Infinity] // Over $50,000
+        "under-1000": [0, 1000], // Under $1,000
+        "1000-5000": [1000, 5000], // $1,000 - $5,000
+        "5000-15000": [5000, 15000], // $5,000 - $15,000
+        "15000-50000": [15000, 50000], // $15,000 - $50,000
+        "over-50000": [50000, Infinity] // Over $50,000
       };
       
       const [min, max] = ranges[priceRange as keyof typeof ranges] || [0, Infinity];
@@ -334,7 +334,7 @@ export const Publications = () => {
                               <p className="text-xs text-muted-foreground">{pub.category}</p>
                             </div>
                             <div className="text-sm font-semibold">
-                              ${(pub.price / 100).toFixed(0)}
+                              ${pub.price.toFixed(0)}
                             </div>
                           </div>
                         );
@@ -345,7 +345,7 @@ export const Publications = () => {
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-lg font-semibold">Total</span>
                         <span className="text-2xl font-bold text-primary">
-                          ${(selectedTotal / 100).toFixed(0)}
+                          ${selectedTotal.toFixed(0)}
                         </span>
                       </div>
 

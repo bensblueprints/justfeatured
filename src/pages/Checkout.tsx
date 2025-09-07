@@ -53,7 +53,7 @@ export const Checkout = () => {
   const [availableStarterPubs, setAvailableStarterPubs] = useState<any[]>([]);
 
   // Rush delivery pricing - $197 flat fee
-  const rushDeliveryPrice = 19700; // $197
+  const rushDeliveryPrice = 197; // $197
   const rushDeliveryItem = {
     id: 'rush-delivery',
     name: '⚡ 48-Hour Rush Delivery',
@@ -70,9 +70,9 @@ export const Checkout = () => {
     {
       id: 'la-weekly',
       name: 'LA Weekly Premium',
-      originalPrice: 350000,
-      discountedPrice: 200000,
-      savings: 150000,
+      originalPrice: 3500,
+      discountedPrice: 2000,
+      savings: 1500,
       category: 'Premium Upgrade',
       tat_days: 1,
       description: 'Major Los Angeles publication with do-follow links',
@@ -83,9 +83,9 @@ export const Checkout = () => {
     {
       id: 'usa-today-bundle',
       name: 'USA Today (50K Impressions)',
-      originalPrice: 600000,
-      discountedPrice: 400000,
-      savings: 200000,
+      originalPrice: 6000,
+      discountedPrice: 4000,
+      savings: 2000,
       category: 'National Reach',
       tat_days: 12,
       description: 'National newspaper with guaranteed impressions',
@@ -96,9 +96,9 @@ export const Checkout = () => {
     {
       id: 'digital-trends',
       name: 'Digital Trends Tech Feature',
-      originalPrice: 350000,
-      discountedPrice: 250000,
-      savings: 100000,
+      originalPrice: 3500,
+      discountedPrice: 2500,
+      savings: 1000,
       category: 'Technology Focus',
       tat_days: 7,
       description: 'Leading technology publication',
@@ -123,7 +123,7 @@ export const Checkout = () => {
         const starterItems = starterPubs.map((pub: any, index: number) => ({
           id: `starter-${pub.id}`,
           name: pub.name,
-          price: index === 0 ? 9700 : 8700, // First publication $97, additional $87 each (discounted from $97)
+          price: index === 0 ? 97 : 87, // First publication $97, additional $87 each (discounted from $97)
           category: 'Starter Package',
           tat_days: 3
         }));
@@ -152,7 +152,7 @@ export const Checkout = () => {
       const starterItems = newSelection.map((pub, index) => ({
         id: `starter-${pub.id}`,
         name: pub.name,
-        price: index === 0 ? 9700 : 8700, // First $97, additional $87 each (discounted from $97)
+        price: index === 0 ? 97 : 87, // First $97, additional $87 each (discounted from $97)
         category: 'Starter Package',
         tat_days: 3
       }));
@@ -165,7 +165,7 @@ export const Checkout = () => {
       const starterItems = newSelection.map((pub, index) => ({
         id: `starter-${pub.id}`,
         name: pub.name,
-        price: index === 0 ? 9700 : 8700, // First $97, additional $87 each (discounted from $97)
+        price: index === 0 ? 97 : 87, // First $97, additional $87 each (discounted from $97)
         category: 'Starter Package',
         tat_days: 3
       }));
