@@ -356,7 +356,7 @@ export type Database = {
           sponsored: boolean | null
           SPONSORED: boolean | null
           TAT: number | null
-          tat_days: number
+          tat_days: string | null
           tier: string
           timeline: string | null
           type: string
@@ -409,7 +409,7 @@ export type Database = {
           sponsored?: boolean | null
           SPONSORED?: boolean | null
           TAT?: number | null
-          tat_days: number
+          tat_days?: string | null
           tier: string
           timeline?: string | null
           type: string
@@ -462,7 +462,7 @@ export type Database = {
           sponsored?: boolean | null
           SPONSORED?: boolean | null
           TAT?: number | null
-          tat_days?: number
+          tat_days?: string | null
           tier?: string
           timeline?: string | null
           type?: string
