@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Star, ArrowRight } from 'lucide-react';
-import { PUBLICATIONS } from '@/data/publications';
+import { fetchPublicationsByTier } from '@/lib/publications';
 import { Publication } from '@/types';
 
 interface StarterPackageSelectionProps {
@@ -13,10 +13,25 @@ interface StarterPackageSelectionProps {
 
 export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageSelectionProps) => {
   const [selectedPublication, setSelectedPublication] = useState<Publication | null>(null);
+  const [publications, setPublications] = useState<Publication[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Get starter package publications
-  const starterPublications = PUBLICATIONS.filter(pub => pub.type === 'starter');
+  // Fetch publications from database
+  useEffect(() => {
+    const loadPublications = async () => {
+      try {
+        const data = await fetchPublicationsByTier('starter');
+        setPublications(data.slice(0, 3)); // Show top 3 starter options
+      } catch (error) {
+        console.error('Error loading publications:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPublications();
+  }, []);
 
   const handleSelect = (publication: Publication) => {
     setSelectedPublication(publication);
@@ -48,7 +63,7 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
 
           {/* Publication Selection Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {starterPublications.map((publication) => (
+            {publications.map((publication) => (
               <Card 
                 key={publication.id}
                 className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${

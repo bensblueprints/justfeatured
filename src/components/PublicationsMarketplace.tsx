@@ -1,23 +1,44 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { PUBLICATIONS } from "@/data/publications";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { BrandFetchService } from "@/utils/brandFetch";
+import { fetchPublicationsByTier } from "@/lib/publications";
+import { Publication } from "@/types";
 
 export const PublicationsMarketplace = () => {
   const navigate = useNavigate();
   const [logos, setLogos] = useState<Record<string, string>>({});
+  const [publications, setPublications] = useState<Publication[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch publications from database
+  useEffect(() => {
+    const loadPublications = async () => {
+      try {
+        const data = await fetchPublicationsByTier('starter');
+        setPublications(data);
+      } catch (error) {
+        console.error('Error loading publications:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPublications();
+  }, []);
 
   // Get starter package publications
-  const popularPublications = PUBLICATIONS
-    .filter(pub => pub.is_active && pub.type === 'starter')
+  const popularPublications = publications
+    .filter(pub => pub.is_active && (pub.type === 'starter' || pub.tier === 'starter'))
     .sort((a, b) => b.popularity - a.popularity)
     .slice(0, 8);
 
   // Fetch logos on component mount
   useEffect(() => {
+    if (publications.length === 0) return;
+    
     const fetchLogos = async () => {
       const logoPromises = popularPublications.map(async (pub) => {
         const logoUrl = await BrandFetchService.getLogoWithFallback(pub.website_url);
@@ -37,7 +58,7 @@ export const PublicationsMarketplace = () => {
     };
 
     fetchLogos();
-  }, []);
+  }, [publications, popularPublications]);
 
   const formatPrice = (price: number) => {
     if (price >= 1000000) {

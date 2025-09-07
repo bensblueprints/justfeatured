@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { PublicationCard } from "@/components/PublicationCard";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, ShoppingCart, Filter, DollarSign, Building } from "lucide-react";
-import { PUBLICATIONS } from "@/data/publications";
+import { fetchPublications } from "@/lib/publications";
 import { Publication, CartItem } from "@/types";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 
@@ -23,11 +23,29 @@ export const Publications = () => {
   const [visibleCount, setVisibleCount] = useState(18);
   const [priceRange, setPriceRange] = useState<string>("all");
   const [industryFilter, setIndustryFilter] = useState<string>("all");
+  const [publications, setPublications] = useState<Publication[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const LOAD_MORE_COUNT = 18;
 
+  // Fetch publications from database
+  useEffect(() => {
+    const loadPublications = async () => {
+      try {
+        const data = await fetchPublications();
+        setPublications(data);
+      } catch (error) {
+        console.error('Error loading publications:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPublications();
+  }, []);
+
   const filteredPublications = useMemo(() => {
-    let filtered = PUBLICATIONS;
+    let filtered = publications;
 
     // Filter by tab
     if (activeTab !== "all") {
@@ -93,10 +111,10 @@ export const Publications = () => {
 
   const selectedTotal = useMemo(() => {
     return selectedPublications.reduce((total, id) => {
-      const pub = PUBLICATIONS.find(p => p.id === id);
+      const pub = publications.find(p => p.id === id);
       return total + (pub?.price || 0);
     }, 0);
-  }, [selectedPublications]);
+  }, [selectedPublications, publications]);
 
   const handleSelectionChange = (publicationId: string, selected: boolean) => {
     setSelectedPublications(prev =>
@@ -106,17 +124,17 @@ export const Publications = () => {
     );
   };
 
-  const getTabCounts = () => {
+  const getTabCounts = useMemo(() => {
     return {
-      all: PUBLICATIONS.length,
-      tier2: PUBLICATIONS.filter(p => p.type === 'tier2').length,
-      premium: PUBLICATIONS.filter(p => p.type === 'premium').length,
-      tier1: PUBLICATIONS.filter(p => p.type === 'tier1').length,
-      exclusive: PUBLICATIONS.filter(p => p.type === 'exclusive').length,
+      all: publications.length,
+      tier2: publications.filter(p => p.type === 'tier2').length,
+      premium: publications.filter(p => p.type === 'premium').length,
+      tier1: publications.filter(p => p.type === 'tier1').length,
+      exclusive: publications.filter(p => p.type === 'exclusive').length,
     };
-  };
+  }, [publications]);
 
-  const tabCounts = getTabCounts();
+  const tabCounts = getTabCounts;
 
   return (
     <div className="min-h-screen bg-background">
@@ -129,7 +147,7 @@ export const Publications = () => {
               Publications Marketplace
             </h1>
             <p className="text-xl text-muted-foreground">
-              Choose from {PUBLICATIONS.length}+ premium publications to get your story featured
+              Choose from {publications.length}+ premium publications to get your story featured
             </p>
           </div>
           <div className="mt-4 md:mt-0">
@@ -306,7 +324,7 @@ export const Publications = () => {
                   <div className="space-y-4">
                     <div className="max-h-60 overflow-y-auto space-y-2">
                       {selectedPublications.map(id => {
-                        const pub = PUBLICATIONS.find(p => p.id === id);
+                        const pub = publications.find(p => p.id === id);
                         if (!pub) return null;
                         
                         return (
@@ -335,7 +353,7 @@ export const Publications = () => {
                         <ProtectedInteraction action={() => navigate('/checkout', { 
                           state: { 
                             selectedPublications: selectedPublications.map(id => {
-                              const pub = PUBLICATIONS.find(p => p.id === id);
+                              const pub = publications.find(p => p.id === id);
                               return pub ? {
                                 id: pub.id,
                                 name: pub.name,

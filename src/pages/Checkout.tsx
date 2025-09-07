@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ShoppingCart, CreditCard, Shield, CheckCircle, Star, TrendingUp, Zap, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { PUBLICATIONS } from "@/data/publications";
+import { fetchPublications } from "@/lib/publications";
 
 interface CheckoutItem {
   id: string;
@@ -50,9 +50,7 @@ export const Checkout = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [packageType, setPackageType] = useState<'starter' | 'custom'>('custom');
   const [selectedStarterPublications, setSelectedStarterPublications] = useState<any[]>([]);
-  const [availableStarterPubs] = useState(() => 
-    PUBLICATIONS.filter(pub => pub.type === 'starter')
-  );
+  const [availableStarterPubs, setAvailableStarterPubs] = useState<any[]>([]);
 
   // Rush delivery pricing - $197 flat fee
   const rushDeliveryPrice = 19700; // $197

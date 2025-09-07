@@ -312,6 +312,96 @@ export type Database = {
         }
         Relationships: []
       }
+      publications: {
+        Row: {
+          author_byline: boolean | null
+          category: string
+          created_at: string
+          da_score: number | null
+          description: string
+          dofollow_link: boolean | null
+          dr_score: number | null
+          external_id: string
+          features: string[]
+          guaranteed_placement: boolean | null
+          homepage_placement: boolean | null
+          id: string
+          image_inclusion: boolean | null
+          is_active: boolean | null
+          location: string | null
+          name: string
+          placement_type: string | null
+          popularity: number | null
+          price: number
+          social_media_post: boolean | null
+          tat_days: number
+          tier: string
+          timeline: string | null
+          type: string
+          updated_at: string
+          video_inclusion: boolean | null
+          website_url: string | null
+        }
+        Insert: {
+          author_byline?: boolean | null
+          category: string
+          created_at?: string
+          da_score?: number | null
+          description: string
+          dofollow_link?: boolean | null
+          dr_score?: number | null
+          external_id: string
+          features?: string[]
+          guaranteed_placement?: boolean | null
+          homepage_placement?: boolean | null
+          id?: string
+          image_inclusion?: boolean | null
+          is_active?: boolean | null
+          location?: string | null
+          name: string
+          placement_type?: string | null
+          popularity?: number | null
+          price: number
+          social_media_post?: boolean | null
+          tat_days: number
+          tier: string
+          timeline?: string | null
+          type: string
+          updated_at?: string
+          video_inclusion?: boolean | null
+          website_url?: string | null
+        }
+        Update: {
+          author_byline?: boolean | null
+          category?: string
+          created_at?: string
+          da_score?: number | null
+          description?: string
+          dofollow_link?: boolean | null
+          dr_score?: number | null
+          external_id?: string
+          features?: string[]
+          guaranteed_placement?: boolean | null
+          homepage_placement?: boolean | null
+          id?: string
+          image_inclusion?: boolean | null
+          is_active?: boolean | null
+          location?: string | null
+          name?: string
+          placement_type?: string | null
+          popularity?: number | null
+          price?: number
+          social_media_post?: boolean | null
+          tat_days?: number
+          tier?: string
+          timeline?: string | null
+          type?: string
+          updated_at?: string
+          video_inclusion?: boolean | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       review_comments: {
         Row: {
           content: string
