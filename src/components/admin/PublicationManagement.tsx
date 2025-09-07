@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,11 +39,44 @@ import {
   Building,
   DollarSign,
   Clock,
-  FileText
+  FileText,
+  Download,
+  Image,
+  Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { type Publication } from "@/types/index";
+import { BrandFetchService } from "@/utils/brandFetch";
+
+interface Publication {
+  id: string;
+  external_id?: string;
+  name: string;
+  type: string;
+  category: string;
+  price: number;
+  tat_days: string;
+  description?: string;
+  features: string[];
+  logo_url?: string;
+  website_url?: string;
+  tier: string;
+  popularity: number;
+  is_active: boolean;
+  da_score?: number;
+  dr_score?: number;
+  location?: string;
+  dofollow_link?: boolean;
+  sponsored?: boolean;
+  indexed?: boolean;
+  erotic?: boolean;
+  health?: boolean;
+  cbd?: boolean;
+  crypto?: boolean;
+  gambling?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
 
 interface NewPublication {
   name: string;
@@ -52,21 +85,13 @@ interface NewPublication {
   price: number;
   tat_days: string;
   description: string;
-  features: string[];
-  website_url: string;
+  features: string;
+  website_url?: string;
   tier: string;
   da_score?: number;
   dr_score?: number;
   location?: string;
-  guaranteed_placement: boolean;
   dofollow_link: boolean;
-  social_media_post: boolean;
-  homepage_placement: boolean;
-  dedicated_article: boolean;
-  press_release_distribution: boolean;
-  author_byline: boolean;
-  image_inclusion: boolean;
-  video_inclusion: boolean;
   sponsored: boolean;
   indexed: boolean;
   erotic: boolean;
@@ -74,31 +99,41 @@ interface NewPublication {
   cbd: boolean;
   crypto: boolean;
   gambling: boolean;
-  placement_type: string;
+}
+
+interface CSVRow {
+  Update?: string;
+  PUBLICATION?: string;
+  Price?: string;
+  DA?: string;
+  DR?: string;
+  GENRE?: string;
+  TAT?: string;
+  SPONSORED?: string;
+  INDEXED?: string;
+  DOFOLLOW?: string;
+  "REGION / LOCATION"?: string;
+  EROTIC?: string;
+  HEALTH?: string;
+  CBD?: string;
+  CRYPTO?: string;
+  GAMBLING?: string;
 }
 
 const defaultPublication: NewPublication = {
   name: "",
   type: "standard",
-  category: "",
+  category: "News",
   price: 0,
-  tat_days: "7",
+  tat_days: "1-2 Weeks",
   description: "",
-  features: [],
+  features: "",
   website_url: "",
   tier: "standard",
   da_score: 0,
   dr_score: 0,
   location: "",
-  guaranteed_placement: false,
-  dofollow_link: true,
-  social_media_post: false,
-  homepage_placement: false,
-  dedicated_article: false,
-  press_release_distribution: false,
-  author_byline: false,
-  image_inclusion: false,
-  video_inclusion: false,
+  dofollow_link: false,
   sponsored: false,
   indexed: true,
   erotic: false,
@@ -106,16 +141,17 @@ const defaultPublication: NewPublication = {
   cbd: false,
   crypto: false,
   gambling: false,
-  placement_type: "standard",
 };
 
-// Move PublicationForm outside to prevent recreation on every render
+// Publication Form Component
 const PublicationForm = ({ 
   newPublication, 
   onInputChange, 
   onNumberChange, 
   onSelectChange, 
   onCheckboxChange,
+  onFetchLogo,
+  fetchingLogo,
   isEdit = false 
 }: { 
   newPublication: NewPublication;
@@ -123,6 +159,8 @@ const PublicationForm = ({
   onNumberChange: (field: keyof NewPublication) => (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectChange: (field: keyof NewPublication) => (value: string) => void;
   onCheckboxChange: (field: keyof NewPublication) => (checked: boolean) => void;
+  onFetchLogo: () => void;
+  fetchingLogo: boolean;
   isEdit?: boolean;
 }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
@@ -154,27 +192,9 @@ const PublicationForm = ({
             <SelectValue placeholder="Select tier" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="exclusive">Exclusive</SelectItem>
-            <SelectItem value="tier1">Tier 1</SelectItem>
             <SelectItem value="premium">Premium</SelectItem>
             <SelectItem value="tier2">Tier 2</SelectItem>
-            <SelectItem value="standard">Standard</SelectItem>
-            <SelectItem value="starter">Starter</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <Label htmlFor="type">Type</Label>
-        <Select value={newPublication.type} onValueChange={onSelectChange('type')}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="exclusive">Exclusive</SelectItem>
             <SelectItem value="tier1">Tier 1</SelectItem>
-            <SelectItem value="premium">Premium</SelectItem>
-            <SelectItem value="tier2">Tier 2</SelectItem>
             <SelectItem value="standard">Standard</SelectItem>
             <SelectItem value="starter">Starter</SelectItem>
           </SelectContent>
@@ -193,12 +213,12 @@ const PublicationForm = ({
           />
         </div>
         <div>
-          <Label htmlFor="tat_days">TAT (Days)</Label>
+          <Label htmlFor="tat_days">TAT</Label>
           <Input
             id="tat_days"
             value={newPublication.tat_days}
             onChange={onInputChange('tat_days')}
-            placeholder="e.g., 7, 1-2 Weeks"
+            placeholder="e.g., 1-2 Weeks"
           />
         </div>
       </div>
@@ -228,12 +248,23 @@ const PublicationForm = ({
 
       <div>
         <Label htmlFor="website_url">Website URL</Label>
-        <Input
-          id="website_url"
-          value={newPublication.website_url}
-          onChange={onInputChange('website_url')}
-          placeholder="https://example.com"
-        />
+        <div className="flex gap-2">
+          <Input
+            id="website_url"
+            value={newPublication.website_url}
+            onChange={onInputChange('website_url')}
+            placeholder="https://example.com"
+          />
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm"
+            onClick={onFetchLogo}
+            disabled={!newPublication.website_url || fetchingLogo}
+          >
+            {fetchingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Image className="h-4 w-4" />}
+          </Button>
+        </div>
       </div>
 
       <div>
@@ -256,35 +287,12 @@ const PublicationForm = ({
           rows={3}
         />
       </div>
-
-      <div>
-        <Label htmlFor="placement_type">Placement Type</Label>
-        <Select value={newPublication.placement_type} onValueChange={onSelectChange('placement_type')}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select placement type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="standard">Standard</SelectItem>
-            <SelectItem value="discreet">Discreet</SelectItem>
-            <SelectItem value="branded">Branded</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
     </div>
 
     <div className="space-y-4">
       <div>
-        <Label>Features</Label>
+        <Label>Publication Features</Label>
         <div className="grid grid-cols-1 gap-2 mt-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="guaranteed_placement"
-              checked={newPublication.guaranteed_placement}
-              onCheckedChange={onCheckboxChange('guaranteed_placement')}
-            />
-            <Label htmlFor="guaranteed_placement">Guaranteed Placement</Label>
-          </div>
-          
           <div className="flex items-center space-x-2">
             <Checkbox
               id="dofollow_link"
@@ -294,74 +302,6 @@ const PublicationForm = ({
             <Label htmlFor="dofollow_link">Dofollow Link</Label>
           </div>
           
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="social_media_post"
-              checked={newPublication.social_media_post}
-              onCheckedChange={onCheckboxChange('social_media_post')}
-            />
-            <Label htmlFor="social_media_post">Social Media Post</Label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="homepage_placement"
-              checked={newPublication.homepage_placement}
-              onCheckedChange={onCheckboxChange('homepage_placement')}
-            />
-            <Label htmlFor="homepage_placement">Homepage Placement</Label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="dedicated_article"
-              checked={newPublication.dedicated_article}
-              onCheckedChange={onCheckboxChange('dedicated_article')}
-            />
-            <Label htmlFor="dedicated_article">Dedicated Article</Label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="press_release_distribution"
-              checked={newPublication.press_release_distribution}
-              onCheckedChange={onCheckboxChange('press_release_distribution')}
-            />
-            <Label htmlFor="press_release_distribution">Press Release Distribution</Label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="author_byline"
-              checked={newPublication.author_byline}
-              onCheckedChange={onCheckboxChange('author_byline')}
-            />
-            <Label htmlFor="author_byline">Author Byline</Label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="image_inclusion"
-              checked={newPublication.image_inclusion}
-              onCheckedChange={onCheckboxChange('image_inclusion')}
-            />
-            <Label htmlFor="image_inclusion">Image Inclusion</Label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="video_inclusion"
-              checked={newPublication.video_inclusion}
-              onCheckedChange={onCheckboxChange('video_inclusion')}
-            />
-            <Label htmlFor="video_inclusion">Video Inclusion</Label>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <Label>Content Restrictions</Label>
-        <div className="grid grid-cols-1 gap-2 mt-2">
           <div className="flex items-center space-x-2">
             <Checkbox
               id="sponsored"
@@ -379,7 +319,12 @@ const PublicationForm = ({
             />
             <Label htmlFor="indexed">Indexed by Search Engines</Label>
           </div>
-          
+        </div>
+      </div>
+
+      <div>
+        <Label>Content Restrictions</Label>
+        <div className="grid grid-cols-1 gap-2 mt-2">
           <div className="flex items-center space-x-2">
             <Checkbox
               id="erotic"
@@ -443,6 +388,9 @@ export const PublicationManagement = () => {
   const [newPublication, setNewPublication] = useState<NewPublication>(defaultPublication);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [fetchingLogo, setFetchingLogo] = useState(false);
+  const [quickAddName, setQuickAddName] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchPublications();
@@ -468,7 +416,7 @@ export const PublicationManagement = () => {
         .from('publications')
         .select('*')
         .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        .order('popularity', { ascending: false });
 
       if (error) throw error;
       setPublications((data || []) as Publication[]);
@@ -484,9 +432,101 @@ export const PublicationManagement = () => {
     }
   };
 
+  const handleFetchLogo = async () => {
+    if (!newPublication.website_url) return;
+    
+    setFetchingLogo(true);
+    try {
+      const logoUrl = await BrandFetchService.getLogoWithFallback(newPublication.website_url);
+      toast({
+        title: "Success",
+        description: "Logo fetched successfully",
+      });
+      // Note: In a real implementation, you'd save this logoUrl to the publication
+      console.log("Fetched logo URL:", logoUrl);
+    } catch (error) {
+      console.error('Error fetching logo:', error);
+      toast({
+        title: "Warning",
+        description: "Could not fetch logo automatically",
+        variant: "destructive"
+      });
+    } finally {
+      setFetchingLogo(false);
+    }
+  };
+
+  const handleQuickAdd = async () => {
+    if (!quickAddName.trim()) return;
+    
+    setUploading(true);
+    try {
+      // Try to fetch logo if it looks like a website URL
+      let logoUrl = null;
+      const websiteUrl = quickAddName.includes('.') ? `https://${quickAddName}` : null;
+      
+      if (websiteUrl) {
+        try {
+          logoUrl = await BrandFetchService.getLogoWithFallback(websiteUrl);
+        } catch (error) {
+          console.log("Could not fetch logo for:", websiteUrl);
+        }
+      }
+
+      const publicationData = {
+        external_id: crypto.randomUUID(),
+        name: quickAddName.trim(),
+        type: 'standard',
+        category: 'News',
+        price: 0,
+        tat_days: '1-2 Weeks',
+        description: '',
+        features: [],
+        website_url: websiteUrl,
+        logo_url: logoUrl,
+        tier: 'standard',
+        da_score: 0,
+        dr_score: 0,
+        location: '',
+        dofollow_link: false,
+        sponsored: false,
+        indexed: true,
+        erotic: false,
+        health: false,
+        cbd: false,
+        crypto: false,
+        gambling: false,
+        is_active: true,
+        popularity: 0,
+      };
+
+      const { error } = await supabase
+        .from('publications')
+        .insert([publicationData]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Publication added successfully",
+      });
+
+      setQuickAddName("");
+      fetchPublications();
+    } catch (error) {
+      console.error('Error adding publication:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add publication",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleAddPublication = async () => {
     try {
-      // Validate required fields
       if (!newPublication.name.trim()) {
         toast({
           title: "Validation Error",
@@ -505,58 +545,21 @@ export const PublicationManagement = () => {
         return;
       }
 
-      if (!newPublication.description.trim()) {
-        toast({
-          title: "Validation Error",
-          description: "Description is required", 
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (newPublication.price <= 0) {
-        toast({
-          title: "Validation Error",
-          description: "Price must be greater than 0",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Build features array from boolean fields
-      const features = [];
-      if (newPublication.guaranteed_placement) features.push("Guaranteed Placement");
-      if (newPublication.dofollow_link) features.push("Do-follow Link");
-      if (newPublication.social_media_post) features.push("Social Media Post");
-      if (newPublication.homepage_placement) features.push("Homepage Placement");
-      if (newPublication.dedicated_article) features.push("Dedicated Article");
-      if (newPublication.press_release_distribution) features.push("Press Release Distribution");
-      if (newPublication.author_byline) features.push("Author Byline");
-      if (newPublication.image_inclusion) features.push("Image Inclusion");
-      if (newPublication.video_inclusion) features.push("Video Inclusion");
-
       const publicationData = {
         external_id: crypto.randomUUID(),
         name: newPublication.name.trim(),
         type: newPublication.type || 'standard',
         category: newPublication.category.trim(),
-        price: Math.max(1, parseInt(newPublication.price.toString()) || 1),
-        tat_days: newPublication.tat_days.trim() || '7',
+        price: Math.max(0, parseInt(newPublication.price.toString()) || 0),
+        tat_days: newPublication.tat_days.trim() || '1-2 Weeks',
         description: newPublication.description.trim(),
-        features: features,
+        features: newPublication.features ? newPublication.features.split(',').map(f => f.trim()).filter(f => f) : [],
         website_url: newPublication.website_url?.trim() || null,
         tier: newPublication.tier || 'standard',
         da_score: Math.max(0, parseInt(newPublication.da_score?.toString() || '0') || 0),
         dr_score: Math.max(0, parseInt(newPublication.dr_score?.toString() || '0') || 0),
         location: newPublication.location?.trim() || null,
-        guaranteed_placement: Boolean(newPublication.guaranteed_placement),
         dofollow_link: Boolean(newPublication.dofollow_link),
-        social_media_post: Boolean(newPublication.social_media_post),
-        homepage_placement: Boolean(newPublication.homepage_placement),
-        author_byline: Boolean(newPublication.author_byline),
-        image_inclusion: Boolean(newPublication.image_inclusion),
-        video_inclusion: Boolean(newPublication.video_inclusion),
-        placement_type: newPublication.placement_type || 'standard',
         sponsored: Boolean(newPublication.sponsored),
         indexed: Boolean(newPublication.indexed),
         erotic: Boolean(newPublication.erotic),
@@ -568,79 +571,130 @@ export const PublicationManagement = () => {
         popularity: 0,
       };
 
-      console.log('About to insert publication data:', publicationData);
-      
-      const { data, error } = await supabase
-        .from('publications')
-        .insert([publicationData])
-        .select();
-
-      if (error) {
-        console.error('=== DETAILED ERROR DEBUG ===');
-        console.error('Full error object:', JSON.stringify(error, null, 2));
-        console.error('Error message:', error.message);
-        console.error('Error details:', error.details);
-        console.error('Error hint:', error.hint);
-        console.error('Error code:', error.code);
-        console.error('Publication data being sent:', JSON.stringify(publicationData, null, 2));
-        console.error('=== END ERROR DEBUG ===');
-        
-        throw error;
-      }
-
-      console.log('Publication inserted successfully:', data);
-
-      toast({
-        title: "Success",
-        description: "Publication added successfully"
-      });
-
-      setIsAddDialogOpen(false);
-      setNewPublication(defaultPublication);
-      fetchPublications();
-    } catch (error) {
-      console.error('Error adding publication:', error);
-      toast({
-        title: "Error",
-        description: `Failed to add publication: ${error.message || 'Unknown error'}`,
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleEditPublication = async () => {
-    if (!editingPublication) return;
-
-    try {
       const { error } = await supabase
         .from('publications')
-        .update(newPublication)
-        .eq('id', editingPublication.id);
+        .insert([publicationData]);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Publication updated successfully"
+        description: "Publication added successfully",
       });
 
-      setIsEditDialogOpen(false);
-      setEditingPublication(null);
       setNewPublication(defaultPublication);
+      setIsAddDialogOpen(false);
       fetchPublications();
     } catch (error) {
-      console.error('Error updating publication:', error);
+      console.error('Error adding publication:', error);
       toast({
         title: "Error",
-        description: "Failed to update publication",
+        description: "Failed to add publication",
         variant: "destructive"
       });
     }
   };
 
-  const handleDeletePublication = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this publication?')) return;
+  const handleCSVUpload = async () => {
+    if (!csvFile) return;
 
+    setUploading(true);
+    try {
+      const text = await csvFile.text();
+      const rows = text.split('\n');
+      const headers = rows[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      
+      const publications: any[] = [];
+      
+      for (let i = 1; i < rows.length; i++) {
+        const values = rows[i].split(',').map(v => v.trim().replace(/"/g, ''));
+        if (values.length < headers.length || !values[1]) continue; // Skip if no publication name
+        
+        const row: any = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] || '';
+        });
+
+        // Convert boolean values
+        const convertBoolean = (value: string) => {
+          const val = value.toUpperCase();
+          return val === 'Y' || val === 'YES' || val === 'TRUE' || val === 'DISCREET';
+        };
+
+        const publication = {
+          external_id: crypto.randomUUID(),
+          name: row.PUBLICATION || '',
+          type: 'standard',
+          category: row.GENRE || 'News',
+          price: parseInt(row.Price) || 0,
+          tat_days: row.TAT || '1-2 Weeks',
+          description: '',
+          features: [],
+          website_url: null,
+          tier: 'standard',
+          da_score: parseInt(row.DA) || 0,
+          dr_score: parseInt(row.DR) || 0,
+          location: row['REGION / LOCATION'] || null,
+          dofollow_link: convertBoolean(row.DOFOLLOW || ''),
+          sponsored: convertBoolean(row.SPONSORED || ''),
+          indexed: convertBoolean(row.INDEXED || 'Y'),
+          erotic: convertBoolean(row.EROTIC || ''),
+          health: convertBoolean(row.HEALTH || ''),
+          cbd: convertBoolean(row.CBD || ''),
+          crypto: convertBoolean(row.CRYPTO || ''),
+          gambling: convertBoolean(row.GAMBLING || ''),
+          is_active: true,
+          popularity: 0,
+        };
+
+        if (publication.name) {
+          publications.push(publication);
+        }
+      }
+
+      if (publications.length === 0) {
+        toast({
+          title: "Error",
+          description: "No valid publications found in CSV",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Insert in batches
+      const batchSize = 50;
+      for (let i = 0; i < publications.length; i += batchSize) {
+        const batch = publications.slice(i, i + batchSize);
+        const { error } = await supabase
+          .from('publications')
+          .insert(batch);
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: `Successfully uploaded ${publications.length} publications`,
+      });
+
+      setCsvFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      fetchPublications();
+    } catch (error) {
+      console.error('Error uploading CSV:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload CSV file",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeletePublication = async (id: string) => {
     try {
       const { error } = await supabase
         .from('publications')
@@ -651,7 +705,7 @@ export const PublicationManagement = () => {
 
       toast({
         title: "Success",
-        description: "Publication deleted successfully"
+        description: "Publication deleted successfully",
       });
 
       fetchPublications();
@@ -665,447 +719,268 @@ export const PublicationManagement = () => {
     }
   };
 
-  const handleCsvUpload = async () => {
-    if (!csvFile) return;
+  const formatPrice = (price: number) => {
+    if (price >= 1000) {
+      return `$${(price / 1000).toFixed(0)}k`;
+    }
+    return `$${price}`;
+  };
 
-    setUploading(true);
-    const errors: string[] = [];
-    let successCount = 0;
-    
-    try {
-      // Read the CSV file
-      const text = await csvFile.text();
-      const lines = text.split('\n').filter(line => line.trim());
-      
-      if (lines.length < 2) {
-        throw new Error('CSV file must have at least a header and one data row');
-      }
-
-      // Get headers
-      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-      
-      // Parse data rows
-      const publications = [];
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-        
-        try {
-          // Better CSV parsing to handle quoted values
-          const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-          const cleanValues = values.map(v => v.replace(/^"|"$/g, '').trim());
-          
-          const publication: any = {
-            external_id: crypto.randomUUID(),
-            is_active: true,
-            popularity: 0,
-          };
-
-          // Map CSV columns with proper data type conversion
-          headers.forEach((header, index) => {
-            const value = cleanValues[index] || '';
-            
-            // Handle boolean conversions for CSV columns that map to boolean fields
-            if (['SPONSORED', 'INDEXED', 'DOFOLLOW', 'EROTIC', 'HEALTH', 'CBD', 'CRYPTO', 'GAMBLING'].includes(header)) {
-              const upperValue = value.toUpperCase();
-              if (upperValue === 'Y' || upperValue === 'DISCREET') {
-                publication[header] = 'Y';
-              } else if (upperValue === 'N' || value === '') {
-                publication[header] = 'N';
-              } else {
-                publication[header] = value;
-              }
-            }
-            // Handle numeric fields
-            else if (['Price', 'DA', 'DR', 'TAT'].includes(header)) {
-              const numValue = parseInt(value);
-              publication[header] = isNaN(numValue) ? null : numValue;
-            }
-            // Handle text fields
-            else {
-              publication[header] = value || null;
-            }
-          });
-
-          // Validate required fields
-          const requiredFields = ['PUBLICATION', 'Price'];
-          const missingFields = requiredFields.filter(field => 
-            !publication[field] || publication[field] === ''
-          );
-          
-          if (missingFields.length > 0) {
-            errors.push(`Row ${i + 1}: Missing required fields: ${missingFields.join(', ')}`);
-            continue;
-          }
-
-          publications.push(publication);
-        } catch (rowError) {
-          errors.push(`Row ${i + 1}: ${rowError instanceof Error ? rowError.message : 'Parse error'}`);
-        }
-      }
-
-      if (publications.length === 0) {
-        throw new Error('No valid data rows found in CSV');
-      }
-
-      // Insert publications in batches with error handling
-      const batchSize = 10; // Smaller batches for better error handling
-      for (let i = 0; i < publications.length; i += batchSize) {
-        const batch = publications.slice(i, i + batchSize);
-        
-        try {
-          const { error } = await supabase
-            .from('publications')
-            .insert(batch);
-
-          if (error) {
-            // Log the specific error and which batch failed
-            console.error(`Batch ${Math.floor(i/batchSize) + 1} failed:`, error);
-            errors.push(`Batch ${Math.floor(i/batchSize) + 1} (rows ${i + 1}-${i + batch.length}): ${error.message}`);
-          } else {
-            successCount += batch.length;
-          }
-        } catch (batchError) {
-          console.error(`Batch ${Math.floor(i/batchSize) + 1} error:`, batchError);
-          errors.push(`Batch ${Math.floor(i/batchSize) + 1}: ${batchError instanceof Error ? batchError.message : 'Unknown error'}`);
-        }
-      }
-
-      // Show results
-      if (successCount > 0) {
-        toast({
-          title: "Import Complete",
-          description: `Successfully imported ${successCount} publications${errors.length > 0 ? ` with ${errors.length} errors` : ''}`
-        });
-      }
-
-      if (errors.length > 0) {
-        console.error('CSV Import Errors:', errors);
-        toast({
-          title: "Import Errors",
-          description: `${errors.length} rows failed. Check console for details.`,
-          variant: "destructive"
-        });
-      }
-
-      setCsvFile(null);
-      fetchPublications();
-    } catch (error) {
-      console.error('Error uploading CSV:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to upload CSV",
-        variant: "destructive"
-      });
-    } finally {
-      setUploading(false);
+  const getTierColor = (tier: string) => {
+    switch (tier) {
+      case 'premium': return 'bg-purple-100 text-purple-800';
+      case 'tier2': return 'bg-blue-100 text-blue-800';
+      case 'tier1': return 'bg-green-100 text-green-800';
+      case 'standard': return 'bg-gray-100 text-gray-800';
+      case 'starter': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const openEditDialog = (publication: Publication) => {
-    setEditingPublication(publication);
-    setNewPublication({
-      name: publication.name,
-      type: publication.type,
-      category: publication.category,
-      price: publication.price,
-      tat_days: publication.tat_days?.toString() || "7",
-      description: publication.description,
-      features: publication.features,
-      website_url: publication.website_url || "",
-      tier: publication.tier,
-      da_score: publication.da_score,
-      dr_score: publication.dr_score,
-      location: publication.location || "",
-      guaranteed_placement: publication.guaranteed_placement || false,
-      dofollow_link: publication.dofollow_link || true,
-      social_media_post: publication.social_media_post || false,
-      homepage_placement: publication.homepage_placement || false,
-      dedicated_article: publication.dedicated_article || false,
-      press_release_distribution: publication.press_release_distribution || false,
-      author_byline: publication.author_byline || false,
-      image_inclusion: publication.image_inclusion || false,
-      video_inclusion: publication.video_inclusion || false,
-      sponsored: publication.sponsored || false,
-      indexed: publication.indexed !== false,
-      erotic: publication.erotic || false,
-      health: publication.health || false,
-      cbd: publication.cbd || false,
-      crypto: publication.crypto || false,
-      gambling: publication.gambling || false,
-      placement_type: publication.placement_type || "standard",
-    });
-    setIsEditDialogOpen(true);
-  };
-
-  const getTierBadge = (tier: string) => {
-    const colors = {
-      exclusive: "bg-purple-100 text-purple-800 border-purple-200",
-      tier1: "bg-blue-100 text-blue-800 border-blue-200",
-      premium: "bg-green-100 text-green-800 border-green-200",
-      tier2: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      standard: "bg-gray-100 text-gray-800 border-gray-200",
-      starter: "bg-orange-100 text-orange-800 border-orange-200",
-    };
-    return <Badge className={colors[tier as keyof typeof colors] || colors.standard}>{tier}</Badge>;
-  };
-
-  // Memoized handlers to prevent input field refocus issues
+  // Event handlers
   const handleInputChange = useCallback((field: keyof NewPublication) => 
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const value = e.target.value;
-      setNewPublication(prev => ({ ...prev, [field]: value }));
+      setNewPublication(prev => ({
+        ...prev,
+        [field]: e.target.value
+      }));
     }, []);
 
   const handleNumberChange = useCallback((field: keyof NewPublication) => 
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = parseInt(e.target.value) || 0;
-      setNewPublication(prev => ({ ...prev, [field]: value }));
+      const value = e.target.value;
+      setNewPublication(prev => ({
+        ...prev,
+        [field]: value === '' ? undefined : Number(value)
+      }));
     }, []);
 
   const handleSelectChange = useCallback((field: keyof NewPublication) => 
     (value: string) => {
-      setNewPublication(prev => ({ ...prev, [field]: value }));
+      setNewPublication(prev => ({
+        ...prev,
+        [field]: value
+      }));
     }, []);
 
   const handleCheckboxChange = useCallback((field: keyof NewPublication) => 
     (checked: boolean) => {
-      setNewPublication(prev => ({ ...prev, [field]: checked }));
+      setNewPublication(prev => ({
+        ...prev,
+        [field]: checked
+      }));
     }, []);
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span className="flex items-center">
-            <Building className="w-5 h-5 mr-2" />
-            Publication Management
-          </span>
-          <div className="flex items-center space-x-2">
-            <Select value={tierFilter} onValueChange={setTierFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Filter by tier" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Tiers</SelectItem>
-                <SelectItem value="exclusive">Exclusive</SelectItem>
-                <SelectItem value="tier1">Tier 1</SelectItem>
-                <SelectItem value="premium">Premium</SelectItem>
-                <SelectItem value="tier2">Tier 2</SelectItem>
-                <SelectItem value="standard">Standard</SelectItem>
-                <SelectItem value="starter">Starter</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search publications..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-64"
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Publication Management</h2>
+        <div className="flex gap-2">
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Publication
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl">
+              <DialogHeader>
+                <DialogTitle>Add New Publication</DialogTitle>
+                <DialogDescription>
+                  Add a new publication to the database
+                </DialogDescription>
+              </DialogHeader>
+              <PublicationForm
+                newPublication={newPublication}
+                onInputChange={handleInputChange}
+                onNumberChange={handleNumberChange}
+                onSelectChange={handleSelectChange}
+                onCheckboxChange={handleCheckboxChange}
+                onFetchLogo={handleFetchLogo}
+                fetchingLogo={fetchingLogo}
               />
-            </div>
-            
-            {/* CSV Upload */}
-            <div className="flex items-center space-x-2">
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAddPublication}>Add Publication</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      {/* Quick Add Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Quick Add Publication</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter publication name or website URL"
+              value={quickAddName}
+              onChange={(e) => setQuickAddName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleQuickAdd()}
+            />
+            <Button 
+              onClick={handleQuickAdd}
+              disabled={!quickAddName.trim() || uploading}
+            >
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              Add
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* CSV Upload Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">CSV Upload</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <Label htmlFor="csv-file">Upload CSV File</Label>
               <Input
+                id="csv-file"
                 type="file"
                 accept=".csv"
+                ref={fileInputRef}
                 onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
-                className="w-auto"
               />
-              <Button
-                onClick={handleCsvUpload}
-                disabled={!csvFile || uploading}
-                variant="outline"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                {uploading ? "Uploading..." : "Upload CSV"}
-              </Button>
             </div>
+            <Button 
+              onClick={handleCSVUpload}
+              disabled={!csvFile || uploading}
+            >
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              Upload
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Publication
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl">
-                <DialogHeader>
-                  <DialogTitle>Add New Publication</DialogTitle>
-                  <DialogDescription>
-                    Add a new publication to the marketplace manually.
-                  </DialogDescription>
-                </DialogHeader>
-                <PublicationForm 
-                  newPublication={newPublication}
-                  onInputChange={handleInputChange}
-                  onNumberChange={handleNumberChange}
-                  onSelectChange={handleSelectChange}
-                  onCheckboxChange={handleCheckboxChange}
-                />
-                <div className="flex justify-end space-x-2 mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsAddDialogOpen(false);
-                      setNewPublication(defaultPublication);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddPublication}>
-                    Add Publication
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {filteredPublications.length === 0 ? (
-          <div className="text-center py-8">
-            <Building className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Publications Found</h3>
-            <p className="text-muted-foreground">
-              {searchTerm || tierFilter !== "all" 
-                ? "No publications match your search criteria." 
-                : "No publications have been added yet."
-              }
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Publication</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Tier</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>TAT</TableHead>
-                  <TableHead>DA/DR</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredPublications.map((publication) => (
-                  <TableRow key={publication.id}>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <div>
-                          <div className="font-medium truncate max-w-[200px]">
-                            {publication.name}
-                          </div>
-                          {publication.website_url && (
-                            <div className="flex items-center text-sm text-muted-foreground">
-                              <Globe className="w-3 h-3 mr-1" />
-                              <span className="truncate max-w-[150px]">
-                                {publication.website_url.replace(/^https?:\/\//, '')}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{publication.category}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {getTierBadge(publication.tier)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center text-sm">
-                        <DollarSign className="w-3 h-3 mr-1" />
-                        {publication.price.toLocaleString()}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center text-sm">
-                        <Clock className="w-3 h-3 mr-1" />
-                        {publication.tat_days}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <div>DA: {publication.da_score || 0}</div>
-                        <div>DR: {publication.dr_score || 0}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openEditDialog(publication)}
-                        >
-                          <Edit className="w-3 h-3 mr-1" />
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDeletePublication(publication.id)}
-                        >
-                          <Trash2 className="w-3 h-3 mr-1" />
-                          Delete
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-
-        {/* Edit Dialog */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>Edit Publication</DialogTitle>
-              <DialogDescription>
-                Update the publication details.
-              </DialogDescription>
-            </DialogHeader>
-            <PublicationForm 
-              newPublication={newPublication}
-              onInputChange={handleInputChange}
-              onNumberChange={handleNumberChange}
-              onSelectChange={handleSelectChange}
-              onCheckboxChange={handleCheckboxChange}
-              isEdit 
+      {/* Search and Filter */}
+      <div className="flex gap-4 items-center">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search publications..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
             />
-            <div className="flex justify-end space-x-2 mt-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsEditDialogOpen(false);
-                  setEditingPublication(null);
-                  setNewPublication(defaultPublication);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleEditPublication}>
-                Update Publication
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </CardContent>
-    </Card>
+          </div>
+        </div>
+        <div className="w-48">
+          <Select value={tierFilter} onValueChange={setTierFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by tier" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Tiers</SelectItem>
+              <SelectItem value="premium">Premium</SelectItem>
+              <SelectItem value="tier2">Tier 2</SelectItem>
+              <SelectItem value="tier1">Tier 1</SelectItem>
+              <SelectItem value="standard">Standard</SelectItem>
+              <SelectItem value="starter">Starter</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Publications Table */}
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Publication</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Tier</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>DA/DR</TableHead>
+                <TableHead>TAT</TableHead>
+                <TableHead>Features</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredPublications.map((publication) => (
+                <TableRow key={publication.id}>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{publication.name}</div>
+                      {publication.location && (
+                        <div className="text-sm text-gray-500">{publication.location}</div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{publication.category}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getTierColor(publication.tier)}>
+                      {publication.tier}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{formatPrice(publication.price)}</TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      <div>DA: {publication.da_score || 0}</div>
+                      <div>DR: {publication.dr_score || 0}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{publication.tat_days}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {publication.dofollow_link && (
+                        <Badge variant="secondary" className="text-xs">Dofollow</Badge>
+                      )}
+                      {publication.sponsored && (
+                        <Badge variant="secondary" className="text-xs">Sponsored</Badge>
+                      )}
+                      {publication.indexed && (
+                        <Badge variant="secondary" className="text-xs">Indexed</Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeletePublication(publication.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {filteredPublications.length === 0 && !loading && (
+        <div className="text-center py-8">
+          <p className="text-gray-500">No publications found</p>
+        </div>
+      )}
+    </div>
   );
 };

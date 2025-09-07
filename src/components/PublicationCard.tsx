@@ -122,7 +122,7 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
             </span>
             <div className="flex items-center text-sm text-muted-foreground">
               <Clock className="h-4 w-4 mr-1" />
-              {publication.timeline || `${publication.tat_days} days`}
+              {publication.tat_days}
             </div>
           </div>
 
@@ -154,53 +154,34 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
 
           {/* Features Grid */}
           <div className="grid grid-cols-2 gap-1 text-xs">
-            {publication.guaranteed_placement && (
-              <div className="flex items-center text-green-600">
-                <CheckCircle className="h-3 w-3 mr-1" />
-                Guaranteed
-              </div>
-            )}
             {publication.dofollow_link && (
               <div className="flex items-center text-blue-600">
                 <LinkIcon className="h-3 w-3 mr-1" />
                 Do-follow
               </div>
             )}
-            {publication.homepage_placement && (
+            {publication.sponsored && (
               <div className="flex items-center text-purple-600">
-                <Home className="h-3 w-3 mr-1" />
-                Homepage
-              </div>
-            )}
-            {publication.social_media_post && (
-              <div className="flex items-center text-pink-600">
-                <Users className="h-3 w-3 mr-1" />
-                Social Post
-              </div>
-            )}
-            {publication.image_inclusion && (
-              <div className="flex items-center text-orange-600">
-                <Image className="h-3 w-3 mr-1" />
-                Images
-              </div>
-            )}
-            {publication.video_inclusion && (
-              <div className="flex items-center text-red-600">
-                <Play className="h-3 w-3 mr-1" />
-                Video
-              </div>
-            )}
-            {publication.author_byline && (
-              <div className="flex items-center text-indigo-600">
-                <UserCheck className="h-3 w-3 mr-1" />
-                Byline
-              </div>
-            )}
-            {publication.placement_type && publication.placement_type !== 'standard' && (
-              <div className="flex items-center text-yellow-600 col-span-2">
                 <Badge variant="outline" className="text-xs">
-                  {publication.placement_type}
+                  Sponsored
                 </Badge>
+              </div>
+            )}
+            {publication.indexed && (
+              <div className="flex items-center text-green-600">
+                <CheckCircle className="h-3 w-3 mr-1" />
+                Indexed
+              </div>
+            )}
+            {(publication.crypto || publication.health || publication.cbd || publication.gambling || publication.erotic) && (
+              <div className="flex items-center text-orange-600 col-span-2">
+                <div className="flex gap-1 flex-wrap">
+                  {publication.crypto && <Badge variant="outline" className="text-xs">Crypto</Badge>}
+                  {publication.health && <Badge variant="outline" className="text-xs">Health</Badge>}
+                  {publication.cbd && <Badge variant="outline" className="text-xs">CBD</Badge>}
+                  {publication.gambling && <Badge variant="outline" className="text-xs">Gambling</Badge>}
+                  {publication.erotic && <Badge variant="outline" className="text-xs">Adult</Badge>}
+                </div>
               </div>
             )}
           </div>

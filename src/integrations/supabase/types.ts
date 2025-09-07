@@ -312,6 +312,96 @@ export type Database = {
         }
         Relationships: []
       }
+      publications: {
+        Row: {
+          category: string
+          cbd: boolean | null
+          created_at: string
+          crypto: boolean | null
+          da_score: number | null
+          description: string | null
+          dofollow_link: boolean | null
+          dr_score: number | null
+          erotic: boolean | null
+          external_id: string | null
+          features: string[] | null
+          gambling: boolean | null
+          health: boolean | null
+          id: string
+          indexed: boolean | null
+          is_active: boolean | null
+          location: string | null
+          logo_url: string | null
+          name: string
+          popularity: number | null
+          price: number
+          sponsored: boolean | null
+          tat_days: string
+          tier: string | null
+          type: string | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          category?: string
+          cbd?: boolean | null
+          created_at?: string
+          crypto?: boolean | null
+          da_score?: number | null
+          description?: string | null
+          dofollow_link?: boolean | null
+          dr_score?: number | null
+          erotic?: boolean | null
+          external_id?: string | null
+          features?: string[] | null
+          gambling?: boolean | null
+          health?: boolean | null
+          id?: string
+          indexed?: boolean | null
+          is_active?: boolean | null
+          location?: string | null
+          logo_url?: string | null
+          name: string
+          popularity?: number | null
+          price?: number
+          sponsored?: boolean | null
+          tat_days?: string
+          tier?: string | null
+          type?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          category?: string
+          cbd?: boolean | null
+          created_at?: string
+          crypto?: boolean | null
+          da_score?: number | null
+          description?: string | null
+          dofollow_link?: boolean | null
+          dr_score?: number | null
+          erotic?: boolean | null
+          external_id?: string | null
+          features?: string[] | null
+          gambling?: boolean | null
+          health?: boolean | null
+          id?: string
+          indexed?: boolean | null
+          is_active?: boolean | null
+          location?: string | null
+          logo_url?: string | null
+          name?: string
+          popularity?: number | null
+          price?: number
+          sponsored?: boolean | null
+          tat_days?: string
+          tier?: string | null
+          type?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       review_comments: {
         Row: {
           content: string

@@ -1,16 +1,9 @@
-import { seedPublications } from '@/scripts/seed-publications';
+// Seed database functionality removed - now managed through admin interface
 
 // This utility can be called from the browser console to seed the database
 export const runSeed = async () => {
-  try {
-    console.log('🌱 Starting database seeding...');
-    const result = await seedPublications();
-    console.log('✅ Database seeding completed!', result);
-    // Reload the page to see the results
-    window.location.reload();
-  } catch (error) {
-    console.error('❌ Database seeding failed:', error);
-  }
+  console.log('🌱 Database seeding is now handled through the admin interface at /admin-dashboard');
+  console.log('✅ Use the Publication Management section to upload publications via CSV or manually add them');
 };
 
 // Make it available globally for easy access
