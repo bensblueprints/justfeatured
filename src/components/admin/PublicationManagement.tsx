@@ -109,6 +109,327 @@ const defaultPublication: NewPublication = {
   placement_type: "standard",
 };
 
+// Move PublicationForm outside to prevent recreation on every render
+const PublicationForm = ({ 
+  newPublication, 
+  onInputChange, 
+  onNumberChange, 
+  onSelectChange, 
+  onCheckboxChange,
+  isEdit = false 
+}: { 
+  newPublication: NewPublication;
+  onInputChange: (field: keyof NewPublication) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onNumberChange: (field: keyof NewPublication) => (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSelectChange: (field: keyof NewPublication) => (value: string) => void;
+  onCheckboxChange: (field: keyof NewPublication) => (checked: boolean) => void;
+  isEdit?: boolean;
+}) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="name">Publication Name *</Label>
+        <Input
+          id="name"
+          value={newPublication.name}
+          onChange={onInputChange('name')}
+          placeholder="Enter publication name"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="category">Category *</Label>
+        <Input
+          id="category"
+          value={newPublication.category}
+          onChange={onInputChange('category')}
+          placeholder="e.g., News, Business, Technology"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="tier">Tier</Label>
+        <Select value={newPublication.tier} onValueChange={onSelectChange('tier')}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select tier" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="exclusive">Exclusive</SelectItem>
+            <SelectItem value="tier1">Tier 1</SelectItem>
+            <SelectItem value="premium">Premium</SelectItem>
+            <SelectItem value="tier2">Tier 2</SelectItem>
+            <SelectItem value="standard">Standard</SelectItem>
+            <SelectItem value="starter">Starter</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="type">Type</Label>
+        <Select value={newPublication.type} onValueChange={onSelectChange('type')}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="exclusive">Exclusive</SelectItem>
+            <SelectItem value="tier1">Tier 1</SelectItem>
+            <SelectItem value="premium">Premium</SelectItem>
+            <SelectItem value="tier2">Tier 2</SelectItem>
+            <SelectItem value="standard">Standard</SelectItem>
+            <SelectItem value="starter">Starter</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <Label htmlFor="price">Price ($) *</Label>
+          <Input
+            id="price"
+            type="number"
+            value={newPublication.price}
+            onChange={onNumberChange('price')}
+            placeholder="0"
+          />
+        </div>
+        <div>
+          <Label htmlFor="tat_days">TAT (Days)</Label>
+          <Input
+            id="tat_days"
+            value={newPublication.tat_days}
+            onChange={onInputChange('tat_days')}
+            placeholder="e.g., 7, 1-2 Weeks"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <Label htmlFor="da_score">DA Score</Label>
+          <Input
+            id="da_score"
+            type="number"
+            value={newPublication.da_score || ""}
+            onChange={onNumberChange('da_score')}
+            placeholder="0"
+          />
+        </div>
+        <div>
+          <Label htmlFor="dr_score">DR Score</Label>
+          <Input
+            id="dr_score"
+            type="number"
+            value={newPublication.dr_score || ""}
+            onChange={onNumberChange('dr_score')}
+            placeholder="0"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="website_url">Website URL</Label>
+        <Input
+          id="website_url"
+          value={newPublication.website_url}
+          onChange={onInputChange('website_url')}
+          placeholder="https://example.com"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="location">Location</Label>
+        <Input
+          id="location"
+          value={newPublication.location || ""}
+          onChange={onInputChange('location')}
+          placeholder="e.g., United States, Global"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={newPublication.description}
+          onChange={onInputChange('description')}
+          placeholder="Publication description"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="placement_type">Placement Type</Label>
+        <Select value={newPublication.placement_type} onValueChange={onSelectChange('placement_type')}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select placement type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="standard">Standard</SelectItem>
+            <SelectItem value="discreet">Discreet</SelectItem>
+            <SelectItem value="branded">Branded</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+
+    <div className="space-y-4">
+      <div>
+        <Label>Features</Label>
+        <div className="grid grid-cols-1 gap-2 mt-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="guaranteed_placement"
+              checked={newPublication.guaranteed_placement}
+              onCheckedChange={onCheckboxChange('guaranteed_placement')}
+            />
+            <Label htmlFor="guaranteed_placement">Guaranteed Placement</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="dofollow_link"
+              checked={newPublication.dofollow_link}
+              onCheckedChange={onCheckboxChange('dofollow_link')}
+            />
+            <Label htmlFor="dofollow_link">Dofollow Link</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="social_media_post"
+              checked={newPublication.social_media_post}
+              onCheckedChange={onCheckboxChange('social_media_post')}
+            />
+            <Label htmlFor="social_media_post">Social Media Post</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="homepage_placement"
+              checked={newPublication.homepage_placement}
+              onCheckedChange={onCheckboxChange('homepage_placement')}
+            />
+            <Label htmlFor="homepage_placement">Homepage Placement</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="dedicated_article"
+              checked={newPublication.dedicated_article}
+              onCheckedChange={onCheckboxChange('dedicated_article')}
+            />
+            <Label htmlFor="dedicated_article">Dedicated Article</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="press_release_distribution"
+              checked={newPublication.press_release_distribution}
+              onCheckedChange={onCheckboxChange('press_release_distribution')}
+            />
+            <Label htmlFor="press_release_distribution">Press Release Distribution</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="author_byline"
+              checked={newPublication.author_byline}
+              onCheckedChange={onCheckboxChange('author_byline')}
+            />
+            <Label htmlFor="author_byline">Author Byline</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="image_inclusion"
+              checked={newPublication.image_inclusion}
+              onCheckedChange={onCheckboxChange('image_inclusion')}
+            />
+            <Label htmlFor="image_inclusion">Image Inclusion</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="video_inclusion"
+              checked={newPublication.video_inclusion}
+              onCheckedChange={onCheckboxChange('video_inclusion')}
+            />
+            <Label htmlFor="video_inclusion">Video Inclusion</Label>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <Label>Content Restrictions</Label>
+        <div className="grid grid-cols-1 gap-2 mt-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="sponsored"
+              checked={newPublication.sponsored}
+              onCheckedChange={onCheckboxChange('sponsored')}
+            />
+            <Label htmlFor="sponsored">Sponsored Content</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="indexed"
+              checked={newPublication.indexed}
+              onCheckedChange={onCheckboxChange('indexed')}
+            />
+            <Label htmlFor="indexed">Indexed by Search Engines</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="erotic"
+              checked={newPublication.erotic}
+              onCheckedChange={onCheckboxChange('erotic')}
+            />
+            <Label htmlFor="erotic">Erotic Content Allowed</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="health"
+              checked={newPublication.health}
+              onCheckedChange={onCheckboxChange('health')}
+            />
+            <Label htmlFor="health">Health Content Allowed</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="cbd"
+              checked={newPublication.cbd}
+              onCheckedChange={onCheckboxChange('cbd')}
+            />
+            <Label htmlFor="cbd">CBD Content Allowed</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="crypto"
+              checked={newPublication.crypto}
+              onCheckedChange={onCheckboxChange('crypto')}
+            />
+            <Label htmlFor="crypto">Crypto Content Allowed</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="gambling"
+              checked={newPublication.gambling}
+              onCheckedChange={onCheckboxChange('gambling')}
+            />
+            <Label htmlFor="gambling">Gambling Content Allowed</Label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 export const PublicationManagement = () => {
   const { toast } = useToast();
   const [publications, setPublications] = useState<Publication[]>([]);
@@ -460,255 +781,7 @@ export const PublicationManagement = () => {
   const handleCheckboxChange = useCallback((field: keyof NewPublication) => 
     (checked: boolean) => {
       setNewPublication(prev => ({ ...prev, [field]: checked }));
-    }, []); 
-
-  const PublicationForm = ({ isEdit = false }: { isEdit?: boolean }) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="name">Publication Name *</Label>
-          <Input
-            id="name"
-            value={newPublication.name}
-            onChange={handleInputChange('name')}
-            placeholder="Enter publication name"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="category">Category *</Label>
-          <Input
-            id="category"
-            value={newPublication.category}
-            onChange={handleInputChange('category')}
-            placeholder="e.g., News, Business, Technology"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="tier">Tier</Label>
-          <Select value={newPublication.tier} onValueChange={handleSelectChange('tier')}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select tier" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="exclusive">Exclusive</SelectItem>
-              <SelectItem value="tier1">Tier 1</SelectItem>
-              <SelectItem value="premium">Premium</SelectItem>
-              <SelectItem value="tier2">Tier 2</SelectItem>
-              <SelectItem value="standard">Standard</SelectItem>
-              <SelectItem value="starter">Starter</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label htmlFor="type">Type</Label>
-          <Select value={newPublication.type} onValueChange={handleSelectChange('type')}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="exclusive">Exclusive</SelectItem>
-              <SelectItem value="tier1">Tier 1</SelectItem>
-              <SelectItem value="premium">Premium</SelectItem>
-              <SelectItem value="tier2">Tier 2</SelectItem>
-              <SelectItem value="standard">Standard</SelectItem>
-              <SelectItem value="starter">Starter</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label htmlFor="price">Price ($) *</Label>
-            <Input
-              id="price"
-              type="number"
-              value={newPublication.price}
-              onChange={handleNumberChange('price')}
-              placeholder="0"
-            />
-          </div>
-          <div>
-            <Label htmlFor="tat_days">TAT (Days)</Label>
-            <Input
-              id="tat_days"
-              value={newPublication.tat_days}
-              onChange={handleInputChange('tat_days')}
-              placeholder="e.g., 7, 1-2 Weeks"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label htmlFor="da_score">DA Score</Label>
-            <Input
-              id="da_score"
-              type="number"
-              value={newPublication.da_score || ""}
-              onChange={handleNumberChange('da_score')}
-              placeholder="0"
-            />
-          </div>
-          <div>
-            <Label htmlFor="dr_score">DR Score</Label>
-            <Input
-              id="dr_score"
-              type="number"
-              value={newPublication.dr_score || ""}
-              onChange={handleNumberChange('dr_score')}
-              placeholder="0"
-            />
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="website_url">Website URL</Label>
-          <Input
-            id="website_url"
-            value={newPublication.website_url}
-            onChange={handleInputChange('website_url')}
-            placeholder="https://example.com"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="location">Location</Label>
-          <Input
-            id="location"
-            value={newPublication.location || ""}
-            onChange={handleInputChange('location')}
-            placeholder="e.g., UNITED STATES, GLOBAL"
-          />
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            value={newPublication.description}
-            onChange={handleInputChange('description')}
-            placeholder="Publication description"
-            rows={3}
-          />
-        </div>
-
-        <div>
-          <Label>Features</Label>
-          <div className="grid grid-cols-2 gap-2 mt-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.guaranteed_placement}
-                onCheckedChange={(checked) => handleCheckboxChange('guaranteed_placement')(!!checked)}
-              />
-              <Label className="text-sm">Guaranteed Placement</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.dofollow_link}
-                onCheckedChange={(checked) => handleCheckboxChange('dofollow_link')(!!checked)}
-              />
-              <Label className="text-sm">Dofollow Link</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.social_media_post}
-                onCheckedChange={(checked) => handleCheckboxChange('social_media_post')(!!checked)}
-              />
-              <Label className="text-sm">Social Media Post</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.homepage_placement}
-                onCheckedChange={(checked) => handleCheckboxChange('homepage_placement')(!!checked)}
-              />
-              <Label className="text-sm">Homepage Placement</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.author_byline}
-                onCheckedChange={(checked) => handleCheckboxChange('author_byline')(!!checked)}
-              />
-              <Label className="text-sm">Author Byline</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.image_inclusion}
-                onCheckedChange={(checked) => handleCheckboxChange('image_inclusion')(!!checked)}
-              />
-              <Label className="text-sm">Image Inclusion</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.video_inclusion}
-                onCheckedChange={(checked) => handleCheckboxChange('video_inclusion')(!!checked)}
-              />
-              <Label className="text-sm">Video Inclusion</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.sponsored}
-                onCheckedChange={(checked) => handleCheckboxChange('sponsored')(!!checked)}
-              />
-              <Label className="text-sm">Sponsored</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.indexed}
-                onCheckedChange={(checked) => handleCheckboxChange('indexed')(!!checked)}
-              />
-              <Label className="text-sm">Indexed</Label>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <Label>Content Restrictions</Label>
-          <div className="grid grid-cols-2 gap-2 mt-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.erotic}
-                onCheckedChange={(checked) => handleCheckboxChange('erotic')(!!checked)}
-              />
-              <Label className="text-sm">Erotic Content</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.health}
-                onCheckedChange={(checked) => handleCheckboxChange('health')(!!checked)}
-              />
-              <Label className="text-sm">Health Content</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.cbd}
-                onCheckedChange={(checked) => handleCheckboxChange('cbd')(!!checked)}
-              />
-              <Label className="text-sm">CBD Content</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.crypto}
-                onCheckedChange={(checked) => handleCheckboxChange('crypto')(!!checked)}
-              />
-              <Label className="text-sm">Crypto Content</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={newPublication.gambling}
-                onCheckedChange={(checked) => handleCheckboxChange('gambling')(!!checked)}
-              />
-              <Label className="text-sm">Gambling Content</Label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    }, []);
 
   if (loading) {
     return (
@@ -785,7 +858,13 @@ export const PublicationManagement = () => {
                     Add a new publication to the marketplace manually.
                   </DialogDescription>
                 </DialogHeader>
-                <PublicationForm />
+                <PublicationForm 
+                  newPublication={newPublication}
+                  onInputChange={handleInputChange}
+                  onNumberChange={handleNumberChange}
+                  onSelectChange={handleSelectChange}
+                  onCheckboxChange={handleCheckboxChange}
+                />
                 <div className="flex justify-end space-x-2 mt-4">
                   <Button
                     variant="outline"
@@ -911,7 +990,14 @@ export const PublicationManagement = () => {
                 Update the publication details.
               </DialogDescription>
             </DialogHeader>
-            <PublicationForm isEdit />
+            <PublicationForm 
+              newPublication={newPublication}
+              onInputChange={handleInputChange}
+              onNumberChange={handleNumberChange}
+              onSelectChange={handleSelectChange}
+              onCheckboxChange={handleCheckboxChange}
+              isEdit 
+            />
             <div className="flex justify-end space-x-2 mt-4">
               <Button
                 variant="outline"
