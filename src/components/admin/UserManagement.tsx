@@ -102,6 +102,42 @@ export const UserManagement = () => {
 
   const updateUserRole = async (userId: string, newRole: UserRole) => {
     try {
+      // Security: Get current user role to prevent privilege escalation
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('Not authenticated');
+      }
+
+      const { data: currentUserRole } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      // Security: Only super_admin can assign super_admin role
+      if (newRole === 'super_admin' && currentUserRole?.role !== 'super_admin') {
+        toast({
+          title: "Access Denied",
+          description: "Only super administrators can assign super admin roles",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Security: Users cannot escalate to higher roles than their own
+      const roleHierarchy = { customer: 1, editor: 2, admin: 3, super_admin: 4 };
+      const currentRoleLevel = roleHierarchy[currentUserRole?.role as keyof typeof roleHierarchy] || 1;
+      const newRoleLevel = roleHierarchy[newRole as keyof typeof roleHierarchy] || 1;
+
+      if (newRoleLevel > currentRoleLevel) {
+        toast({
+          title: "Access Denied", 
+          description: "Cannot assign a role higher than your own",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('user_roles')
         .update({ role: newRole })
@@ -118,7 +154,7 @@ export const UserManagement = () => {
 
       toast({
         title: "Success",
-        description: "User role updated successfully"
+        description: "User role updated successfully. Change has been logged for audit.",
       });
     } catch (error) {
       console.error('Error updating user role:', error);

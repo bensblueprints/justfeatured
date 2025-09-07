@@ -1,15 +1,38 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Publication } from '@/types';
 
+// Public fields that can be shown to unauthenticated users
+const PUBLIC_FIELDS = [
+  'external_id', 'name', 'website_url', 'type', 'tier', 
+  'category', 'description', 'features', 'is_active', 'popularity',
+  'timeline', 'location'
+];
+
+// Sensitive business fields that require authentication
+const AUTHENTICATED_FIELDS = [
+  ...PUBLIC_FIELDS,
+  'price', 'da_score', 'dr_score', 'tat_days', 'placement_type',
+  'guaranteed_placement', 'dofollow_link', 'social_media_post',
+  'homepage_placement', 'image_inclusion', 'video_inclusion',
+  'author_byline', 'sponsored', 'indexed', 'erotic', 'health',
+  'cbd', 'crypto', 'gambling'
+];
+
 /**
- * Fetch all publications from the database
+ * Fetch all publications from the database with security filtering
  */
 export const fetchPublications = async (): Promise<Publication[]> => {
+  // Check if user is authenticated to determine fields to select
+  const { data: { user } } = await supabase.auth.getUser();
+  const isAuthenticated = !!user;
+
+  const fields = isAuthenticated ? AUTHENTICATED_FIELDS.join(',') : PUBLIC_FIELDS.join(',');
+
   const { data, error } = await supabase
     .from('publications')
-    .select('*')
+    .select(fields)
     .eq('is_active', true)
-    .order('price', { ascending: false });
+    .order('popularity', { ascending: false });
 
   if (error) {
     console.error('Error fetching publications:', error);
@@ -17,32 +40,32 @@ export const fetchPublications = async (): Promise<Publication[]> => {
   }
 
   // Transform database records to match the Publication type
-  return data.map(record => ({
+  return data.map((record: any) => ({
     id: record.external_id,
     name: record.name,
     type: record.type as Publication['type'],
     category: record.category,
-    price: record.price,
-    tat_days: record.tat_days,
+    price: isAuthenticated ? record.price : undefined,
+    tat_days: isAuthenticated ? record.tat_days : undefined,
     description: record.description,
     features: record.features || [],
     website_url: record.website_url,
     tier: record.tier,
     popularity: record.popularity || 0,
     is_active: record.is_active,
-    // Additional fields for premium publications
-    da_score: record.da_score,
-    dr_score: record.dr_score,
+    // Additional fields for premium publications (only if authenticated)
+    da_score: isAuthenticated ? record.da_score : undefined,
+    dr_score: isAuthenticated ? record.dr_score : undefined,
     timeline: record.timeline,
     location: record.location,
-    guaranteed_placement: record.guaranteed_placement,
-    dofollow_link: record.dofollow_link,
-    social_media_post: record.social_media_post,
-    homepage_placement: record.homepage_placement,
-    image_inclusion: record.image_inclusion,
-    video_inclusion: record.video_inclusion,
-    author_byline: record.author_byline,
-    placement_type: (record.placement_type as Publication['placement_type']) || 'standard'
+    guaranteed_placement: isAuthenticated ? record.guaranteed_placement : undefined,
+    dofollow_link: isAuthenticated ? record.dofollow_link : undefined,
+    social_media_post: isAuthenticated ? record.social_media_post : undefined,
+    homepage_placement: isAuthenticated ? record.homepage_placement : undefined,
+    image_inclusion: isAuthenticated ? record.image_inclusion : undefined,
+    video_inclusion: isAuthenticated ? record.video_inclusion : undefined,
+    author_byline: isAuthenticated ? record.author_byline : undefined,
+    placement_type: isAuthenticated ? (record.placement_type as Publication['placement_type']) || 'standard' : undefined
   }));
 };
 

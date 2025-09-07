@@ -528,6 +528,36 @@ export type Database = {
           },
         ]
       }
+      role_change_audit: {
+        Row: {
+          changed_by: string | null
+          changed_user_id: string
+          created_at: string | null
+          id: string
+          new_role: Database["public"]["Enums"]["user_role"]
+          old_role: Database["public"]["Enums"]["user_role"] | null
+          reason: string | null
+        }
+        Insert: {
+          changed_by?: string | null
+          changed_user_id: string
+          created_at?: string | null
+          id?: string
+          new_role: Database["public"]["Enums"]["user_role"]
+          old_role?: Database["public"]["Enums"]["user_role"] | null
+          reason?: string | null
+        }
+        Update: {
+          changed_by?: string | null
+          changed_user_id?: string
+          created_at?: string | null
+          id?: string
+          new_role?: Database["public"]["Enums"]["user_role"]
+          old_role?: Database["public"]["Enums"]["user_role"] | null
+          reason?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
