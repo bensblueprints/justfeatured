@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { CheckCircle, Star, ArrowRight } from 'lucide-react';
 import { fetchPublicationsByTier } from '@/lib/publications';
 import { PublicationCard } from '@/components/PublicationCard';
@@ -63,42 +62,32 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
             </p>
           </div>
 
-          {/* Publication Selection Carousel */}
-          <div className="mb-8">
-            <Carousel className="w-full max-w-7xl mx-auto">
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {publications.map((publication) => (
-                  <CarouselItem key={publication.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
-                    <div className="p-1">
-                      <div className={`relative ${
-                        selectedPublication?.id === publication.id 
-                          ? 'ring-2 ring-primary rounded-lg' 
-                          : ''
-                      }`}>
-                        <PublicationCard
-                          publication={publication}
-                          selected={selectedPublication?.id === publication.id}
-                          onSelectionChange={(selected) => {
-                            if (selected) {
-                              handleSelect(publication);
-                            } else {
-                              setSelectedPublication(null);
-                            }
-                          }}
-                        />
-                        {selectedPublication?.id === publication.id && (
-                          <div className="absolute -top-2 -right-2 bg-primary rounded-full p-1">
-                            <CheckCircle className="h-4 w-4 text-primary-foreground" />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
+          {/* Publication Selection Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            {publications.map((publication) => (
+              <div key={publication.id} className={`relative ${
+                selectedPublication?.id === publication.id 
+                  ? 'ring-2 ring-primary rounded-lg' 
+                  : ''
+              }`}>
+                <PublicationCard
+                  publication={publication}
+                  selected={selectedPublication?.id === publication.id}
+                  onSelectionChange={(selected) => {
+                    if (selected) {
+                      handleSelect(publication);
+                    } else {
+                      setSelectedPublication(null);
+                    }
+                  }}
+                />
+                {selectedPublication?.id === publication.id && (
+                  <div className="absolute -top-2 -right-2 bg-primary rounded-full p-1">
+                    <CheckCircle className="h-4 w-4 text-primary-foreground" />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
           {/* Action Buttons */}
