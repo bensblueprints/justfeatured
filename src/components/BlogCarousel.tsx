@@ -33,7 +33,7 @@ const blogPosts = [
     readTime: "6 min read",
     author: "Emily Rodriguez",
     date: "Dec 10, 2024",
-    image: "/api/placeholder/400/240"
+    image: "/lovable-uploads/131c8afc-69f6-4375-9e2f-5e031cc2f208.png"
   },
   {
     id: 4,
