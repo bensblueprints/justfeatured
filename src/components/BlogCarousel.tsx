@@ -43,7 +43,7 @@ const blogPosts = [
     readTime: "8 min read",
     author: "Michael Johnson",
     date: "Dec 8, 2024",
-    image: "/api/placeholder/400/240"
+    image: "/lovable-uploads/09b7982d-72ac-45dc-be43-8723ba89a40c.png"
   },
   {
     id: 5,
