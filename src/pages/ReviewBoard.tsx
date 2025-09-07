@@ -66,7 +66,7 @@ const quillModules = {
   ],
   clipboard: {
     matchVisual: false,
-    dangerouslyPasteHTML: true
+    dangerouslyPasteHTML: false
   }
 };
 
