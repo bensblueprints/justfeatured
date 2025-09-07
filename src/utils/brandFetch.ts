@@ -103,6 +103,13 @@ export class BrandFetchService {
       // Cache the result (even if null to avoid repeated failures)
       this.logoCache.set(domain, logoUrl || '');
       
+      // Try to save to database for future use (fire and forget)
+      if (logoUrl) {
+        this.saveLogo(websiteUrl, logoUrl).catch(error => 
+          console.log('Failed to save logo to database:', error)
+        );
+      }
+      
       return logoUrl || null;
     } catch (error) {
       console.error(`Error fetching logo for ${domain}:`, error);
@@ -160,6 +167,27 @@ export class BrandFetchService {
       `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
       `https://logo.clearbit.com/${domain}?size=64&fallback=true`,
     ];
+  }
+
+  /**
+   * Save fetched logo to database for caching
+   */
+  private static async saveLogo(websiteUrl: string, logoUrl: string): Promise<void> {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      // Find publication by website URL and update logo
+      const { error } = await supabase
+        .from('publications')
+        .update({ logo_url: logoUrl })
+        .eq('website_url', websiteUrl);
+
+      if (error) {
+        console.error('Error saving logo to database:', error);
+      }
+    } catch (error) {
+      console.error('Failed to save logo to database:', error);
+    }
   }
 
   /**

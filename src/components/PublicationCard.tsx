@@ -14,23 +14,32 @@ interface PublicationCardProps {
 }
 
 export const PublicationCard = ({ publication, selected, onSelectionChange }: PublicationCardProps) => {
-  const [logo, setLogo] = useState<string>('');
+  const [logo, setLogo] = useState<string>(publication.logo_url || '');
 
-  // Fetch logo on component mount
+  // Fetch logo on component mount - prioritize cached logo from database
   useEffect(() => {
     const fetchLogo = async () => {
+      // If we already have a logo_url from the database, use it
+      if (publication.logo_url) {
+        setLogo(publication.logo_url);
+        return;
+      }
+
+      // Otherwise fetch from BrandFetch if we have a website URL
       if (publication.website_url) {
         try {
           const logoUrl = await BrandFetchService.getLogoWithFallback(publication.website_url);
           setLogo(logoUrl);
         } catch (error) {
           console.log('Failed to fetch logo for:', publication.name);
+          // Use a better fallback for publications without logos
+          setLogo('');
         }
       }
     };
 
     fetchLogo();
-  }, [publication.website_url]);
+  }, [publication.website_url, publication.logo_url]);
 
   const formatPrice = (price: number | undefined | null) => {
     // Handle undefined, null, or 0 price
