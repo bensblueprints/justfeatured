@@ -45,7 +45,11 @@ export const Publications = () => {
   }, []);
 
   const filteredPublications = useMemo(() => {
-    let filtered = publications;
+    if (loading || publications.length === 0) {
+      return [];
+    }
+    
+    let filtered = publications.filter(pub => pub.is_active !== false);
 
     // Filter by tab
     if (activeTab !== "all") {
@@ -99,7 +103,7 @@ export const Publications = () => {
     });
 
     return filtered;
-  }, [searchTerm, sortBy, activeTab, priceRange, industryFilter]);
+  }, [searchTerm, sortBy, activeTab, priceRange, industryFilter, publications, loading]);
 
   // Reset visible count when filters change
   useMemo(() => {
@@ -264,6 +268,7 @@ export const Publications = () => {
             <div className="mb-6 flex items-center justify-between">
               <p className="text-muted-foreground">
                 Showing {visiblePublications.length} of {filteredPublications.length} publications
+                {loading && " (Loading...)"}
               </p>
               {hasMorePublications && (
                 <p className="text-sm text-muted-foreground">
