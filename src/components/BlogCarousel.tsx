@@ -154,8 +154,8 @@ export const BlogCarousel = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="left-4" />
-            <CarouselNext className="right-4" />
+            <CarouselPrevious className="left-4 bg-background/80 hover:bg-background border-border/50" />
+            <CarouselNext className="right-4 bg-background/80 hover:bg-background border-border/50" />
           </Carousel>
         </div>
 
