@@ -76,23 +76,24 @@ export const Hero = () => {
           {/* Premium CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20 animate-slide-up" style={{ animationDelay: '0.4s' }}>
             <ProtectedInteraction action={() => navigate("/starter-selection")} source="hero_get_started_button">
-              <button 
+              <Button 
                 className="cta-primary group relative overflow-hidden"
+                size="lg"
               >
                 <span className="relative z-10 flex items-center">
                   🎯 GET STARTED FOR <span className="line-through text-gray-400 mx-1">$497</span> <span className="text-green-400">$97</span>
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </span>
-              </button>
+              </Button>
             </ProtectedInteraction>
             
             <ProtectedInteraction action={() => navigate("/publications")} source="hero_publications_button">
-              <button 
+              <Button 
                 className="bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 hover:border-white/50 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 group shadow-lg hover:shadow-xl"
               >
                 355+ PREMIUM PUBLICATIONS
                 <Sparkles className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
-              </button>
+              </Button>
             </ProtectedInteraction>
           </div>
 
