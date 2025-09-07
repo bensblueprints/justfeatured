@@ -486,19 +486,96 @@ export const PublicationManagement = () => {
 
   const handleAddPublication = async () => {
     try {
+      // Validate required fields
+      if (!newPublication.name.trim()) {
+        toast({
+          title: "Validation Error",
+          description: "Publication name is required",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!newPublication.category.trim()) {
+        toast({
+          title: "Validation Error", 
+          description: "Category is required",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!newPublication.description.trim()) {
+        toast({
+          title: "Validation Error",
+          description: "Description is required", 
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (newPublication.price <= 0) {
+        toast({
+          title: "Validation Error",
+          description: "Price must be greater than 0",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Build features array from boolean fields
+      const features = [];
+      if (newPublication.guaranteed_placement) features.push("Guaranteed Placement");
+      if (newPublication.dofollow_link) features.push("Do-follow Link");
+      if (newPublication.social_media_post) features.push("Social Media Post");
+      if (newPublication.homepage_placement) features.push("Homepage Placement");
+      if (newPublication.dedicated_article) features.push("Dedicated Article");
+      if (newPublication.press_release_distribution) features.push("Press Release Distribution");
+      if (newPublication.author_byline) features.push("Author Byline");
+      if (newPublication.image_inclusion) features.push("Image Inclusion");
+      if (newPublication.video_inclusion) features.push("Video Inclusion");
+
       const publicationData = {
-        ...newPublication,
         external_id: crypto.randomUUID(),
+        name: newPublication.name.trim(),
+        type: newPublication.type,
+        category: newPublication.category.trim(),
+        price: parseInt(newPublication.price.toString()),
+        tat_days: newPublication.tat_days,
+        description: newPublication.description.trim(),
+        features: features,
+        website_url: newPublication.website_url?.trim() || null,
+        tier: newPublication.tier,
+        da_score: newPublication.da_score > 0 ? parseInt(newPublication.da_score.toString()) : 0,
+        dr_score: newPublication.dr_score > 0 ? parseInt(newPublication.dr_score.toString()) : 0,
+        location: newPublication.location?.trim() || null,
+        guaranteed_placement: newPublication.guaranteed_placement,
+        dofollow_link: newPublication.dofollow_link,
+        social_media_post: newPublication.social_media_post,
+        homepage_placement: newPublication.homepage_placement,
+        author_byline: newPublication.author_byline,
+        image_inclusion: newPublication.image_inclusion,
+        video_inclusion: newPublication.video_inclusion,
+        placement_type: newPublication.placement_type,
+        sponsored: newPublication.sponsored,
+        indexed: newPublication.indexed,
+        erotic: newPublication.erotic,
+        health: newPublication.health,
+        cbd: newPublication.cbd,
+        crypto: newPublication.crypto,
+        gambling: newPublication.gambling,
         is_active: true,
         popularity: 0,
-        tat_days: newPublication.tat_days,
       };
 
       const { error } = await supabase
         .from('publications')
         .insert([publicationData]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       toast({
         title: "Success",
@@ -512,7 +589,7 @@ export const PublicationManagement = () => {
       console.error('Error adding publication:', error);
       toast({
         title: "Error",
-        description: "Failed to add publication",
+        description: `Failed to add publication: ${error.message || 'Unknown error'}`,
         variant: "destructive"
       });
     }
