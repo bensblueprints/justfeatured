@@ -73,7 +73,7 @@ export const Hero = () => {
       <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-pink-400/20 to-transparent rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-pink-300/15 to-transparent rounded-full blur-3xl" />
 
-      <div className="container relative z-10 pt-32 pb-20">
+      <div className="container relative z-10 pt-3 md:pt-32 pb-20">
         <div className="max-w-7xl mx-auto">
           {/* Floating Trust Badges */}
           <div className="flex justify-center items-center gap-4 mb-12 animate-slide-up">
