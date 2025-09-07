@@ -258,17 +258,20 @@ export const PublicationManagement = () => {
     if (!csvFile) return;
 
     setUploading(true);
+    const errors: string[] = [];
+    let successCount = 0;
+    
     try {
       // Read the CSV file
       const text = await csvFile.text();
-      const lines = text.split('\n');
+      const lines = text.split('\n').filter(line => line.trim());
       
       if (lines.length < 2) {
         throw new Error('CSV file must have at least a header and one data row');
       }
 
       // Get headers
-      const headers = lines[0].split(',').map(h => h.trim());
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
       
       // Parse data rows
       const publications = [];
@@ -276,41 +279,103 @@ export const PublicationManagement = () => {
         const line = lines[i].trim();
         if (!line) continue;
         
-        const values = line.split(',').map(v => v.trim());
-        const publication: any = {
-          external_id: crypto.randomUUID(),
-          is_active: true,
-          popularity: 0,
-        };
+        try {
+          // Better CSV parsing to handle quoted values
+          const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+          const cleanValues = values.map(v => v.replace(/^"|"$/g, '').trim());
+          
+          const publication: any = {
+            external_id: crypto.randomUUID(),
+            is_active: true,
+            popularity: 0,
+          };
 
-        // Map CSV columns to database columns
-        headers.forEach((header, index) => {
-          const value = values[index] || '';
-          publication[header] = value;
-        });
+          // Map CSV columns with proper data type conversion
+          headers.forEach((header, index) => {
+            const value = cleanValues[index] || '';
+            
+            // Handle boolean conversions for CSV columns that map to boolean fields
+            if (['SPONSORED', 'INDEXED', 'DOFOLLOW', 'EROTIC', 'HEALTH', 'CBD', 'CRYPTO', 'GAMBLING'].includes(header)) {
+              const upperValue = value.toUpperCase();
+              if (upperValue === 'Y' || upperValue === 'DISCREET') {
+                publication[header] = 'Y';
+              } else if (upperValue === 'N' || value === '') {
+                publication[header] = 'N';
+              } else {
+                publication[header] = value;
+              }
+            }
+            // Handle numeric fields
+            else if (['Price', 'DA', 'DR', 'TAT'].includes(header)) {
+              const numValue = parseInt(value);
+              publication[header] = isNaN(numValue) ? null : numValue;
+            }
+            // Handle text fields
+            else {
+              publication[header] = value || null;
+            }
+          });
 
-        publications.push(publication);
+          // Validate required fields
+          const requiredFields = ['PUBLICATION', 'Price'];
+          const missingFields = requiredFields.filter(field => 
+            !publication[field] || publication[field] === ''
+          );
+          
+          if (missingFields.length > 0) {
+            errors.push(`Row ${i + 1}: Missing required fields: ${missingFields.join(', ')}`);
+            continue;
+          }
+
+          publications.push(publication);
+        } catch (rowError) {
+          errors.push(`Row ${i + 1}: ${rowError instanceof Error ? rowError.message : 'Parse error'}`);
+        }
       }
 
       if (publications.length === 0) {
         throw new Error('No valid data rows found in CSV');
       }
 
-      // Insert publications in batches
-      const batchSize = 50;
+      // Insert publications in batches with error handling
+      const batchSize = 10; // Smaller batches for better error handling
       for (let i = 0; i < publications.length; i += batchSize) {
         const batch = publications.slice(i, i + batchSize);
-        const { error } = await supabase
-          .from('publications')
-          .insert(batch);
+        
+        try {
+          const { error } = await supabase
+            .from('publications')
+            .insert(batch);
 
-        if (error) throw error;
+          if (error) {
+            // Log the specific error and which batch failed
+            console.error(`Batch ${Math.floor(i/batchSize) + 1} failed:`, error);
+            errors.push(`Batch ${Math.floor(i/batchSize) + 1} (rows ${i + 1}-${i + batch.length}): ${error.message}`);
+          } else {
+            successCount += batch.length;
+          }
+        } catch (batchError) {
+          console.error(`Batch ${Math.floor(i/batchSize) + 1} error:`, batchError);
+          errors.push(`Batch ${Math.floor(i/batchSize) + 1}: ${batchError instanceof Error ? batchError.message : 'Unknown error'}`);
+        }
       }
 
-      toast({
-        title: "Success",
-        description: `Successfully imported ${publications.length} publications`
-      });
+      // Show results
+      if (successCount > 0) {
+        toast({
+          title: "Import Complete",
+          description: `Successfully imported ${successCount} publications${errors.length > 0 ? ` with ${errors.length} errors` : ''}`
+        });
+      }
+
+      if (errors.length > 0) {
+        console.error('CSV Import Errors:', errors);
+        toast({
+          title: "Import Errors",
+          description: `${errors.length} rows failed. Check console for details.`,
+          variant: "destructive"
+        });
+      }
 
       setCsvFile(null);
       fetchPublications();
