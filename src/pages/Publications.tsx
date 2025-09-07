@@ -67,7 +67,14 @@ export const Publications = () => {
       };
       
       const [min, max] = ranges[priceRange as keyof typeof ranges] || [0, Infinity];
-      filtered = filtered.filter(pub => pub.price >= min && pub.price < max);
+      console.log('Price filter:', priceRange, 'Range:', [min, max]);
+      
+      filtered = filtered.filter(pub => {
+        const price = Number(pub.price) || 0;
+        const inRange = price >= min && price < max;
+        console.log('Publication:', pub.name, 'Price:', price, 'In range:', inRange);
+        return inRange;
+      });
     }
 
     // Filter by industry/category
