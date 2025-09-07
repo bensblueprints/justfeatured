@@ -683,58 +683,6 @@ export const Checkout = () => {
                     </div>
                   </div>
 
-                  {/* Other Upsells Section */}
-                  <div className="space-y-4">
-                    <Separator />
-                    <div className="flex items-center space-x-2">
-                      <TrendingUp className="h-5 w-5 text-accent" />
-                      <h3 className="text-lg font-bold">🔥 Additional Premium Upgrades</h3>
-                    </div>
-                    
-                    {upsellOffers.map(upsell => (
-                      <div key={upsell.id} className="border-2 border-dashed border-accent/30 rounded-lg p-4 hover:border-accent/60 transition-colors">
-                        <div className="flex items-start space-x-3">
-                          <Checkbox
-                            id={`upsell-${upsell.id}`}
-                            checked={selectedUpsells.includes(upsell.id)}
-                            onCheckedChange={(checked) => handleUpsellToggle(upsell.id, checked as boolean)}
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <Label htmlFor={`upsell-${upsell.id}`} className="font-bold cursor-pointer text-lg">
-                                {upsell.name}
-                              </Label>
-                              <Badge className={`${upsell.color} text-white`}>
-                                {upsell.badge}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-2">{upsell.description}</p>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                              {upsell.features.map((feature, index) => (
-                                <div key={index} className="flex items-center">
-                                  <CheckCircle className="h-3 w-3 mr-1 text-accent" />
-                                  {feature}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="flex flex-col items-end">
-                              <span className="text-sm text-muted-foreground line-through">
-                                ${upsell.originalPrice.toFixed(0)}
-                              </span>
-                              <span className="text-lg font-bold text-accent">
-                                ${upsell.discountedPrice.toFixed(0)}
-                              </span>
-                              <span className="text-xs text-success font-semibold">
-                                Save ${upsell.savings.toFixed(0)}!
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
 
                   {items.filter(item => item.isUpsell).length > 0 && (
                     <div className="space-y-3">
