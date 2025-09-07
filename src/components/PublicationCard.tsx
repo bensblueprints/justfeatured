@@ -38,10 +38,13 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
       return "Contact for Price";
     }
     
-    if (price >= 1000) {
-      return `$${(price / 1000).toFixed(0)}k`;
+    // Convert to number and format with proper thousands separators
+    const numPrice = Number(price);
+    
+    if (numPrice >= 1000) {
+      return `$${numPrice.toLocaleString()}`;
     }
-    return `$${price}`;
+    return `$${numPrice}`;
   };
 
   const getTierColor = (tier: string) => {
