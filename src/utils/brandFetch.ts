@@ -67,7 +67,7 @@ export class BrandFetchService {
   }
 
   /**
-   * Fetch brand logo for a given website URL
+   * Fetch brand logo for a given website URL using secure edge function
    */
   static async fetchLogo(websiteUrl: string | undefined): Promise<string | null> {
     if (!websiteUrl) {
@@ -85,25 +85,25 @@ export class BrandFetchService {
     }
 
     try {
-      const response = await fetch(`${this.API_BASE}/brands/${domain}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        }
+      // Use secure edge function instead of direct API call
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      const { data, error } = await supabase.functions.invoke('fetch-brand-logo', {
+        body: { websiteUrl }
       });
 
-      if (!response.ok) {
-        console.warn(`Failed to fetch logo for ${domain}:`, response.status);
+      if (error) {
+        console.warn(`Failed to fetch logo for ${domain} via edge function:`, error);
+        this.logoCache.set(domain, '');
         return null;
       }
 
-      const data: BrandResponse = await response.json();
-      const logoUrl = this.getBestLogo(data.logos);
+      const logoUrl = data?.logoUrl;
       
       // Cache the result (even if null to avoid repeated failures)
       this.logoCache.set(domain, logoUrl || '');
       
-      return logoUrl;
+      return logoUrl || null;
     } catch (error) {
       console.error(`Error fetching logo for ${domain}:`, error);
       this.logoCache.set(domain, '');
