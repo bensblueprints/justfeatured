@@ -18,7 +18,7 @@ export const Publications = () => {
   const navigate = useNavigate();
   const [selectedPublications, setSelectedPublications] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("popularity");
+  const [sortBy, setSortBy] = useState("price-low");
   const [activeTab, setActiveTab] = useState("all");
   const [visibleCount, setVisibleCount] = useState(18);
   const [priceRange, setPriceRange] = useState<string>("all");
@@ -49,7 +49,7 @@ export const Publications = () => {
 
     // Filter by tab
     if (activeTab !== "all") {
-      filtered = filtered.filter(pub => pub.type === activeTab);
+      filtered = filtered.filter(pub => pub.type === activeTab || pub.tier === activeTab);
     }
 
     // Filter by price range
@@ -127,6 +127,7 @@ export const Publications = () => {
   const getTabCounts = useMemo(() => {
     return {
       all: publications.length,
+      starter: publications.filter(p => p.type === 'starter' || p.tier === 'starter').length,
       tier2: publications.filter(p => p.type === 'tier2').length,
       premium: publications.filter(p => p.type === 'premium').length,
       tier1: publications.filter(p => p.type === 'tier1').length,
@@ -234,9 +235,12 @@ export const Publications = () => {
 
           {/* Category Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="all" className="text-sm">
                 All ({tabCounts.all})
+              </TabsTrigger>
+              <TabsTrigger value="starter" className="text-sm">
+                Starter ({tabCounts.starter})
               </TabsTrigger>
               <TabsTrigger value="tier2" className="text-sm">
                 Standard ({tabCounts.tier2})
