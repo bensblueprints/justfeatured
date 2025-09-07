@@ -7,6 +7,7 @@ import { CheckCircle, Star, ArrowRight } from 'lucide-react';
 import { fetchPublicationsByTier } from '@/lib/publications';
 import { PublicationCard } from '@/components/PublicationCard';
 import { Publication } from '@/types';
+import { BrandFetchService } from '@/utils/brandFetch';
 
 interface StarterPackageSelectionProps {
   onSelectionComplete: (selectedPublication: Publication) => void;
@@ -16,6 +17,7 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
   const [selectedPublication, setSelectedPublication] = useState<Publication | null>(null);
   const [publications, setPublications] = useState<Publication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [logos, setLogos] = useState<{ [key: string]: string }>({});
   const navigate = useNavigate();
 
   // Fetch publications from database
@@ -24,6 +26,29 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
       try {
         const data = await fetchPublicationsByTier('starter');
         setPublications(data); // Show all starter options
+        
+        // Fetch logos for each publication
+        const logoPromises = data.map(async (publication) => {
+          if (publication.logo_url) {
+            return { id: publication.id, logo: publication.logo_url };
+          } else if (publication.website_url) {
+            try {
+              const logoUrl = await BrandFetchService.getLogoWithFallback(publication.website_url);
+              return { id: publication.id, logo: logoUrl };
+            } catch (error) {
+              console.log('Failed to fetch logo for:', publication.name);
+              return { id: publication.id, logo: '' };
+            }
+          }
+          return { id: publication.id, logo: '' };
+        });
+        
+        const logoResults = await Promise.all(logoPromises);
+        const logoMap: { [key: string]: string } = {};
+        logoResults.forEach(result => {
+          logoMap[result.id] = result.logo;
+        });
+        setLogos(logoMap);
       } catch (error) {
         console.error('Error loading publications:', error);
       } finally {
@@ -102,6 +127,29 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
                   onClick={() => handleSelect(publication)}
                 >
                   <CardHeader className="pb-3">
+                    {/* Logo */}
+                    <div className="flex justify-center mb-3">
+                      {logos[publication.id] ? (
+                        <img
+                          src={logos[publication.id]}
+                          alt={`${publication.name} logo`}
+                          className="w-12 h-12 object-contain rounded-lg bg-white/50 p-2"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const placeholder = target.nextElementSibling as HTMLElement;
+                            if (placeholder) placeholder.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center text-sm font-bold text-primary"
+                        style={{ display: logos[publication.id] ? 'none' : 'flex' }}
+                      >
+                        {publication.name.charAt(0).toUpperCase()}
+                      </div>
+                    </div>
+                    
                     <div className="flex items-center justify-between mb-2">
                       <Badge variant="secondary" className="text-xs">
                         {publication.category}
@@ -110,8 +158,8 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
                         <CheckCircle className="h-5 w-5 text-primary" />
                       )}
                     </div>
-                    <CardTitle className="text-lg">{publication.name}</CardTitle>
-                    <CardDescription className="text-sm">
+                    <CardTitle className="text-lg text-center">{publication.name}</CardTitle>
+                    <CardDescription className="text-sm text-center">
                       {getTargetAudience(publication.category, publication.name)}
                     </CardDescription>
                   </CardHeader>
