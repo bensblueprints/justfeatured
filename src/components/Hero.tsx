@@ -2,9 +2,20 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, Star, TrendingUp, Zap, Sparkles, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
+import { useState, useEffect } from "react";
+import { BrandFetchService } from "@/utils/brandFetch";
 
 export const Hero = () => {
   const navigate = useNavigate();
+  const [brandLogos, setBrandLogos] = useState<{ [key: string]: string }>({});
+
+  // Define brands to fetch logos for
+  const featuredBrands = [
+    { name: "NBC News", website: "https://www.nbcnews.com" },
+    { name: "Forbes", website: "https://www.forbes.com" },
+    { name: "Associated Press", website: "https://www.ap.org" },
+    { name: "CNBC", website: "https://www.cnbc.com" }
+  ];
 
   const featuredOutlets = [
     "USA TODAY", "FORBES", "CNN", "REUTERS", "BLOOMBERG", 
@@ -14,6 +25,30 @@ export const Hero = () => {
   ];
 
   const duplicatedOutlets = [...featuredOutlets, ...featuredOutlets];
+
+  // Fetch brand logos on component mount
+  useEffect(() => {
+    const fetchBrandLogos = async () => {
+      const logoPromises = featuredBrands.map(async (brand) => {
+        try {
+          const logoUrl = await BrandFetchService.getLogoWithFallback(brand.website);
+          return { name: brand.name, logo: logoUrl };
+        } catch (error) {
+          console.log('Failed to fetch logo for:', brand.name);
+          return { name: brand.name, logo: '' };
+        }
+      });
+
+      const logoResults = await Promise.all(logoPromises);
+      const logoMap: { [key: string]: string } = {};
+      logoResults.forEach(result => {
+        logoMap[result.name] = result.logo;
+      });
+      setBrandLogos(logoMap);
+    };
+
+    fetchBrandLogos();
+  }, []);
 
   return (
     <section className="hero-section purple-section relative min-h-screen overflow-hidden">
@@ -141,30 +176,30 @@ export const Hero = () => {
               AS SEEN IN
             </p>
             <div className="flex justify-center items-center gap-12 flex-wrap">
-              <img 
-                src="/lovable-uploads/63ea97fe-ab5e-4561-b168-779be0b81162.png" 
-                alt="NBC News" 
-                className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
-                style={{ filter: 'brightness(0.8) contrast(1.2)' }}
-              />
-              <img 
-                src="/lovable-uploads/cd84d210-67a0-4b98-9091-fb5b30cad1aa.png" 
-                alt="Forbes" 
-                className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
-                style={{ filter: 'brightness(0.8) contrast(1.2)' }}
-              />
-              <img 
-                src="/lovable-uploads/69c90a1a-7b81-4bc7-ac30-d18ab67007ac.png" 
-                alt="Associated Press" 
-                className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
-                style={{ filter: 'brightness(0.8) contrast(1.2)' }}
-              />
-              <img 
-                src="/lovable-uploads/cnbc-logo.png" 
-                alt="CNBC" 
-                className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic"
-                style={{ filter: 'brightness(0.8) contrast(1.2)' }}
-              />
+              {featuredBrands.map((brand) => (
+                <div key={brand.name} className="h-8 flex items-center">
+                  {brandLogos[brand.name] ? (
+                    <img 
+                      src={brandLogos[brand.name]} 
+                      alt={brand.name} 
+                      className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic object-contain"
+                      style={{ filter: 'brightness(0.8) contrast(1.2)' }}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const placeholder = target.nextElementSibling as HTMLElement;
+                        if (placeholder) placeholder.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div 
+                    className="h-8 bg-white/20 rounded px-3 flex items-center justify-center text-white/80 text-sm font-semibold magnetic"
+                    style={{ display: brandLogos[brand.name] ? 'none' : 'flex' }}
+                  >
+                    {brand.name}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
