@@ -208,7 +208,7 @@ export const Checkout = () => {
     const upsell = upsellOffers.find(u => u.id === upsellId);
     return sum + (upsell?.savings || 0);
   }, 0);
-  const processingFee = Math.round(subtotal * 0.029); // 2.9% processing fee
+  const processingFee = Math.round(subtotal * 0.029 * 100) / 100; // 2.9% processing fee
   const total = subtotal + processingFee;
 
   const industries = [
@@ -755,7 +755,7 @@ export const Checkout = () => {
                       <span className="font-semibold text-lg">Professional PR Feature</span>
                       <p className="text-sm text-muted-foreground">Premium publication placement</p>
                     </div>
-                    <span className="text-2xl font-bold text-primary">${packageType === 'starter' ? '97' : (subtotal / 100).toFixed(0)}</span>
+                    <span className="text-2xl font-bold text-primary">${packageType === 'starter' ? '97' : subtotal.toFixed(0)}</span>
                   </div>
 
                   {/* Upsells */}
@@ -767,7 +767,7 @@ export const Checkout = () => {
                         return upsell ? (
                           <div key={upsellId} className="flex justify-between text-sm p-3 bg-accent/5 rounded border border-accent/20">
                             <span>{upsell.name}</span>
-                            <span className="font-semibold">+${(upsell.discountedPrice / 100).toFixed(0)}</span>
+                            <span className="font-semibold">+${upsell.discountedPrice.toFixed(0)}</span>
                           </div>
                         ) : null;
                       })}
@@ -787,12 +787,12 @@ export const Checkout = () => {
                   {/* Total */}
                   <div className="flex justify-between items-center p-4 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg border-2 border-primary/30">
                     <span className="text-xl font-bold">Total Investment:</span>
-                    <span className="text-3xl font-bold text-primary">${(total / 100).toFixed(2)}</span>
+                    <span className="text-3xl font-bold text-primary">${total.toFixed(2)}</span>
                   </div>
 
                   {totalSavings > 0 && (
                     <div className="text-center p-3 bg-success/10 rounded-lg border border-success/20">
-                      <p className="text-success font-bold">🎉 You're saving ${(totalSavings / 100).toFixed(2)} with these upgrades!</p>
+                      <p className="text-success font-bold">🎉 You're saving ${totalSavings.toFixed(2)} with these upgrades!</p>
                     </div>
                   )}
                 </div>
