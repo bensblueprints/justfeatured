@@ -30,17 +30,12 @@ interface Publication {
   updated_at?: string;
 }
 
-// Public fields that can be shown to unauthenticated users
-const PUBLIC_FIELDS = [
+// All fields are now public - no authentication required
+const ALL_FIELDS = [
   'id', 'external_id', 'name', 'type', 'category', 'tier', 
   'description', 'features', 'logo_url', 'website_url', 'is_active', 
   'popularity', 'location', 'created_at', 'updated_at',
-  'price', 'da_score', 'dr_score', 'tat_days'
-];
-
-// Sensitive business fields that require authentication
-const AUTHENTICATED_FIELDS = [
-  ...PUBLIC_FIELDS,
+  'price', 'da_score', 'dr_score', 'tat_days',
   'dofollow_link', 'sponsored', 'indexed', 'erotic', 'health',
   'cbd', 'crypto', 'gambling'
 ];
@@ -49,11 +44,7 @@ const AUTHENTICATED_FIELDS = [
  * Fetch all publications from the database with security filtering
  */
 export const fetchPublications = async (): Promise<Publication[]> => {
-  // Check if user is authenticated to determine fields to select
-  const { data: { user } } = await supabase.auth.getUser();
-  const isAuthenticated = !!user;
-
-  const fields = isAuthenticated ? AUTHENTICATED_FIELDS.join(',') : PUBLIC_FIELDS.join(',');
+  const fields = ALL_FIELDS.join(',');
 
   const { data, error } = await supabase
     .from('publications')
@@ -73,8 +64,8 @@ export const fetchPublications = async (): Promise<Publication[]> => {
     name: record.name,
     type: record.type,
     category: record.category,
-    price: isAuthenticated ? record.price : undefined,
-    tat_days: isAuthenticated ? record.tat_days : undefined,
+    price: record.price,
+    tat_days: record.tat_days,
     description: record.description,
     features: record.features || [],
     logo_url: record.logo_url,
@@ -82,18 +73,17 @@ export const fetchPublications = async (): Promise<Publication[]> => {
     tier: record.tier,
     popularity: record.popularity || 0,
     is_active: record.is_active,
-    // Additional fields (only if authenticated)
-    da_score: isAuthenticated ? record.da_score : undefined,
-    dr_score: isAuthenticated ? record.dr_score : undefined,
+    da_score: record.da_score,
+    dr_score: record.dr_score,
     location: record.location,
-    dofollow_link: isAuthenticated ? record.dofollow_link : undefined,
-    sponsored: isAuthenticated ? record.sponsored : undefined,
-    indexed: isAuthenticated ? record.indexed : undefined,
-    erotic: isAuthenticated ? record.erotic : undefined,
-    health: isAuthenticated ? record.health : undefined,
-    cbd: isAuthenticated ? record.cbd : undefined,
-    crypto: isAuthenticated ? record.crypto : undefined,
-    gambling: isAuthenticated ? record.gambling : undefined,
+    dofollow_link: record.dofollow_link,
+    sponsored: record.sponsored,
+    indexed: record.indexed,
+    erotic: record.erotic,
+    health: record.health,
+    cbd: record.cbd,
+    crypto: record.crypto,
+    gambling: record.gambling,
     created_at: record.created_at,
     updated_at: record.updated_at,
   }));
