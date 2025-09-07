@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { CheckCircle, Star, ArrowRight } from 'lucide-react';
 import { fetchPublicationsByTier } from '@/lib/publications';
+import { PublicationCard } from '@/components/PublicationCard';
 import { Publication } from '@/types';
 
 interface StarterPackageSelectionProps {
@@ -22,7 +24,7 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
     const loadPublications = async () => {
       try {
         const data = await fetchPublicationsByTier('starter');
-        setPublications(data.slice(0, 3)); // Show top 3 starter options
+        setPublications(data); // Show all starter options
       } catch (error) {
         console.error('Error loading publications:', error);
       } finally {
@@ -61,56 +63,42 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
             </p>
           </div>
 
-          {/* Publication Selection Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {publications.map((publication) => (
-              <Card 
-                key={publication.id}
-                className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                  selectedPublication?.id === publication.id 
-                    ? 'ring-2 ring-primary border-primary bg-primary/5' 
-                    : 'hover:border-primary/50'
-                }`}
-                onClick={() => handleSelect(publication)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {publication.category}
-                    </Badge>
-                    {selectedPublication?.id === publication.id && (
-                      <CheckCircle className="h-5 w-5 text-primary" />
-                    )}
-                  </div>
-                  <CardTitle className="text-lg">{publication.name}</CardTitle>
-                  <CardDescription className="text-sm">
-                    {publication.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Turnaround:</span>
-                      <span className="font-medium">{publication.tat_days} days</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Popularity:</span>
-                      <span className="font-medium">{publication.popularity}/100</span>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground mb-2">Features:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {publication.features.slice(0, 2).map((feature, index) => (
-                          <Badge key={index} variant="outline" className="text-xs px-2 py-0">
-                            {feature}
-                          </Badge>
-                        ))}
+          {/* Publication Selection Carousel */}
+          <div className="mb-8">
+            <Carousel className="w-full max-w-7xl mx-auto">
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {publications.map((publication) => (
+                  <CarouselItem key={publication.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                    <div className="p-1">
+                      <div className={`relative ${
+                        selectedPublication?.id === publication.id 
+                          ? 'ring-2 ring-primary rounded-lg' 
+                          : ''
+                      }`}>
+                        <PublicationCard
+                          publication={publication}
+                          selected={selectedPublication?.id === publication.id}
+                          onSelectionChange={(selected) => {
+                            if (selected) {
+                              handleSelect(publication);
+                            } else {
+                              setSelectedPublication(null);
+                            }
+                          }}
+                        />
+                        {selectedPublication?.id === publication.id && (
+                          <div className="absolute -top-2 -right-2 bg-primary rounded-full p-1">
+                            <CheckCircle className="h-4 w-4 text-primary-foreground" />
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
           </div>
 
           {/* Action Buttons */}
