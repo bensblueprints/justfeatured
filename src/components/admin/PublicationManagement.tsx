@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -374,6 +374,29 @@ export const PublicationManagement = () => {
     return <Badge className={colors[tier as keyof typeof colors] || colors.standard}>{tier}</Badge>;
   };
 
+  // Memoized handlers to prevent input field refocus issues
+  const handleInputChange = useCallback((field: keyof NewPublication) => 
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = e.target.value;
+      setNewPublication(prev => ({ ...prev, [field]: value }));
+    }, []);
+
+  const handleNumberChange = useCallback((field: keyof NewPublication) => 
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseInt(e.target.value) || 0;
+      setNewPublication(prev => ({ ...prev, [field]: value }));
+    }, []);
+
+  const handleSelectChange = useCallback((field: keyof NewPublication) => 
+    (value: string) => {
+      setNewPublication(prev => ({ ...prev, [field]: value }));
+    }, []);
+
+  const handleCheckboxChange = useCallback((field: keyof NewPublication) => 
+    (checked: boolean) => {
+      setNewPublication(prev => ({ ...prev, [field]: checked }));
+    }, []); 
+
   const PublicationForm = ({ isEdit = false }: { isEdit?: boolean }) => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
       <div className="space-y-4">
@@ -382,7 +405,7 @@ export const PublicationManagement = () => {
           <Input
             id="name"
             value={newPublication.name}
-            onChange={(e) => setNewPublication(prev => ({ ...prev, name: e.target.value }))}
+            onChange={handleInputChange('name')}
             placeholder="Enter publication name"
           />
         </div>
@@ -392,14 +415,14 @@ export const PublicationManagement = () => {
           <Input
             id="category"
             value={newPublication.category}
-            onChange={(e) => setNewPublication(prev => ({ ...prev, category: e.target.value }))}
+            onChange={handleInputChange('category')}
             placeholder="e.g., News, Business, Technology"
           />
         </div>
 
         <div>
           <Label htmlFor="tier">Tier</Label>
-          <Select value={newPublication.tier} onValueChange={(value) => setNewPublication(prev => ({ ...prev, tier: value }))}>
+          <Select value={newPublication.tier} onValueChange={handleSelectChange('tier')}>
             <SelectTrigger>
               <SelectValue placeholder="Select tier" />
             </SelectTrigger>
@@ -416,7 +439,7 @@ export const PublicationManagement = () => {
 
         <div>
           <Label htmlFor="type">Type</Label>
-          <Select value={newPublication.type} onValueChange={(value) => setNewPublication(prev => ({ ...prev, type: value }))}>
+          <Select value={newPublication.type} onValueChange={handleSelectChange('type')}>
             <SelectTrigger>
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
@@ -438,7 +461,7 @@ export const PublicationManagement = () => {
               id="price"
               type="number"
               value={newPublication.price}
-              onChange={(e) => setNewPublication(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
+              onChange={handleNumberChange('price')}
               placeholder="0"
             />
           </div>
@@ -447,7 +470,7 @@ export const PublicationManagement = () => {
             <Input
               id="tat_days"
               value={newPublication.tat_days}
-              onChange={(e) => setNewPublication(prev => ({ ...prev, tat_days: e.target.value }))}
+              onChange={handleInputChange('tat_days')}
               placeholder="e.g., 7, 1-2 Weeks"
             />
           </div>
@@ -460,7 +483,7 @@ export const PublicationManagement = () => {
               id="da_score"
               type="number"
               value={newPublication.da_score || ""}
-              onChange={(e) => setNewPublication(prev => ({ ...prev, da_score: parseInt(e.target.value) || 0 }))}
+              onChange={handleNumberChange('da_score')}
               placeholder="0"
             />
           </div>
@@ -470,7 +493,7 @@ export const PublicationManagement = () => {
               id="dr_score"
               type="number"
               value={newPublication.dr_score || ""}
-              onChange={(e) => setNewPublication(prev => ({ ...prev, dr_score: parseInt(e.target.value) || 0 }))}
+              onChange={handleNumberChange('dr_score')}
               placeholder="0"
             />
           </div>
@@ -481,7 +504,7 @@ export const PublicationManagement = () => {
           <Input
             id="website_url"
             value={newPublication.website_url}
-            onChange={(e) => setNewPublication(prev => ({ ...prev, website_url: e.target.value }))}
+            onChange={handleInputChange('website_url')}
             placeholder="https://example.com"
           />
         </div>
@@ -491,7 +514,7 @@ export const PublicationManagement = () => {
           <Input
             id="location"
             value={newPublication.location || ""}
-            onChange={(e) => setNewPublication(prev => ({ ...prev, location: e.target.value }))}
+            onChange={handleInputChange('location')}
             placeholder="e.g., UNITED STATES, GLOBAL"
           />
         </div>
@@ -503,7 +526,7 @@ export const PublicationManagement = () => {
           <Textarea
             id="description"
             value={newPublication.description}
-            onChange={(e) => setNewPublication(prev => ({ ...prev, description: e.target.value }))}
+            onChange={handleInputChange('description')}
             placeholder="Publication description"
             rows={3}
           />
@@ -515,63 +538,63 @@ export const PublicationManagement = () => {
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.guaranteed_placement}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, guaranteed_placement: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('guaranteed_placement')(!!checked)}
               />
               <Label className="text-sm">Guaranteed Placement</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.dofollow_link}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, dofollow_link: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('dofollow_link')(!!checked)}
               />
               <Label className="text-sm">Dofollow Link</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.social_media_post}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, social_media_post: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('social_media_post')(!!checked)}
               />
               <Label className="text-sm">Social Media Post</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.homepage_placement}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, homepage_placement: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('homepage_placement')(!!checked)}
               />
               <Label className="text-sm">Homepage Placement</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.author_byline}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, author_byline: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('author_byline')(!!checked)}
               />
               <Label className="text-sm">Author Byline</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.image_inclusion}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, image_inclusion: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('image_inclusion')(!!checked)}
               />
               <Label className="text-sm">Image Inclusion</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.video_inclusion}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, video_inclusion: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('video_inclusion')(!!checked)}
               />
               <Label className="text-sm">Video Inclusion</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.sponsored}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, sponsored: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('sponsored')(!!checked)}
               />
               <Label className="text-sm">Sponsored</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.indexed}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, indexed: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('indexed')(!!checked)}
               />
               <Label className="text-sm">Indexed</Label>
             </div>
@@ -584,35 +607,35 @@ export const PublicationManagement = () => {
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.erotic}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, erotic: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('erotic')(!!checked)}
               />
               <Label className="text-sm">Erotic Content</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.health}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, health: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('health')(!!checked)}
               />
               <Label className="text-sm">Health Content</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.cbd}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, cbd: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('cbd')(!!checked)}
               />
               <Label className="text-sm">CBD Content</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.crypto}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, crypto: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('crypto')(!!checked)}
               />
               <Label className="text-sm">Crypto Content</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={newPublication.gambling}
-                onCheckedChange={(checked) => setNewPublication(prev => ({ ...prev, gambling: !!checked }))}
+                onCheckedChange={(checked) => handleCheckboxChange('gambling')(!!checked)}
               />
               <Label className="text-sm">Gambling Content</Label>
             </div>
