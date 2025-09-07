@@ -63,31 +63,88 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
           </div>
 
           {/* Publication Selection Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-            {publications.map((publication) => (
-              <div key={publication.id} className={`relative ${
-                selectedPublication?.id === publication.id 
-                  ? 'ring-2 ring-primary rounded-lg' 
-                  : ''
-              }`}>
-                <PublicationCard
-                  publication={publication}
-                  selected={selectedPublication?.id === publication.id}
-                  onSelectionChange={(selected) => {
-                    if (selected) {
-                      handleSelect(publication);
-                    } else {
-                      setSelectedPublication(null);
-                    }
-                  }}
-                />
-                {selectedPublication?.id === publication.id && (
-                  <div className="absolute -top-2 -right-2 bg-primary rounded-full p-1">
-                    <CheckCircle className="h-4 w-4 text-primary-foreground" />
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {publications.map((publication) => {
+              // Determine target audience based on publication category
+              const getTargetAudience = (category: string, name: string) => {
+                const categoryLower = category.toLowerCase();
+                const nameLower = name.toLowerCase();
+                
+                if (categoryLower.includes('business') || nameLower.includes('ceo') || nameLower.includes('biz')) {
+                  return "Perfect for CEOs, entrepreneurs, and business leaders";
+                } else if (categoryLower.includes('news') || nameLower.includes('news')) {
+                  return "Ideal for newsworthy announcements and press releases";
+                } else if (categoryLower.includes('lifestyle') || nameLower.includes('men') || nameLower.includes('women')) {
+                  return "Great for lifestyle brands, personal brands, and consumer products";
+                } else if (categoryLower.includes('entertainment') || nameLower.includes('celeb')) {
+                  return "Best for entertainment industry and celebrity news";
+                } else if (categoryLower.includes('real estate') || nameLower.includes('rent') || nameLower.includes('houses')) {
+                  return "Perfect for real estate professionals and property announcements";
+                } else if (categoryLower.includes('legal') || nameLower.includes('juris')) {
+                  return "Ideal for law firms and legal professionals";
+                } else if (categoryLower.includes('arts') || categoryLower.includes('culture') || nameLower.includes('artist')) {
+                  return "Great for artists, galleries, and cultural organizations";
+                } else if (categoryLower.includes('regional') || nameLower.includes('state') || nameLower.includes('texas') || nameLower.includes('miami') || nameLower.includes('california')) {
+                  return "Perfect for local businesses and regional announcements";
+                } else {
+                  return "Suitable for general business announcements and brand awareness";
+                }
+              };
+
+              return (
+                <Card 
+                  key={publication.id}
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
+                    selectedPublication?.id === publication.id 
+                      ? 'ring-2 ring-primary border-primary bg-primary/5' 
+                      : 'hover:border-primary/50'
+                  }`}
+                  onClick={() => handleSelect(publication)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="secondary" className="text-xs">
+                        {publication.category}
+                      </Badge>
+                      {selectedPublication?.id === publication.id && (
+                        <CheckCircle className="h-5 w-5 text-primary" />
+                      )}
+                    </div>
+                    <CardTitle className="text-lg">{publication.name}</CardTitle>
+                    <CardDescription className="text-sm">
+                      {getTargetAudience(publication.category, publication.name)}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Price:</span>
+                        <span className="font-bold text-primary">$97</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Turnaround:</span>
+                        <span className="font-medium">{publication.tat_days}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Location:</span>
+                        <span className="font-medium text-xs">{publication.location}</span>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground mb-2">Features:</p>
+                        <div className="flex flex-wrap gap-1">
+                          <Badge variant="outline" className="text-xs px-2 py-0">
+                            {publication.indexed ? 'Indexed' : 'Not Indexed'}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs px-2 py-0">
+                            {publication.dofollow_link ? 'Dofollow' : 'Nofollow'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           {/* Action Buttons */}
