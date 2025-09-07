@@ -118,10 +118,6 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
             <div className="text-4xl font-bold text-primary">
               {formatPrice(publication.price)}
             </div>
-            {/* Debug info - remove this later */}
-            <div className="text-xs text-gray-400 mt-1">
-              Raw price: {JSON.stringify(publication.price)} ({typeof publication.price})
-            </div>
           </div>
 
           {/* DA/DR Scores */}

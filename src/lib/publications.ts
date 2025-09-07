@@ -34,13 +34,13 @@ interface Publication {
 const PUBLIC_FIELDS = [
   'id', 'external_id', 'name', 'type', 'category', 'tier', 
   'description', 'features', 'logo_url', 'website_url', 'is_active', 
-  'popularity', 'location', 'created_at', 'updated_at'
+  'popularity', 'location', 'created_at', 'updated_at',
+  'price', 'da_score', 'dr_score', 'tat_days'
 ];
 
 // Sensitive business fields that require authentication
 const AUTHENTICATED_FIELDS = [
   ...PUBLIC_FIELDS,
-  'price', 'da_score', 'dr_score', 'tat_days',
   'dofollow_link', 'sponsored', 'indexed', 'erotic', 'health',
   'cbd', 'crypto', 'gambling'
 ];
