@@ -11,6 +11,7 @@ interface PublicationCardProps {
   publication: Publication;
   selected: boolean;
   onSelectionChange: (selected: boolean) => void;
+  onUpdate?: () => void;
 }
 
 export const PublicationCard = ({ publication, selected, onSelectionChange }: PublicationCardProps) => {

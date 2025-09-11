@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { PublicationCard } from "@/components/PublicationCard";
 import { PublicationListView } from "@/components/PublicationListView";
 import { SpreadsheetSync } from "@/components/SpreadsheetSync";
+import { CSVPublicationImporter } from "@/components/CSVPublicationImporter";
 import { AIPresAgentDialog } from "@/components/AIPresAgentDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,7 +47,37 @@ export const Publications = () => {
 
     // Filter by tab
     if (activeTab !== "all") {
-      filtered = filtered.filter(pub => pub.type === activeTab || pub.tier === activeTab);
+      switch (activeTab) {
+        case "nonsponsored":
+          filtered = filtered.filter(pub => pub.sponsored === false);
+          break;
+        case "dofollow":
+          filtered = filtered.filter(pub => pub.dofollow_link === true);
+          break;
+        case "bestsellers":
+          filtered = filtered.filter(pub => pub.popularity > 70);
+          break;
+        case "listicles":
+          filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('listicle'));
+          break;
+        case "bundles":
+          filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('bundle'));
+          break;
+        case "print":
+          filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('print'));
+          break;
+        case "digitaltv":
+          filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('digital') || pub.category?.toLowerCase().includes('tv'));
+          break;
+        case "broadcasttv":
+          filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('broadcast'));
+          break;
+        case "socialpost":
+          filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('social'));
+          break;
+        default:
+          filtered = filtered.filter(pub => pub.type === activeTab || pub.tier === activeTab);
+      }
     }
 
     // Filter by price range
@@ -131,11 +162,15 @@ export const Publications = () => {
   const getTabCounts = useMemo(() => {
     return {
       all: publications.length,
-      starter: publications.filter(p => p.type === 'starter' || p.tier === 'starter').length,
-      tier2: publications.filter(p => p.type === 'tier2').length,
-      premium: publications.filter(p => p.type === 'premium').length,
-      tier1: publications.filter(p => p.type === 'tier1').length,
-      exclusive: publications.filter(p => p.type === 'exclusive').length,
+      nonsponsored: publications.filter(p => p.sponsored === false).length,
+      dofollow: publications.filter(p => p.dofollow_link === true).length,
+      bestsellers: publications.filter(p => p.popularity > 70).length,
+      listicles: publications.filter(p => p.category?.toLowerCase().includes('listicle')).length,
+      bundles: publications.filter(p => p.category?.toLowerCase().includes('bundle')).length,
+      print: publications.filter(p => p.category?.toLowerCase().includes('print')).length,
+      digitaltv: publications.filter(p => p.category?.toLowerCase().includes('digital') || p.category?.toLowerCase().includes('tv')).length,
+      broadcasttv: publications.filter(p => p.category?.toLowerCase().includes('broadcast')).length,
+      socialpost: publications.filter(p => p.category?.toLowerCase().includes('social')).length,
     };
   }, [publications]);
 
@@ -156,27 +191,24 @@ export const Publications = () => {
             </p>
           </div>
           <div className="mt-4 md:mt-0 flex items-center gap-4">
-            {/* Spreadsheet Sync - Admin Only */}
+            {/* CSV Import & Spreadsheet Sync - Admin Only */}
             {isAdmin && (
-              <Dialog open={showSpreadsheetSync} onOpenChange={setShowSpreadsheetSync}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Sync Spreadsheet
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Sync Publications from Spreadsheet</DialogTitle>
-                  </DialogHeader>
-                  <SpreadsheetSync 
-                    onSyncComplete={() => {
-                      setShowSpreadsheetSync(false);
-                      refreshPublications();
-                    }}
-                  />
-                </DialogContent>
-              </Dialog>
+              <>
+                <Dialog open={showSpreadsheetSync} onOpenChange={setShowSpreadsheetSync}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Upload className="h-4 w-4 mr-2" />
+                      CSV Import
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Import Publications from CSV</DialogTitle>
+                    </DialogHeader>
+                    <CSVPublicationImporter />
+                  </DialogContent>
+                </Dialog>
+              </>
             )}
 
             {/* View Toggle */}
@@ -284,26 +316,40 @@ export const Publications = () => {
 
           {/* Category Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="all" className="text-sm">
-                All ({tabCounts.all})
-              </TabsTrigger>
-              <TabsTrigger value="starter" className="text-sm">
-                Starter ({tabCounts.starter})
-              </TabsTrigger>
-              <TabsTrigger value="tier2" className="text-sm">
-                Standard ({tabCounts.tier2})
-              </TabsTrigger>
-              <TabsTrigger value="premium" className="text-sm">
-                Premium ({tabCounts.premium})
-              </TabsTrigger>
-              <TabsTrigger value="tier1" className="text-sm">
-                Tier 1 ({tabCounts.tier1})
-              </TabsTrigger>
-              <TabsTrigger value="exclusive" className="text-sm">
-                Exclusive ({tabCounts.exclusive})
-              </TabsTrigger>
-            </TabsList>
+            <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2">
+              <TabsList className="col-span-full grid grid-cols-10 h-auto p-1">
+                <TabsTrigger value="all" className="text-xs px-2 py-2">
+                  All ({tabCounts.all})
+                </TabsTrigger>
+                <TabsTrigger value="nonsponsored" className="text-xs px-2 py-2">
+                  NonSponsored ({tabCounts.nonsponsored})
+                </TabsTrigger>
+                <TabsTrigger value="dofollow" className="text-xs px-2 py-2">
+                  DoFollow ({tabCounts.dofollow})
+                </TabsTrigger>
+                <TabsTrigger value="bestsellers" className="text-xs px-2 py-2">
+                  Best Sellers ({tabCounts.bestsellers})
+                </TabsTrigger>
+                <TabsTrigger value="listicles" className="text-xs px-2 py-2">
+                  Listicles ({tabCounts.listicles})
+                </TabsTrigger>
+                <TabsTrigger value="bundles" className="text-xs px-2 py-2">
+                  PR Bundles ({tabCounts.bundles})
+                </TabsTrigger>
+                <TabsTrigger value="print" className="text-xs px-2 py-2">
+                  Print ({tabCounts.print})
+                </TabsTrigger>
+                <TabsTrigger value="digitaltv" className="text-xs px-2 py-2">
+                  Digital TV ({tabCounts.digitaltv})
+                </TabsTrigger>
+                <TabsTrigger value="broadcasttv" className="text-xs px-2 py-2">
+                  Broadcast TV ({tabCounts.broadcasttv})
+                </TabsTrigger>
+                <TabsTrigger value="socialpost" className="text-xs px-2 py-2">
+                  Social Post ({tabCounts.socialpost})
+                </TabsTrigger>
+              </TabsList>
+            </div>
           </Tabs>
         </div>
 
@@ -341,6 +387,7 @@ export const Publications = () => {
                           publication={publication}
                           selected={selectedPublications.includes(publication.id)}
                           onSelectionChange={(selected) => handleSelectionChange(publication.id, selected)}
+                          onUpdate={refreshPublications}
                         />
                       </div>
                     </ProtectedInteraction>
