@@ -222,31 +222,35 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   label
 }) => {
   return (
-    <Sidebar collapsible="icon" className="border-r">
-      <SidebarContent>
+    <Sidebar collapsible="icon" className="border-r min-w-[280px] w-[280px]">
+      <SidebarContent className="p-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="flex items-center space-x-2 px-2 py-2">
+          <SidebarGroupLabel className="flex items-center space-x-2 px-3 py-3 mb-2">
             {userRole === 'super_admin' ? (
-              <Crown className="h-4 w-4 text-amber-500" />
+              <Crown className="h-4 w-4 text-amber-500 flex-shrink-0" />
             ) : (
-              <ShieldCheck className="h-4 w-4 text-primary" />
+              <ShieldCheck className="h-4 w-4 text-primary flex-shrink-0" />
             )}
-            <span className="font-semibold">{label}</span>
+            <span className="font-semibold text-sm">{label}</span>
           </SidebarGroupLabel>
           
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
+            <SidebarMenu className="space-y-2">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => onSectionChange(item.id)}
                     isActive={activeSection === item.id}
-                    className="w-full justify-start"
+                    className="w-full justify-start p-3 h-auto min-h-[60px] rounded-lg hover:bg-muted/80 data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
                   >
-                    <item.icon className="h-4 w-4" />
-                    <div className="flex flex-col items-start ml-2">
-                      <span className="font-medium text-sm">{item.title}</span>
-                      <span className="text-xs text-muted-foreground">{item.description}</span>
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    <div className="flex flex-col items-start ml-3 min-w-0 flex-1">
+                      <span className="font-medium text-sm leading-tight mb-1 text-left w-full">
+                        {item.title}
+                      </span>
+                      <span className="text-xs text-muted-foreground leading-tight text-left w-full line-clamp-2">
+                        {item.description}
+                      </span>
                     </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
