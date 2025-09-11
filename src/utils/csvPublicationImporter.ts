@@ -56,9 +56,9 @@ export const parseCsvLine = (line: string): string[] => {
 };
 
 export const parseCSVContent = (csvContent: string): CSVRowData[] => {
-  const lines = csvContent.split('\n').filter((l) => l.trim().length > 0)
+  const lines = csvContent.replace(/^\uFEFF/, '').split(/\r?\n/).filter((l) => l.trim().length > 0)
 
-  // Find the header row (the first line that contains a PUBLICATION column)
+  // Find the header row (prefer a line that contains a PUBLICATION-like column)
   let headerIndex = -1
   for (let i = 0; i < lines.length; i++) {
     const cols = parseCsvLine(lines[i])
@@ -67,8 +67,10 @@ export const parseCSVContent = (csvContent: string): CSVRowData[] => {
       break
     }
   }
+  // Fallback to the first non-empty line if none matched
   if (headerIndex === -1) {
-    throw new Error('CSV header row not found. Make sure a PUBLICATION column exists.')
+    console.warn('CSV header row with PUBLICATION not found. Falling back to first line as header.')
+    headerIndex = 0
   }
 
   const rawHeaders = parseCsvLine(lines[headerIndex])
@@ -101,7 +103,15 @@ export const parseCSVContent = (csvContent: string): CSVRowData[] => {
     return h.trim()
   }
 
-  const headers = rawHeaders.map(normalize)
+  let headers = rawHeaders.map(normalize)
+
+  // If PUBLICATION header still missing, assume default column order as fallback
+  if (!headers.includes('PUBLICATION')) {
+    const defaults = [
+      'Update','PUBLICATION','PRICE','DA','DR','GENRE','TAT','SPONSORED','INDEXED','DOFOLLOW','REGION / LOCATION','EROTIC','HEALTH','CBD','CRYPTO','GAMBLING','Website URL','Description','Type','Tier'
+    ] as const
+    headers = rawHeaders.map((_, idx) => defaults[idx] ?? `col_${idx}`)
+  }
 
   const rows: CSVRowData[] = []
   for (let i = headerIndex + 1; i < lines.length; i++) {
