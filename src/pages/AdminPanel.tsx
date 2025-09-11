@@ -34,8 +34,10 @@ import { PublicationBulkEditor } from '@/components/admin/PublicationBulkEditor'
 import { PublicationManagement } from '@/components/admin/PublicationManagement';
 import { SpreadsheetSync } from '@/components/SpreadsheetSync';
 import { useToast } from '@/hooks/use-toast';
+import { Dashboard as UserDashboard } from './Dashboard';
 
 type AdminSection = 
+  | 'my-dashboard'
   | 'dashboard'
   | 'clients' 
   | 'press-releases'
@@ -46,19 +48,14 @@ type AdminSection =
 const AdminPanel = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAdmin, isLoading, userRole } = useAdminCheck();
-  const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
+  const { isAdmin, isLoading, userRole, user } = useAdminCheck();
+  const [activeSection, setActiveSection] = useState<AdminSection>('my-dashboard');
 
   useEffect(() => {
-    if (!isLoading && !isAdmin) {
-      toast({
-        title: "Access Denied",
-        description: "You don't have permission to access the admin panel",
-        variant: "destructive"
-      });
-      navigate('/dashboard');
+    if (!isLoading && !user) {
+      navigate('/auth');
     }
-  }, [isAdmin, isLoading, navigate, toast]);
+  }, [isLoading, user, navigate]);
 
   if (isLoading) {
     return (
@@ -71,14 +68,17 @@ const AdminPanel = () => {
     );
   }
 
-  if (!isAdmin) {
-    return null;
-  }
 
-  const menuItems = [
+  const menuItems = isAdmin ? [
+    { 
+      id: 'my-dashboard' as AdminSection, 
+      title: 'My Dashboard', 
+      icon: FileText,
+      description: 'Your press releases and activity'
+    },
     { 
       id: 'dashboard' as AdminSection, 
-      title: 'Dashboard', 
+      title: 'Admin Overview', 
       icon: BarChart3,
       description: 'Overview and statistics'
     },
@@ -112,10 +112,19 @@ const AdminPanel = () => {
       icon: Users,
       description: 'Manage user accounts and roles'
     }
+  ] : [
+    { 
+      id: 'my-dashboard' as AdminSection, 
+      title: 'My Dashboard', 
+      icon: FileText,
+      description: 'Your press releases and activity'
+    }
   ];
 
   const renderContent = () => {
     switch (activeSection) {
+      case 'my-dashboard':
+        return <UserDashboard />;
       case 'dashboard':
         return <AdminDashboard />;
       case 'clients':
@@ -141,7 +150,7 @@ const AdminPanel = () => {
       case 'users':
         return <UserManagement />;
       default:
-        return <AdminDashboard />;
+        return <UserDashboard />;
     }
   };
 
@@ -153,6 +162,7 @@ const AdminPanel = () => {
           activeSection={activeSection}
           onSectionChange={setActiveSection}
           userRole={userRole}
+          label={isAdmin ? 'Administration' : 'Dashboard'}
         />
         
         <main className="flex-1 overflow-hidden">
@@ -167,7 +177,7 @@ const AdminPanel = () => {
                   ) : (
                     <ShieldCheck className="h-5 w-5 text-primary" />
                   )}
-                  <h1 className="text-xl font-semibold">Admin Panel</h1>
+                  <h1 className="text-xl font-semibold">Dashboard</h1>
                   <span className="text-sm text-muted-foreground">•</span>
                   <span className="text-sm text-muted-foreground">
                     {menuItems.find(item => item.id === activeSection)?.title}
@@ -199,14 +209,16 @@ interface AdminSidebarProps {
   }>;
   activeSection: AdminSection;
   onSectionChange: (section: AdminSection) => void;
-  userRole: string;
+  userRole: string | null;
+  label: string;
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({
   menuItems,
   activeSection,
   onSectionChange,
-  userRole
+  userRole,
+  label
 }) => {
   return (
     <Sidebar collapsible="icon" className="border-r">
@@ -218,7 +230,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             ) : (
               <ShieldCheck className="h-4 w-4 text-primary" />
             )}
-            <span className="font-semibold">Administration</span>
+            <span className="font-semibold">{label}</span>
           </SidebarGroupLabel>
           
           <SidebarGroupContent>

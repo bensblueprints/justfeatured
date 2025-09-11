@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { Home } from "./pages/Home";
-import { Dashboard } from "./pages/Dashboard";
+
 
 import { MediaUpload } from "./pages/MediaUpload";
 import { PostCheckout } from "./pages/PostCheckout";
@@ -42,8 +42,8 @@ const App = () => {
               <Route path="/auth" element={<Auth />} />
               <Route path="/blog/trust-factor" element={<BlogPost />} />
               <Route path="/blog/social-proof" element={<SocialProofBlogPost />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/dashboard" element={<AdminPanel />} />
+              <Route path="/admin" element={<AdminPanel />} />
               <Route path="/media-upload/:id" element={<MediaUpload />} />
               <Route path="/post-checkout" element={<PostCheckout />} />
               <Route path="/review-board/:id" element={<ReviewBoard />} />
