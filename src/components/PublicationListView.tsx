@@ -13,15 +13,18 @@ interface PublicationListViewProps {
   loading: boolean;
   selectedPublications: string[];
   onSelectionChange: (publicationId: string, selected: boolean) => void;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
 }
 
 export const PublicationListView = ({
   publications,
   loading,
   selectedPublications,
-  onSelectionChange
+  onSelectionChange,
+  searchTerm,
+  onSearchChange
 }: PublicationListViewProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [sponsoredFilter, setSponsoredFilter] = useState("all");
   const [dofollowFilter, setDofollowFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -51,14 +54,8 @@ export const PublicationListView = ({
     
     let filtered = publications.filter(pub => pub.is_active !== false);
 
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(pub =>
-        pub.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.location?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+    // Note: Search filtering is now handled by the parent component
+    // since we receive pre-filtered publications
 
     // Sponsored filter
     if (sponsoredFilter === "sponsored") {
@@ -144,7 +141,7 @@ export const PublicationListView = ({
           <Input
             placeholder="Search publications..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10"
           />
         </div>

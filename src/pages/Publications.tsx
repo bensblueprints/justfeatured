@@ -298,10 +298,12 @@ export const Publications = () => {
           <div className="flex-1">
             {viewMode === "list" ? (
               <PublicationListView
-                publications={publications}
+                publications={filteredPublications}
                 loading={loading}
                 selectedPublications={selectedPublications}
                 onSelectionChange={handleSelectionChange}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
               />
             ) : (
               <>
