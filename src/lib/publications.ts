@@ -284,3 +284,18 @@ export const deletePublication = async (external_id: string) => {
     throw error;
   }
 };
+
+/**
+ * Purge all publications (hard delete). Admin only.
+ */
+export const purgeAllPublications = async () => {
+  const { error } = await supabase
+    .from('publications')
+    .delete()
+    .neq('id', '');
+
+  if (error) {
+    console.error('Error purging publications:', error);
+    throw error;
+  }
+};

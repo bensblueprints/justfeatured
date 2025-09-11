@@ -3,7 +3,9 @@ import { toast } from "@/hooks/use-toast";
 
 interface CSVRowData {
   PUBLICATION: string;
-  PRICE: string;
+  PRICE?: string;
+  'SELL PRICE'?: string;
+  'BUY PRICE'?: string;
   DA: string;
   DR: string;
   GENRE: string;
@@ -82,7 +84,9 @@ export const parseCSVContent = (csvContent: string): CSVRowData[] => {
       .replace(/\s+/g, ' ')
       .replace(/\//g, ' / ')
     if (s.includes('publication')) return 'PUBLICATION'
-    if (s === 'price' || s.includes('price')) return 'PRICE'
+    if (s.includes('sell') && s.includes('price')) return 'SELL PRICE'
+    if (s.includes('buy') && s.includes('price')) return 'BUY PRICE'
+    if (s === 'price' || (s.includes('price') && !s.includes('sell') && !s.includes('buy'))) return 'PRICE'
     if (s === 'da') return 'DA'
     if (s === 'dr') return 'DR'
     if (s.includes('genre') || s.includes('category')) return 'GENRE'
@@ -130,6 +134,8 @@ export const parseCSVContent = (csvContent: string): CSVRowData[] => {
     rows.push({
       PUBLICATION: name,
       PRICE: price,
+      'SELL PRICE': rowObj['SELL PRICE'] || rowObj['Price'] || rowObj['PRICE'] || '',
+      'BUY PRICE': rowObj['BUY PRICE'] || '',
       DA: rowObj['DA'] || '0',
       DR: rowObj['DR'] || '0',
       GENRE: rowObj['GENRE'] || 'News',
@@ -154,52 +160,52 @@ export const parseCSVContent = (csvContent: string): CSVRowData[] => {
 }
 
 export const convertToSupabaseFormat = (csvData: CSVRowData[]) => {
+  const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   return csvData.map((row, index) => {
-    // Parse price - handle cases like "$75", "75", etc.
-    let price = 0;
-    const priceStr = row.PRICE.replace(/[$,]/g, '').trim();
-    if (priceStr && !isNaN(Number(priceStr))) {
-      price = Number(priceStr);
-    }
+    // Prefer SELL PRICE if present; fallback to PRICE
+    const rawPrice = (row['SELL PRICE'] ?? row.PRICE ?? '').toString();
+    const cleaned = rawPrice.replace(/[$,]/g, '').trim();
+    const price = cleaned && !isNaN(Number(cleaned)) ? Number(cleaned) : 0;
 
     // Parse DA and DR scores
-    const daScore = parseInt(row.DA) || 0;
-    const drScore = parseInt(row.DR) || 0;
+    const daScore = parseInt(row.DA as any) || 0;
+    const drScore = parseInt(row.DR as any) || 0;
 
     // Convert Y/N to boolean
-    const sponsored = row.SPONSORED.toUpperCase() === 'Y' || row.SPONSORED.toLowerCase() === 'discreet' || row.SPONSORED.toLowerCase() === 'discrete';
-    const indexed = row.INDEXED.toUpperCase() === 'Y';
-    const dofollow = row.DOFOLLOW.toUpperCase() === 'Y';
+    const sponsored = (row.SPONSORED || '').toString().toLowerCase();
+    const isSponsored = sponsored === 'y' || sponsored === 'yes' || sponsored === 'discreet' || sponsored === 'discrete';
+    const indexed = ((row.INDEXED || '') as string).toUpperCase() === 'Y';
+    const dofollow = ((row.DOFOLLOW || '') as string).toUpperCase() === 'Y';
 
-    // Handle special restrictions
-    const erotic = row.EROTIC?.includes('Cost') || row.EROTIC?.toUpperCase() === 'Y';
-    const health = row.HEALTH?.includes('Cost') || row.HEALTH?.toUpperCase() === 'Y';
-    const cbd = row.CBD?.includes('Cost') || row.CBD?.toUpperCase() === 'Y';
-    const crypto = row.CRYPTO?.includes('Cost') || row.CRYPTO?.toUpperCase() === 'Y';
-    const gambling = row.GAMBLING?.includes('Cost') || row.GAMBLING?.toUpperCase() === 'Y';
+    // Handle special restrictions (treat values like "x2 Cost" as true => requires disclosure)
+    const erotic = !!row.EROTIC && (/cost/i.test(row.EROTIC) || row.EROTIC.toUpperCase() === 'Y');
+    const health = !!row.HEALTH && (/cost/i.test(row.HEALTH) || row.HEALTH.toUpperCase() === 'Y');
+    const cbd = !!row.CBD && (/cost/i.test(row.CBD) || row.CBD.toUpperCase() === 'Y');
+    const crypto = !!row.CRYPTO && (/cost/i.test(row.CRYPTO) || row.CRYPTO.toUpperCase() === 'Y');
+    const gambling = !!row.GAMBLING && (/cost/i.test(row.GAMBLING) || row.GAMBLING.toUpperCase() === 'Y');
 
     return {
       name: row.PUBLICATION,
-      price: price,
+      price,
       da_score: daScore,
       dr_score: drScore,
       category: row.GENRE || 'News',
       tat_days: row.TAT || '1-3 Days',
-      sponsored: sponsored,
-      indexed: indexed,
+      sponsored: isSponsored,
+      indexed,
       dofollow_link: dofollow,
       location: row['REGION / LOCATION'] || 'GLOBAL',
-      erotic: erotic,
-      health: health,
-      cbd: cbd,
-      crypto: crypto,
-      gambling: gambling,
+      erotic,
+      health,
+      cbd,
+      crypto,
+      gambling,
       status: 'active' as const,
-      monthly_readers: Math.floor(Math.random() * 100000) + 10000, // Placeholder
+      monthly_readers: Math.floor(Math.random() * 100000) + 10000,
       description: `${row.GENRE} publication with DA ${daScore} and DR ${drScore}`,
       contact_info: 'Contact via platform',
       is_active: true,
-      external_id: `csv-import-${index + 1}`
+      external_id: `${slugify(row.PUBLICATION)}-${index + 1}-${Date.now()}`
     };
   });
 };

@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { parseCSVContent, convertToSupabaseFormat, importPublicationsToSupabase } from "@/utils/csvPublicationImporter";
-import { addPublication } from "@/lib/publications";
+import { addPublication, purgeAllPublications } from "@/lib/publications";
 import { Link } from "react-router-dom";
 import { Shield, CheckCircle2, AlertTriangle } from "lucide-react";
 
@@ -184,6 +184,53 @@ const AdminManualImport = () => {
     }
   }, [isAdmin, isLoading]);
 
+  // Purge all publications (hard delete)
+  const purgeAll = async () => {
+    setIsImporting(true);
+    setResult(null);
+    setError(null);
+    try {
+      await purgeAllPublications();
+      localStorage.removeItem('csv-import-offset');
+      setOffset(0);
+      toast({ title: 'Purged', description: 'All publications have been deleted.' });
+    } catch (e: any) {
+      const msg = e?.message || 'Failed to purge publications';
+      setError(msg);
+      toast({ title: 'Purge failed', description: msg, variant: 'destructive' });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  // Purge and re-import ALL rows from bundled CSV
+  const purgeAndReimport = async () => {
+    setIsImporting(true);
+    setResult(null);
+    setError(null);
+    try {
+      await purgeAllPublications();
+      localStorage.removeItem('csv-import-offset');
+      setOffset(0);
+
+      const response = await fetch('/Just Featured PR Sheet - All Publications.csv');
+      if (!response.ok) throw new Error('CSV file not found');
+      const csvContent = await response.text();
+      const csvData = parseCSVContent(csvContent);
+      setTotal(csvData.length);
+      const supabaseData = convertToSupabaseFormat(csvData);
+      const res = await importPublicationsToSupabase(supabaseData);
+      setResult({ ...res, total: csvData.length });
+      toast({ title: 'Re-import complete', description: `Imported ${res.imported}/${csvData.length} publications` });
+    } catch (e: any) {
+      const msg = e?.message || 'Failed to purge and re-import';
+      setError(msg);
+      toast({ title: 'Re-import failed', description: msg, variant: 'destructive' });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen grid place-items-center">
@@ -273,9 +320,15 @@ const AdminManualImport = () => {
             </div>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button onClick={runImport} disabled={isImporting} className="min-w-[180px]">
               {isImporting ? 'Importing…' : 'Import Next 50'}
+            </Button>
+            <Button onClick={purgeAndReimport} disabled={isImporting} className="min-w-[200px]">
+              {isImporting ? 'Working…' : 'Purge & Re-Import (All)'}
+            </Button>
+            <Button onClick={purgeAll} disabled={isImporting} variant="destructive">
+              Purge All Publications
             </Button>
             <Button onClick={() => { localStorage.removeItem('csv-import-offset'); setOffset(0); setResult(null); setError(null); toast({ title: 'Progress reset', description: 'Import progress has been reset.' }); }} variant="outline">
               Reset Progress
