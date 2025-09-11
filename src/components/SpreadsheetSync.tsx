@@ -252,47 +252,50 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
   }, [file, toast, onSyncComplete]);
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="h-fit">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-lg">
           <FileSpreadsheet className="h-5 w-5" />
           Spreadsheet Sync
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {/* File Upload */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Upload CSV File</label>
             <Input
               type="file"
               accept=".csv"
               onChange={handleFileUpload}
               disabled={isProcessing}
-              className="flex-1"
+              className="w-full"
             />
-            <Button
-              onClick={processSpreadsheet}
-              disabled={!file || isProcessing}
-              className="min-w-[120px]"
-            >
-              {isProcessing ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Syncing...
-                </>
-              ) : (
-                <>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Sync Data
-                </>
-              )}
-            </Button>
           </div>
+          
+          <Button
+            onClick={processSpreadsheet}
+            disabled={!file || isProcessing}
+            className="w-full"
+            size="sm"
+          >
+            {isProcessing ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                Syncing Data...
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4 mr-2" />
+                Sync Data
+              </>
+            )}
+          </Button>
 
-          <Alert>
+          <Alert className="text-xs">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Upload a CSV file with columns: PUBLICATION, Price, DA, DR, GENRE, TAT, SPONSORED, INDEXED, DOFOLLOW, etc.
+            <AlertDescription className="text-xs leading-relaxed">
+              Upload a CSV file with columns: PUBLICATION, Price, DA, DR, GENRE, TAT, SPONSORED, INDEXED, DOFOLLOW, etc. 
               The system will automatically add new publications and update existing ones.
             </AlertDescription>
           </Alert>
@@ -300,86 +303,91 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
 
         {/* Progress */}
         {syncStatus && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Progress</span>
+              <div className="flex justify-between text-xs">
+                <span className="font-medium">Progress</span>
                 <span>{syncStatus.processed} / {syncStatus.total}</span>
               </div>
               <Progress 
                 value={(syncStatus.processed / syncStatus.total) * 100} 
-                className="w-full" 
+                className="w-full h-2" 
               />
               {syncStatus.currentItem && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground truncate">
                   Processing: {syncStatus.currentItem}
                 </p>
               )}
             </div>
 
-            <div className="grid grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{syncStatus.added}</div>
-                <div className="text-sm text-muted-foreground">Added</div>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="flex justify-between">
+                <span>Added:</span>
+                <span className="font-medium text-green-600">{syncStatus.added}</span>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{syncStatus.updated}</div>
-                <div className="text-sm text-muted-foreground">Updated</div>
+              <div className="flex justify-between">
+                <span>Updated:</span>
+                <span className="font-medium text-blue-600">{syncStatus.updated}</span>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-600">{syncStatus.processed}</div>
-                <div className="text-sm text-muted-foreground">Processed</div>
+              <div className="flex justify-between">
+                <span>Processed:</span>
+                <span className="font-medium">{syncStatus.processed}</span>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">{syncStatus.errors}</div>
-                <div className="text-sm text-muted-foreground">Errors</div>
+              <div className="flex justify-between">
+                <span>Errors:</span>
+                <span className="font-medium text-red-600">{syncStatus.errors}</span>
               </div>
             </div>
           </div>
-        )}
-
-        {/* Errors */}
-        {errors.length > 0 && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              <div className="space-y-2">
-                <p className="font-medium">Errors encountered during sync:</p>
-                <div className="max-h-32 overflow-y-auto space-y-1">
-                  {errors.map((error, index) => (
-                    <div key={index} className="text-xs">
-                      {error}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success Message */}
-        {syncStatus && syncStatus.processed === syncStatus.total && !isProcessing && (
-          <Alert>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-600">
-              Sync completed successfully! {syncStatus.added} publications added, {syncStatus.updated} updated.
-            </AlertDescription>
-          </Alert>
         )}
 
         {/* File Info */}
         {file && (
-          <div className="bg-muted/50 p-4 rounded-lg">
+          <div className="bg-muted/30 p-3 rounded-md">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{file.name}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="font-medium text-xs">{file.name}</p>
+                <p className="text-xs text-muted-foreground">
                   {(file.size / 1024).toFixed(1)} KB
                 </p>
               </div>
-              <Badge variant="outline">CSV</Badge>
+              <Badge variant="outline" className="text-xs">CSV</Badge>
             </div>
           </div>
+        )}
+
+        {/* Success Message */}
+        {syncStatus && syncStatus.processed === syncStatus.total && !isProcessing && (
+          <Alert className="border-green-200 bg-green-50">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-700 text-xs">
+              Sync completed! {syncStatus.added} added, {syncStatus.updated} updated.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Errors */}
+        {errors.length > 0 && (
+          <Alert variant="destructive" className="text-xs">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              <div className="space-y-2">
+                <p className="font-medium text-xs">Errors during sync:</p>
+                <div className="max-h-24 overflow-y-auto space-y-1">
+                  {errors.slice(0, 3).map((error, index) => (
+                    <div key={index} className="text-xs leading-tight">
+                      {error}
+                    </div>
+                  ))}
+                  {errors.length > 3 && (
+                    <div className="text-xs text-muted-foreground">
+                      ... and {errors.length - 3} more errors
+                    </div>
+                  )}
+                </div>
+              </div>
+            </AlertDescription>
+          </Alert>
         )}
       </CardContent>
     </Card>
