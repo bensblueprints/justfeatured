@@ -14,16 +14,246 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      email_subscribers: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          metadata: Json | null
+          source: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          metadata?: Json | null
+          source: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          metadata?: Json | null
+          source?: string
+        }
+        Relationships: []
+      }
+      file_attachments: {
+        Row: {
+          created_at: string | null
+          file_name: string
+          file_size: number
+          file_type: string
+          id: string
+          is_logo: boolean | null
+          post_checkout_info_id: string | null
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string | null
+          file_name: string
+          file_size: number
+          file_type: string
+          id?: string
+          is_logo?: boolean | null
+          post_checkout_info_id?: string | null
+          storage_path: string
+        }
+        Update: {
+          created_at?: string | null
+          file_name?: string
+          file_size?: number
+          file_type?: string
+          id?: string
+          is_logo?: boolean | null
+          post_checkout_info_id?: string | null
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_attachments_post_checkout_info_id_fkey"
+            columns: ["post_checkout_info_id"]
+            isOneToOne: false
+            referencedRelation: "post_checkout_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_checkout_info: {
+        Row: {
+          additional_info: string | null
+          budget_range: string | null
+          company_name: string
+          contact_email: string
+          contact_phone: string | null
+          created_at: string | null
+          id: string
+          industry: string | null
+          key_messages: string | null
+          preferred_timeline: string | null
+          status: Database["public"]["Enums"]["checkout_status"] | null
+          target_audience: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          additional_info?: string | null
+          budget_range?: string | null
+          company_name: string
+          contact_email: string
+          contact_phone?: string | null
+          created_at?: string | null
+          id?: string
+          industry?: string | null
+          key_messages?: string | null
+          preferred_timeline?: string | null
+          status?: Database["public"]["Enums"]["checkout_status"] | null
+          target_audience?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          additional_info?: string | null
+          budget_range?: string | null
+          company_name?: string
+          contact_email?: string
+          contact_phone?: string | null
+          created_at?: string | null
+          id?: string
+          industry?: string | null
+          key_messages?: string | null
+          preferred_timeline?: string | null
+          status?: Database["public"]["Enums"]["checkout_status"] | null
+          target_audience?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      press_releases: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          post_checkout_info_id: string | null
+          status: Database["public"]["Enums"]["press_release_status"] | null
+          title: string
+          updated_at: string | null
+          user_id: string
+          word_count: number
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          post_checkout_info_id?: string | null
+          status?: Database["public"]["Enums"]["press_release_status"] | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+          word_count?: number
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          post_checkout_info_id?: string | null
+          status?: Database["public"]["Enums"]["press_release_status"] | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+          word_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "press_releases_post_checkout_info_id_fkey"
+            columns: ["post_checkout_info_id"]
+            isOneToOne: false
+            referencedRelation: "post_checkout_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publications: {
+        Row: {
+          category: string
+          contact_info: string
+          created_at: string | null
+          id: string
+          logo_url: string | null
+          monthly_readers: number
+          name: string
+          price: number
+          status: Database["public"]["Enums"]["publication_status"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          contact_info: string
+          created_at?: string | null
+          id?: string
+          logo_url?: string | null
+          monthly_readers?: number
+          name: string
+          price?: number
+          status?: Database["public"]["Enums"]["publication_status"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          contact_info?: string
+          created_at?: string | null
+          id?: string
+          logo_url?: string | null
+          monthly_readers?: number
+          name?: string
+          price?: number
+          status?: Database["public"]["Enums"]["publication_status"] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
+      checkout_status: "pending" | "in_progress" | "completed" | "cancelled"
+      press_release_status:
+        | "draft"
+        | "submitted"
+        | "approved"
+        | "published"
+        | "rejected"
+      publication_status: "active" | "inactive"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +380,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+      checkout_status: ["pending", "in_progress", "completed", "cancelled"],
+      press_release_status: [
+        "draft",
+        "submitted",
+        "approved",
+        "published",
+        "rejected",
+      ],
+      publication_status: ["active", "inactive"],
+    },
   },
 } as const
