@@ -89,7 +89,7 @@ export const PublicationsMarketplace = () => {
             Most Popular Publications
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Get featured in these top-rated news outlets trusted by thousands of businesses. Choose from 355+ publications.
+            Get featured in these top-rated news outlets trusted by thousands of businesses. Browse over 1,200 publications.
           </p>
         </div>
 

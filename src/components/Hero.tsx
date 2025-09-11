@@ -126,7 +126,7 @@ export const Hero = () => {
               <Button 
                 className="bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 hover:border-white/50 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 group shadow-lg hover:shadow-xl"
               >
-                355+ PREMIUM PUBLICATIONS
+                BROWSE OVER 1,200 PUBLICATIONS
                 <Sparkles className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
               </Button>
             </ProtectedInteraction>
