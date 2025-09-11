@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Search, ShoppingCart, Filter, DollarSign, Building, Grid3X3, List, Upload } from "lucide-react";
 import { fetchPublications } from "@/lib/publications";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { Publication, CartItem } from "@/types";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 
@@ -32,8 +33,9 @@ export const Publications = () => {
   
   const LOAD_MORE_COUNT = 18;
 
-  // Use real-time publications sync
+  // Use real-time publications sync and admin check
   const { publications, loading, refreshPublications } = usePublicationsSync();
+  const { isAdmin } = useAdminCheck();
 
   const filteredPublications = useMemo(() => {
     if (loading || publications.length === 0) {
@@ -154,26 +156,28 @@ export const Publications = () => {
             </p>
           </div>
           <div className="mt-4 md:mt-0 flex items-center gap-4">
-            {/* Spreadsheet Sync */}
-            <Dialog open={showSpreadsheetSync} onOpenChange={setShowSpreadsheetSync}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Sync Spreadsheet
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Sync Publications from Spreadsheet</DialogTitle>
-                </DialogHeader>
-                <SpreadsheetSync 
-                  onSyncComplete={() => {
-                    setShowSpreadsheetSync(false);
-                    refreshPublications();
-                  }}
-                />
-              </DialogContent>
-            </Dialog>
+            {/* Spreadsheet Sync - Admin Only */}
+            {isAdmin && (
+              <Dialog open={showSpreadsheetSync} onOpenChange={setShowSpreadsheetSync}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Sync Spreadsheet
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Sync Publications from Spreadsheet</DialogTitle>
+                  </DialogHeader>
+                  <SpreadsheetSync 
+                    onSyncComplete={() => {
+                      setShowSpreadsheetSync(false);
+                      refreshPublications();
+                    }}
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
 
             {/* View Toggle */}
             <div className="flex items-center border rounded-lg p-1 bg-background">

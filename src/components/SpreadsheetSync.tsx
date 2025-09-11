@@ -68,34 +68,48 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
 
   const convertToPublication = (row: CSVRow, index: number) => {
     try {
+      // Generate a more unique external_id
+      const external_id = `csv_${Date.now()}_${Math.random().toString(36).substring(2, 15)}_${index}`;
+      
       const publication = {
-        external_id: `csv_${Date.now()}_${index}`,
-        name: row.PUBLICATION || `Publication ${index}`,
-        type: row.Type?.toLowerCase() || 'standard',
-        tier: row.Tier?.toLowerCase() || 'standard', 
-        category: row.GENRE || 'News',
-        price: parseFloat(row.Price || '0') || 0,
-        tat_days: row.TAT || '1-2 Weeks',
-        description: row.Description || '',
+        external_id,
+        name: row.PUBLICATION?.trim() || `Publication ${index + 1}`,
+        type: (row.Type?.toLowerCase().trim()) || 'standard',
+        tier: (row.Tier?.toLowerCase().trim()) || 'standard', 
+        category: row.GENRE?.trim() || 'News',
+        price: Math.max(0, parseFloat(row.Price?.replace(/[^0-9.-]/g, '') || '0') || 0),
+        tat_days: row.TAT?.trim() || '1-2 Weeks',
+        description: row.Description?.trim() || '',
         features: ['Press Release', 'SEO Backlink'],
-        website_url: row["Website URL"] || '',
-        da_score: parseInt(row.DA || '0') || 0,
-        dr_score: parseInt(row.DR || '0') || 0,
-        location: row["REGION / LOCATION"] || '',
-        dofollow_link: (row.DOFOLLOW?.toUpperCase() === 'Y') || false,
-        sponsored: (row.SPONSORED?.toUpperCase() === 'Y') || false,
-        indexed: (row.INDEXED?.toUpperCase() === 'Y') || true,
-        erotic: (row.EROTIC?.toUpperCase() === 'Y') || false,
-        health: (row.HEALTH?.toUpperCase() === 'Y') || false,
-        cbd: (row.CBD?.toUpperCase() === 'Y') || false,
-        crypto: (row.CRYPTO?.toUpperCase() === 'Y') || false,
-        gambling: (row.GAMBLING?.toUpperCase() === 'Y') || false,
+        website_url: row["Website URL"]?.trim() || '',
+        da_score: Math.max(0, parseInt(row.DA?.replace(/[^0-9]/g, '') || '0') || 0),
+        dr_score: Math.max(0, parseInt(row.DR?.replace(/[^0-9]/g, '') || '0') || 0),
+        location: row["REGION / LOCATION"]?.trim() || '',
+        dofollow_link: (row.DOFOLLOW?.toUpperCase().trim() === 'Y'),
+        sponsored: (row.SPONSORED?.toUpperCase().trim() === 'Y'),
+        indexed: (row.INDEXED?.toUpperCase().trim() !== 'N'), // Default to true unless explicitly 'N'
+        erotic: (row.EROTIC?.toUpperCase().trim() === 'Y'),
+        health: (row.HEALTH?.toUpperCase().trim() === 'Y'),
+        cbd: (row.CBD?.toUpperCase().trim() === 'Y'),
+        crypto: (row.CRYPTO?.toUpperCase().trim() === 'Y'),
+        gambling: (row.GAMBLING?.toUpperCase().trim() === 'Y'),
         popularity: Math.floor(Math.random() * 100) + 1,
         is_active: true
       };
 
+      // Validate required fields
+      if (!publication.name || publication.name === `Publication ${index + 1}`) {
+        throw new Error(`Publication name is required`);
+      }
+
+      if (publication.price < 0) {
+        throw new Error(`Invalid price: ${row.Price}`);
+      }
+
+      console.log(`Converted row ${index + 1}:`, publication);
       return publication;
     } catch (error) {
+      console.error(`Error converting row ${index + 1}:`, error);
       throw new Error(`Row ${index + 1}: ${error instanceof Error ? error.message : 'Invalid data format'}`);
     }
   };
@@ -125,12 +139,24 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
     setSyncStatus({ total: 0, processed: 0, added: 0, updated: 0, errors: 0 });
 
     try {
+      console.log('Starting spreadsheet processing...');
       const csvText = await file.text();
-      const rows = parseCSV(csvText);
+      console.log('CSV text length:', csvText.length);
       
+      const rows = parseCSV(csvText);
+      console.log('Parsed rows:', rows.length);
+      console.log('First few rows:', rows.slice(0, 3));
+      
+      if (rows.length === 0) {
+        throw new Error('No data rows found in CSV file');
+      }
+
       // Get existing publications for comparison
+      console.log('Fetching existing publications...');
       const existingPublications = await fetchPublications();
-      const existingNames = new Set(existingPublications.map(p => p.name.toLowerCase()));
+      console.log('Found existing publications:', existingPublications.length);
+      
+      const existingNames = new Set(existingPublications.map(p => p.name.toLowerCase().trim()));
 
       setSyncStatus(prev => prev ? { ...prev, total: rows.length } : null);
 
@@ -144,40 +170,51 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
         setSyncStatus(prev => prev ? { 
           ...prev, 
           processed: i + 1,
-          currentItem: row.PUBLICATION || `Row ${i + 1}`
+          currentItem: row.PUBLICATION?.trim() || `Row ${i + 1}`
         } : null);
 
         try {
+          console.log(`Processing row ${i + 1}:`, row);
           const publicationData = convertToPublication(row, i);
+          console.log(`Converted data for row ${i + 1}:`, publicationData);
           
-          // Check if publication already exists
-          const existsAlready = existingNames.has(publicationData.name.toLowerCase());
+          // Check if publication already exists by name
+          const existsAlready = existingNames.has(publicationData.name.toLowerCase().trim());
+          console.log(`Publication "${publicationData.name}" exists: ${existsAlready}`);
           
           if (existsAlready) {
             // Update existing publication
             const existingPub = existingPublications.find(p => 
-              p.name.toLowerCase() === publicationData.name.toLowerCase()
+              p.name.toLowerCase().trim() === publicationData.name.toLowerCase().trim()
             );
             if (existingPub?.external_id) {
+              console.log(`Updating publication: ${publicationData.name}`);
               await updatePublication(existingPub.external_id, publicationData);
               updated++;
+              console.log(`Successfully updated: ${publicationData.name}`);
             }
           } else {
             // Add new publication
-            await addPublication(publicationData);
+            console.log(`Adding new publication: ${publicationData.name}`);
+            const result = await addPublication(publicationData);
+            console.log(`Successfully added: ${publicationData.name}`, result);
             added++;
-            existingNames.add(publicationData.name.toLowerCase());
+            existingNames.add(publicationData.name.toLowerCase().trim());
           }
 
           // Small delay to prevent overwhelming the database
-          if (i % 10 === 0) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+          if (i % 5 === 0 && i > 0) {
+            console.log(`Processed ${i + 1} rows, taking a short break...`);
+            await new Promise(resolve => setTimeout(resolve, 200));
           }
         } catch (error) {
           console.error(`Error processing row ${i + 1}:`, error);
-          errorList.push(`Row ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          const errorMessage = `Row ${i + 1} (${row.PUBLICATION || 'Unknown'}): ${error instanceof Error ? error.message : 'Unknown error'}`;
+          errorList.push(errorMessage);
         }
       }
+
+      console.log(`Processing complete. Added: ${added}, Updated: ${updated}, Errors: ${errorList.length}`);
 
       setSyncStatus(prev => prev ? { 
         ...prev, 
@@ -189,13 +226,16 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
       
       setErrors(errorList);
 
+      const isSuccess = errorList.length < rows.length / 2; // Success if less than 50% errors
+
       toast({
-        title: "Sync Complete",
+        title: isSuccess ? "Sync Complete" : "Sync Completed with Errors",
         description: `Added ${added} new publications, updated ${updated} existing ones. ${errorList.length} errors.`,
-        variant: errorList.length > 0 ? "destructive" : "default",
+        variant: isSuccess ? "default" : "destructive",
       });
 
-      if (onSyncComplete) {
+      if (onSyncComplete && (added > 0 || updated > 0)) {
+        console.log('Calling onSyncComplete callback...');
         onSyncComplete();
       }
 
