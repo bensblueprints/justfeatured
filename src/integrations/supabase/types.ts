@@ -14,495 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
-      approval_history: {
+      messages: {
         Row: {
-          action: string
-          comment: string | null
-          created_at: string
-          id: string
-          press_release_id: string | null
-          status: Database["public"]["Enums"]["review_status"]
-          user_id: string | null
-        }
-        Insert: {
-          action: string
-          comment?: string | null
-          created_at?: string
-          id?: string
-          press_release_id?: string | null
-          status: Database["public"]["Enums"]["review_status"]
-          user_id?: string | null
-        }
-        Update: {
-          action?: string
-          comment?: string | null
-          created_at?: string
-          id?: string
-          press_release_id?: string | null
-          status?: Database["public"]["Enums"]["review_status"]
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "approval_history_press_release_id_fkey"
-            columns: ["press_release_id"]
-            isOneToOne: false
-            referencedRelation: "press_releases"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      email_subscribers: {
-        Row: {
-          email: string
-          id: string
-          metadata: Json | null
-          source: string
-          subscribed_at: string
-        }
-        Insert: {
-          email: string
-          id?: string
-          metadata?: Json | null
-          source: string
-          subscribed_at?: string
-        }
-        Update: {
-          email?: string
-          id?: string
-          metadata?: Json | null
-          source?: string
-          subscribed_at?: string
-        }
-        Relationships: []
-      }
-      file_attachments: {
-        Row: {
-          created_at: string
-          file_name: string
-          file_size: number
-          file_type: string
-          id: string
-          is_logo: boolean | null
-          post_checkout_info_id: string | null
-          storage_path: string
-        }
-        Insert: {
-          created_at?: string
-          file_name: string
-          file_size: number
-          file_type: string
-          id?: string
-          is_logo?: boolean | null
-          post_checkout_info_id?: string | null
-          storage_path: string
-        }
-        Update: {
-          created_at?: string
-          file_name?: string
-          file_size?: number
-          file_type?: string
-          id?: string
-          is_logo?: boolean | null
-          post_checkout_info_id?: string | null
-          storage_path?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "file_attachments_post_checkout_info_id_fkey"
-            columns: ["post_checkout_info_id"]
-            isOneToOne: false
-            referencedRelation: "post_checkout_info"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      post_checkout_info: {
-        Row: {
-          additional_notes: string | null
-          business_description: string
-          company_name: string
-          company_website: string | null
-          contact_person_name: string
-          created_at: string
-          custom_press_release: string | null
-          email: string
-          id: string
-          important_dates: string | null
-          industry_sector: Database["public"]["Enums"]["industry_sector"]
-          key_products_services: string | null
-          order_id: string | null
-          phone_number: string
-          preferred_tone:
-            | Database["public"]["Enums"]["press_release_tone"]
-            | null
-          recent_achievements: string | null
-          target_audience: string | null
-          updated_at: string
-          user_id: string | null
-          write_own_release: boolean
-        }
-        Insert: {
-          additional_notes?: string | null
-          business_description: string
-          company_name: string
-          company_website?: string | null
-          contact_person_name: string
-          created_at?: string
-          custom_press_release?: string | null
-          email: string
-          id?: string
-          important_dates?: string | null
-          industry_sector: Database["public"]["Enums"]["industry_sector"]
-          key_products_services?: string | null
-          order_id?: string | null
-          phone_number: string
-          preferred_tone?:
-            | Database["public"]["Enums"]["press_release_tone"]
-            | null
-          recent_achievements?: string | null
-          target_audience?: string | null
-          updated_at?: string
-          user_id?: string | null
-          write_own_release?: boolean
-        }
-        Update: {
-          additional_notes?: string | null
-          business_description?: string
-          company_name?: string
-          company_website?: string | null
-          contact_person_name?: string
-          created_at?: string
-          custom_press_release?: string | null
-          email?: string
-          id?: string
-          important_dates?: string | null
-          industry_sector?: Database["public"]["Enums"]["industry_sector"]
-          key_products_services?: string | null
-          order_id?: string | null
-          phone_number?: string
-          preferred_tone?:
-            | Database["public"]["Enums"]["press_release_tone"]
-            | null
-          recent_achievements?: string | null
-          target_audience?: string | null
-          updated_at?: string
-          user_id?: string | null
-          write_own_release?: boolean
-        }
-        Relationships: []
-      }
-      press_releases: {
-        Row: {
-          actual_delivery_date: string | null
-          approved_at: string | null
-          approved_by: string | null
           content: string
           created_at: string
-          estimated_delivery_date: string | null
           id: string
-          post_checkout_info_id: string | null
-          status: Database["public"]["Enums"]["review_status"]
-          title: string
-          updated_at: string
-          user_id: string | null
-          version_number: number
-          word_count: number | null
+          is_read: boolean | null
+          recipient_id: string
+          sender_id: string
+          subject: string | null
         }
         Insert: {
-          actual_delivery_date?: string | null
-          approved_at?: string | null
-          approved_by?: string | null
           content: string
           created_at?: string
-          estimated_delivery_date?: string | null
           id?: string
-          post_checkout_info_id?: string | null
-          status?: Database["public"]["Enums"]["review_status"]
-          title: string
-          updated_at?: string
-          user_id?: string | null
-          version_number?: number
-          word_count?: number | null
+          is_read?: boolean | null
+          recipient_id: string
+          sender_id: string
+          subject?: string | null
         }
         Update: {
-          actual_delivery_date?: string | null
-          approved_at?: string | null
-          approved_by?: string | null
           content?: string
           created_at?: string
-          estimated_delivery_date?: string | null
           id?: string
-          post_checkout_info_id?: string | null
-          status?: Database["public"]["Enums"]["review_status"]
-          title?: string
-          updated_at?: string
-          user_id?: string | null
-          version_number?: number
-          word_count?: number | null
+          is_read?: boolean | null
+          recipient_id?: string
+          sender_id?: string
+          subject?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "press_releases_post_checkout_info_id_fkey"
-            columns: ["post_checkout_info_id"]
-            isOneToOne: false
-            referencedRelation: "post_checkout_info"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      profiles: {
+      orders: {
         Row: {
-          additional_notes: string | null
-          business_description: string | null
-          company_name: string | null
-          company_website: string | null
-          contact_person_name: string | null
+          amount: number
           created_at: string
-          email: string | null
+          currency: string | null
           id: string
-          important_dates: string | null
-          industry_sector: Database["public"]["Enums"]["industry_sector"] | null
-          key_products_services: string | null
-          phone_number: string | null
-          recent_achievements: string | null
-          target_audience: string | null
+          service_type: string
+          status: string | null
+          stripe_session_id: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          additional_notes?: string | null
-          business_description?: string | null
-          company_name?: string | null
-          company_website?: string | null
-          contact_person_name?: string | null
+          amount: number
           created_at?: string
-          email?: string | null
+          currency?: string | null
           id?: string
-          important_dates?: string | null
-          industry_sector?:
-            | Database["public"]["Enums"]["industry_sector"]
-            | null
-          key_products_services?: string | null
-          phone_number?: string | null
-          recent_achievements?: string | null
-          target_audience?: string | null
+          service_type: string
+          status?: string | null
+          stripe_session_id?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          additional_notes?: string | null
-          business_description?: string | null
-          company_name?: string | null
-          company_website?: string | null
-          contact_person_name?: string | null
+          amount?: number
           created_at?: string
-          email?: string | null
+          currency?: string | null
           id?: string
-          important_dates?: string | null
-          industry_sector?:
-            | Database["public"]["Enums"]["industry_sector"]
-            | null
-          key_products_services?: string | null
-          phone_number?: string | null
-          recent_achievements?: string | null
-          target_audience?: string | null
+          service_type?: string
+          status?: string | null
+          stripe_session_id?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
       }
-      publications: {
+      profiles: {
         Row: {
-          category: string
-          cbd: boolean | null
+          avatar_url: string | null
           created_at: string
-          crypto: boolean | null
-          da_score: number | null
-          description: string | null
-          dofollow_link: boolean | null
-          dr_score: number | null
-          erotic: boolean | null
-          external_id: string | null
-          features: string[] | null
-          gambling: boolean | null
-          health: boolean | null
-          id: string
-          indexed: boolean | null
-          is_active: boolean | null
-          location: string | null
-          logo_url: string | null
-          name: string
-          popularity: number | null
-          price: number
-          sponsored: boolean | null
-          tat_days: string
-          tier: string | null
-          type: string | null
-          updated_at: string
-          website_url: string | null
-        }
-        Insert: {
-          category?: string
-          cbd?: boolean | null
-          created_at?: string
-          crypto?: boolean | null
-          da_score?: number | null
-          description?: string | null
-          dofollow_link?: boolean | null
-          dr_score?: number | null
-          erotic?: boolean | null
-          external_id?: string | null
-          features?: string[] | null
-          gambling?: boolean | null
-          health?: boolean | null
-          id?: string
-          indexed?: boolean | null
-          is_active?: boolean | null
-          location?: string | null
-          logo_url?: string | null
-          name: string
-          popularity?: number | null
-          price?: number
-          sponsored?: boolean | null
-          tat_days?: string
-          tier?: string | null
-          type?: string | null
-          updated_at?: string
-          website_url?: string | null
-        }
-        Update: {
-          category?: string
-          cbd?: boolean | null
-          created_at?: string
-          crypto?: boolean | null
-          da_score?: number | null
-          description?: string | null
-          dofollow_link?: boolean | null
-          dr_score?: number | null
-          erotic?: boolean | null
-          external_id?: string | null
-          features?: string[] | null
-          gambling?: boolean | null
-          health?: boolean | null
-          id?: string
-          indexed?: boolean | null
-          is_active?: boolean | null
-          location?: string | null
-          logo_url?: string | null
-          name?: string
-          popularity?: number | null
-          price?: number
-          sponsored?: boolean | null
-          tat_days?: string
-          tier?: string | null
-          type?: string | null
-          updated_at?: string
-          website_url?: string | null
-        }
-        Relationships: []
-      }
-      review_comments: {
-        Row: {
-          content: string
-          created_at: string
-          id: string
-          is_resolved: boolean | null
-          parent_comment_id: string | null
-          position_end: number | null
-          position_start: number | null
-          press_release_id: string | null
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          id?: string
-          is_resolved?: boolean | null
-          parent_comment_id?: string | null
-          position_end?: number | null
-          position_start?: number | null
-          press_release_id?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          id?: string
-          is_resolved?: boolean | null
-          parent_comment_id?: string | null
-          position_end?: number | null
-          position_start?: number | null
-          press_release_id?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "review_comments_parent_comment_id_fkey"
-            columns: ["parent_comment_id"]
-            isOneToOne: false
-            referencedRelation: "review_comments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "review_comments_press_release_id_fkey"
-            columns: ["press_release_id"]
-            isOneToOne: false
-            referencedRelation: "press_releases"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      role_change_audit: {
-        Row: {
-          changed_by: string | null
-          changed_user_id: string
-          created_at: string | null
-          id: string
-          new_role: Database["public"]["Enums"]["user_role"]
-          old_role: Database["public"]["Enums"]["user_role"] | null
-          reason: string | null
-        }
-        Insert: {
-          changed_by?: string | null
-          changed_user_id: string
-          created_at?: string | null
-          id?: string
-          new_role: Database["public"]["Enums"]["user_role"]
-          old_role?: Database["public"]["Enums"]["user_role"] | null
-          reason?: string | null
-        }
-        Update: {
-          changed_by?: string | null
-          changed_user_id?: string
-          created_at?: string | null
-          id?: string
-          new_role?: Database["public"]["Enums"]["user_role"]
-          old_role?: Database["public"]["Enums"]["user_role"] | null
-          reason?: string | null
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string
+          email: string
+          full_name: string | null
           id: string
           role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
+          email: string
+          full_name?: string | null
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
+          email?: string
+          full_name?: string | null
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -512,55 +118,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_role: {
-        Args: { _user_id: string }
-        Returns: Database["public"]["Enums"]["user_role"]
-      }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["user_role"]
-          _user_id: string
-        }
+      validate_service_pricing: {
+        Args: { amount: number; service_type: string }
         Returns: boolean
-      }
-      update_publication_logo: {
-        Args: { new_logo_url: string; publication_external_id: string }
-        Returns: undefined
       }
     }
     Enums: {
-      industry_sector:
-        | "technology"
-        | "healthcare"
-        | "finance"
-        | "retail"
-        | "manufacturing"
-        | "education"
-        | "real_estate"
-        | "hospitality"
-        | "automotive"
-        | "media"
-        | "consulting"
-        | "non_profit"
-        | "government"
-        | "energy"
-        | "agriculture"
-        | "transportation"
-        | "entertainment"
-        | "food_beverage"
-        | "other"
-      press_release_tone:
-        | "professional"
-        | "casual"
-        | "technical"
-        | "inspirational"
-      review_status:
-        | "draft"
-        | "in_review"
-        | "revision_requested"
-        | "approved"
-        | "published"
-      user_role: "customer" | "editor" | "admin" | "super_admin"
+      user_role: "admin" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -688,41 +252,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      industry_sector: [
-        "technology",
-        "healthcare",
-        "finance",
-        "retail",
-        "manufacturing",
-        "education",
-        "real_estate",
-        "hospitality",
-        "automotive",
-        "media",
-        "consulting",
-        "non_profit",
-        "government",
-        "energy",
-        "agriculture",
-        "transportation",
-        "entertainment",
-        "food_beverage",
-        "other",
-      ],
-      press_release_tone: [
-        "professional",
-        "casual",
-        "technical",
-        "inspirational",
-      ],
-      review_status: [
-        "draft",
-        "in_review",
-        "revision_requested",
-        "approved",
-        "published",
-      ],
-      user_role: ["customer", "editor", "admin", "super_admin"],
+      user_role: ["admin", "client"],
     },
   },
 } as const
