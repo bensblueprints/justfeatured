@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 import AdminUpload from "./pages/AdminUpload";
 import BrandBundles from "./pages/BrandBundles";
 import AdminPanel from "./pages/AdminPanel";
+import AdminSetup from "./pages/AdminSetup";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => {
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/admin-upload" element={<AdminUpload />} />
               <Route path="/brand-bundles" element={<BrandBundles />} />
+              <Route path="/admin-setup" element={<AdminSetup />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
