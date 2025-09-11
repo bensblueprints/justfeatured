@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { processAndImportCSV } from "@/utils/csvPublicationImporter";
+import { parseCSVContent, convertToSupabaseFormat, importPublicationsToSupabase } from "@/utils/csvPublicationImporter";
 import { Link } from "react-router-dom";
 import { Shield, CheckCircle2, AlertTriangle } from "lucide-react";
 
@@ -14,6 +14,8 @@ const AdminManualImport = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [result, setResult] = useState<{ imported: number; errors: number; total: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [offset, setOffset] = useState<number>(() => Number(localStorage.getItem('csv-import-offset') || 0));
+  const [total, setTotal] = useState<number>(0);
 
   useEffect(() => {
     document.title = "Manual CSV Import • Admin";
@@ -29,8 +31,34 @@ const AdminManualImport = () => {
       const response = await fetch('/Just Featured PR Sheet - All Publications.csv');
       if (!response.ok) throw new Error('CSV file not found');
       const csvContent = await response.text();
-      const res = await processAndImportCSV(csvContent);
-      setResult(res);
+
+      const csvData = parseCSVContent(csvContent);
+      setTotal(csvData.length);
+
+      const start = offset;
+      if (start >= csvData.length) {
+        const msg = 'All rows already imported. Reset progress to start over.';
+        setResult({ imported: 0, errors: 0, total: csvData.length });
+        toast({ title: 'Complete', description: msg });
+        return;
+      }
+
+      const slice = csvData.slice(start, start + 50);
+      const supabaseData = convertToSupabaseFormat(slice);
+      const res = await importPublicationsToSupabase(supabaseData);
+
+      const newOffset = Math.min(start + slice.length, csvData.length);
+      setOffset(newOffset);
+      localStorage.setItem('csv-import-offset', String(newOffset));
+
+      const finalRes = { ...res, total: csvData.length };
+      setResult(finalRes);
+
+      if (newOffset < csvData.length) {
+        toast({ title: 'Chunk imported', description: `Imported ${res.imported}/${slice.length}. Click "Import Next 50" to continue.` });
+      } else {
+        toast({ title: 'Import complete', description: `All ${csvData.length} rows processed.` });
+      }
     } catch (e: any) {
       const msg = e?.message || 'Failed to import CSV';
       setError(msg);
@@ -110,8 +138,11 @@ const AdminManualImport = () => {
           )}
 
           <div className="flex gap-3">
-            <Button onClick={runImport} disabled={isImporting} className="min-w-[160px]">
-              {isImporting ? 'Importing…' : 'Run Import Now'}
+            <Button onClick={runImport} disabled={isImporting} className="min-w-[180px]">
+              {isImporting ? 'Importing…' : 'Import Next 50'}
+            </Button>
+            <Button onClick={() => { localStorage.removeItem('csv-import-offset'); setOffset(0); setResult(null); setError(null); toast({ title: 'Progress reset', description: 'Import progress has been reset.' }); }} variant="outline">
+              Reset Progress
             </Button>
             <Button asChild variant="outline">
               <Link to="/admin">Go to Admin Dashboard</Link>

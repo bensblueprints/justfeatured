@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import { PublicationCard } from "@/components/PublicationCard";
 import { PublicationListView } from "@/components/PublicationListView";
 import { SpreadsheetSync } from "@/components/SpreadsheetSync";
-import { CSVPublicationImporter } from "@/components/CSVPublicationImporter";
+
 import { AIPresAgentDialog } from "@/components/AIPresAgentDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,8 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, ShoppingCart, Filter, DollarSign, Building, Grid3X3, List, Upload } from "lucide-react";
+
+import { Search, ShoppingCart, Filter, DollarSign, Building, Grid3X3, List } from "lucide-react";
 import { fetchPublications } from "@/lib/publications";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
@@ -30,7 +30,6 @@ export const Publications = () => {
   const [priceRange, setPriceRange] = useState<string>("all");
   const [industryFilter, setIndustryFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
-  const [showSpreadsheetSync, setShowSpreadsheetSync] = useState(false);
   
   const LOAD_MORE_COUNT = 18;
 
@@ -191,25 +190,6 @@ export const Publications = () => {
             </p>
           </div>
           <div className="mt-4 md:mt-0 flex items-center gap-4">
-            {/* CSV Import & Spreadsheet Sync - Admin Only */}
-            {isAdmin && (
-              <>
-                <Dialog open={showSpreadsheetSync} onOpenChange={setShowSpreadsheetSync}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-2" />
-                      CSV Import
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Import Publications from CSV</DialogTitle>
-                    </DialogHeader>
-                    <CSVPublicationImporter />
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
 
             {/* View Toggle */}
             <div className="flex items-center border rounded-lg p-1 bg-background">
