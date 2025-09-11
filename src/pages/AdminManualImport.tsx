@@ -33,25 +33,30 @@ const AdminManualImport = () => {
     
     for (const line of lines) {
       const cols = line.split('\t');
-      if (cols.length < 10) continue;
+      if (cols.length < 12) continue; // Updated minimum column count
       
-      // Parse the tab-separated data
+      // Parse the tab-separated data: PUBLICATION, Buy PRICE, Sell PRICE, DA, DR, GENRE, TAT, SPONSORED, INDEXED, DOFOLLOW, REGION/LOCATION, EROTIC, HEALTH, CBD, CRYPTO, GAMBLING
       const name = cols[0]?.trim();
-      const price1 = cols[2]?.replace(/[$,]/g, '') || '0';
-      const price2 = cols[3]?.replace(/[$,]/g, '') || '0';
-      const daScore = parseInt(cols[5]) || 0;
-      const drScore = parseInt(cols[6]) || 0;
-      const category = cols[7]?.trim() || 'News';
-      const tatDays = cols[8]?.trim() || '1-2 Weeks';
-      const location = cols[cols.length - 1]?.trim() || 'GLOBAL';
-      
-      // Use the higher price as the main price
-      const price = Math.max(parseFloat(price1), parseFloat(price2));
+      const buyPrice = parseFloat(cols[1]?.replace(/[$,]/g, '') || '0');
+      const sellPrice = parseFloat(cols[2]?.replace(/[$,]/g, '') || '0');
+      const daScore = parseInt(cols[3]) || 0;
+      const drScore = parseInt(cols[4]) || 0;
+      const category = cols[5]?.trim() || 'News';
+      const tatDays = cols[6]?.trim() || '1-2 Weeks';
+      const sponsored = cols[7]?.toLowerCase().trim() === 'y' || cols[7]?.toLowerCase().trim() === 'yes';
+      const indexed = cols[8]?.toLowerCase().trim() === 'y' || cols[8]?.toLowerCase().trim() === 'yes';
+      const dofollow = cols[9]?.toLowerCase().trim() === 'y' || cols[9]?.toLowerCase().trim() === 'yes';
+      const location = cols[10]?.trim() || 'GLOBAL';
+      const erotic = cols[11]?.toLowerCase().trim() === 'y' || cols[11]?.toLowerCase().trim() === 'yes';
+      const health = cols[12]?.toLowerCase().trim() === 'y' || cols[12]?.toLowerCase().trim() === 'yes';
+      const cbd = cols[13]?.toLowerCase().trim() === 'y' || cols[13]?.toLowerCase().trim() === 'yes';
+      const crypto = cols[14]?.toLowerCase().trim() === 'y' || cols[14]?.toLowerCase().trim() === 'yes';
+      const gambling = cols[15]?.toLowerCase().trim() === 'y' || cols[15]?.toLowerCase().trim() === 'yes';
       
       if (name && name !== 'New' && name !== 'On Hold' && name !== 'Lowered' && name !== 'Raised' && name !== 'Has a new URL') {
         publications.push({
           name: name,
-          price: price,
+          price: sellPrice, // Use sell price as main price
           da_score: daScore,
           dr_score: drScore,
           category: category,
@@ -60,10 +65,16 @@ const AdminManualImport = () => {
           contact_info: 'Contact via Just Featured',
           monthly_readers: 100000,
           type: 'premium',
-          tier: price > 5000 ? 'premium' : 'standard',
+          tier: sellPrice > 5000 ? 'premium' : 'standard',
           features: ['Press Release Placement'],
-          dofollow_link: true,
-          indexed: true,
+          dofollow_link: dofollow,
+          indexed: indexed,
+          sponsored: sponsored,
+          erotic: erotic,
+          health: health,
+          cbd: cbd,
+          crypto: crypto,
+          gambling: gambling,
           status: 'active',
           is_active: true
         });
@@ -199,7 +210,7 @@ const AdminManualImport = () => {
             <div>
               <h3 className="text-lg font-medium">Direct Data Import</h3>
               <p className="text-sm text-muted-foreground mb-3">
-                Paste tab-separated publication data directly below:
+                Paste tab-separated publication data with all fields: PUBLICATION, Buy PRICE, Sell PRICE, DA, DR, GENRE, TAT, SPONSORED, INDEXED, DOFOLLOW, REGION/LOCATION, EROTIC, HEALTH, CBD, CRYPTO, GAMBLING
               </p>
               <Textarea
                 value={directData}

@@ -130,10 +130,10 @@ export const PublicationCard = ({ publication, selected, onSelectionChange, onUp
             </Badge>
           </div>
 
-          {/* Price - Large and prominent with doubled pricing */}
+          {/* Price - Show sell price only */}
           <div className="text-center">
             <div className="text-4xl font-bold text-primary">
-              {formatPrice((publication.price || 0) * 2)}
+              {formatPrice(publication.price)}
             </div>
           </div>
 
@@ -225,14 +225,56 @@ export const PublicationCard = ({ publication, selected, onSelectionChange, onUp
               )}
             </div>
 
-            {/* Health - Full width */}
-            <div className={`col-span-2 flex items-center justify-center gap-1 p-2 rounded-md transition-colors ${
+            {/* Health */}
+            <div className={`flex items-center justify-center gap-1 p-2 rounded-md transition-colors ${
               publication.health 
                 ? 'bg-orange-100 text-orange-800 border border-orange-200' 
                 : 'bg-gray-50 text-gray-500 border border-gray-200'
             }`}>
               <span className="font-bold text-[10px]">HEALTH</span>
               {publication.health ? (
+                <CheckCircle className="h-3 w-3" />
+              ) : (
+                <X className="h-3 w-3" />
+              )}
+            </div>
+
+            {/* CBD */}
+            <div className={`flex items-center justify-center gap-1 p-2 rounded-md transition-colors ${
+              publication.cbd 
+                ? 'bg-green-100 text-green-800 border border-green-200' 
+                : 'bg-gray-50 text-gray-500 border border-gray-200'
+            }`}>
+              <span className="font-bold text-[10px]">CBD</span>
+              {publication.cbd ? (
+                <CheckCircle className="h-3 w-3" />
+              ) : (
+                <X className="h-3 w-3" />
+              )}
+            </div>
+
+            {/* Crypto */}
+            <div className={`flex items-center justify-center gap-1 p-2 rounded-md transition-colors ${
+              publication.crypto 
+                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' 
+                : 'bg-gray-50 text-gray-500 border border-gray-200'
+            }`}>
+              <span className="font-bold text-[10px]">CRYPTO</span>
+              {publication.crypto ? (
+                <CheckCircle className="h-3 w-3" />
+              ) : (
+                <X className="h-3 w-3" />
+              )}
+            </div>
+
+            {/* Gambling */}
+            <div className={`flex items-center justify-center gap-1 p-2 rounded-md transition-colors ${
+              publication.gambling 
+                ? 'bg-red-100 text-red-800 border border-red-200' 
+                : 'bg-gray-50 text-gray-500 border border-gray-200'
+            }`}>
+              <span className="font-bold text-[10px]">GAMBLING</span>
+              {publication.gambling ? (
                 <CheckCircle className="h-3 w-3" />
               ) : (
                 <X className="h-3 w-3" />
