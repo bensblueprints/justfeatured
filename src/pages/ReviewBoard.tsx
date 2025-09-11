@@ -183,16 +183,8 @@ export const ReviewBoard = () => {
           setEditedContent(pressReleaseData.content);
           setEditedTitle(pressReleaseData.title);
 
-          // Fetch comments
-          const { data: commentsData } = await supabase
-            .from('review_comments')
-            .select('*')
-            .eq('press_release_id', pressReleaseData.id)
-            .order('created_at', { ascending: false });
-
-          if (commentsData) {
-            setComments(commentsData);
-          }
+          // Note: Comments functionality removed as review_comments table doesn't exist
+          // Will be implemented when proper comment system is set up
         }
 
         // Fetch existing file attachments
@@ -454,41 +446,12 @@ export const ReviewBoard = () => {
   const addComment = async () => {
     if (!newComment.trim() || !pressRelease || !user) return;
 
-    try {
-      const { error } = await supabase
-        .from('review_comments')
-        .insert({
-          press_release_id: pressRelease.id,
-          user_id: user.id,
-          content: newComment.trim()
-        });
-
-      if (error) throw error;
-
-      setNewComment("");
-      
-      // Refresh comments
-      const { data: commentsData } = await supabase
-        .from('review_comments')
-        .select('*')
-        .eq('press_release_id', pressRelease.id)
-        .order('created_at', { ascending: false });
-
-      if (commentsData) {
-        setComments(commentsData);
-      }
-
-      toast({
-        title: "Comment Added",
-        description: "Your comment has been added successfully"
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to add comment",
-        variant: "destructive"
-      });
-    }
+    // TODO: Implement comment system when review_comments table is created
+    toast({
+      title: "Feature Coming Soon",
+      description: "Comment system will be available soon",
+      variant: "default"
+    });
   };
 
   const getStatusIcon = () => {
@@ -694,45 +657,9 @@ export const ReviewBoard = () => {
                   </h3>
                 </CardHeader>
                 <CardContent>
-                  {comments.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-8">
-                      No comments yet. Add feedback to start the conversation.
-                    </p>
-                  ) : (
-                    <div className="space-y-4 mb-6">
-                      {comments.map((comment) => (
-                        <div key={comment.id} className="border rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-sm">
-                              {comment.user_id === user?.id ? 'You' : 'Team Member'}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(comment.created_at).toLocaleString()}
-                            </span>
-                          </div>
-                          <p className="text-sm leading-relaxed">{comment.content}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Add Comment */}
-                  <div className="border-t pt-4">
-                    <textarea
-                      placeholder="Add your feedback or comments..."
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-h-[100px] mb-3"
-                    />
-                    <Button 
-                      onClick={addComment}
-                      disabled={!newComment.trim()}
-                      size="sm"
-                    >
-                      <Send className="w-4 h-4 mr-2" />
-                      Add Comment
-                    </Button>
-                  </div>
+                  <p className="text-muted-foreground text-center py-8">
+                    Comment system coming soon. For now, please use email or phone to communicate with the team.
+                  </p>
                 </CardContent>
               </Card>
             )}

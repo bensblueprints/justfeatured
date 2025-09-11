@@ -3,33 +3,41 @@ export interface PostCheckoutInfo {
   user_id: string;
   order_id?: string;
   company_name: string;
-  industry_sector: IndustrySector;
-  contact_person_name: string;
-  email: string;
-  phone_number: string;
+  industry_sector: string;
+  industry?: string;
+  contact_person_name?: string;
+  contact_email: string;
+  contact_phone?: string;
+  email?: string;
+  phone_number?: string;
   company_website?: string;
-  business_description: string;
+  business_description?: string;
   recent_achievements?: string;
   key_products_services?: string;
   target_audience?: string;
-  preferred_tone: PressReleaseTone;
+  key_messages?: string;
+  additional_info?: string;
+  preferred_tone?: string;
+  preferred_timeline?: string;
   important_dates?: string;
   additional_notes?: string;
-  write_own_release: boolean;
+  budget_range?: string;
+  write_own_release?: boolean;
   custom_press_release?: string;
+  status?: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface PressRelease {
   id: string;
-  post_checkout_info_id: string;
+  post_checkout_info_id?: string;
   user_id: string;
   title: string;
   content: string;
-  version_number: number;
-  status: ReviewStatus;
-  word_count?: number;
+  version_number?: number;
+  status: string;
+  word_count: number;
   estimated_delivery_date?: string;
   actual_delivery_date?: string;
   approved_by?: string;
@@ -95,7 +103,7 @@ export type IndustrySector =
 
 export type PressReleaseTone = 'professional' | 'casual' | 'technical' | 'inspirational';
 
-export type ReviewStatus = 'draft' | 'in_review' | 'revision_requested' | 'approved' | 'published';
+export type ReviewStatus = 'draft' | 'in_review' | 'revision_requested' | 'approved' | 'published' | 'submitted' | 'rejected';
 
 export type UserRole = 'customer' | 'editor' | 'admin' | 'super_admin';
 
