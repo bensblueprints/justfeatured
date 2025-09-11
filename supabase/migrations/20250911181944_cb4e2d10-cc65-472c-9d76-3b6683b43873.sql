@@ -1,0 +1,98 @@
+-- First, clear existing publications to avoid duplicates
+DELETE FROM public.publications WHERE external_id LIKE 'la-collide%' OR external_id LIKE 'la-entertainment%';
+
+-- Clear all existing sample publications to start fresh
+TRUNCATE TABLE public.publications RESTART IDENTITY CASCADE;
+
+-- Now insert all publications from the CSV file
+-- First batch: Publications 1-100
+INSERT INTO public.publications (
+  external_id,
+  name,
+  price,
+  da_score,
+  dr_score,
+  category,
+  tat_days,
+  sponsored,
+  indexed,
+  dofollow_link,
+  location,
+  erotic,
+  health,
+  cbd,
+  crypto,
+  gambling,
+  is_active,
+  type,
+  tier,
+  description,
+  features,
+  popularity
+) VALUES 
+('la-collide-001', 'LA Collide', 75, 7, 11, 'News', '1-3 Days', false, true, false, 'LOS ANGELES', false, false, true, true, false, true, 'standard', 'standard', '', '{}', 0),
+('la-entertainment-weekly-002', 'LA Entertainment Weekly', 75, 63, 12, 'News', '1-3 Days', false, true, false, 'LOS ANGELES', false, false, true, true, false, true, 'standard', 'standard', '', '{}', 0),
+('hood-critic-003', 'Hood Critic', 75, 11, 21, 'Music', '1-3 Days', false, true, true, 'GLOBAL', false, true, true, true, true, true, 'standard', 'standard', '', '{}', 0),
+('ny-times-mag-004', 'NY Times Mag', 75, 8, 27, 'News', '1 Day', false, true, false, 'NEW YORK', true, true, true, true, true, true, 'standard', 'standard', '', '{}', 0),
+('cali-post-005', 'Cali Post', 75, 60, 55, 'Music/News', '1-3 Days', false, true, true, 'CALIFORNIA', true, true, true, true, true, true, 'standard', 'standard', '', '{}', 0),
+('daily-scanner-006', 'Daily Scanner', 75, 67, 59, 'News', '1 Day', false, true, false, 'GLOBAL', false, true, true, true, true, true, 'standard', 'standard', '', '{}', 0),
+('medium-007', 'Medium', 75, 95, 94, 'News', '1 Day', false, false, false, 'GLOBAL', false, true, true, true, true, true, 'standard', 'standard', '', '{}', 0),
+('self-growth-008', 'Self Growth', 80, 63, 77, 'News', '1 Week', false, true, false, 'GLOBAL', false, true, true, true, true, true, 'standard', 'standard', '', '{}', 0),
+('vents-magazine-009', 'Vents Magazine', 80, 64, 77, 'Lifestyle', '1 Week', false, true, true, 'GLOBAL', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('foreign-affairs-observers-010', 'Foreign Affairs Observers', 100, 42, 57, 'News', '1-3 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('ceo-magazine-011', 'CEO Magazine', 100, 38, 1, 'News', '1-3 Days', true, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('exec-magazine-012', 'Exec Magazine', 100, 38, 1, 'News', '1-3 Days', true, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('boss-today-013', 'Boss Today', 100, 38, 1, 'News', '1-3 Days', true, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('ny-magazine-014', 'NY Magazine', 100, 37, 1, 'News', '1-3 Days', true, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('vc-magazine-015', 'VC Magazine', 100, 39, 1, 'News', '1-3 Days', true, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('restaurant-portals-016', 'Restaurant Portals', 100, 62, 12, 'Web 3', '3-5 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('crypto-nexa-017', 'Crypto Nexa', 100, 56, 38, 'Lifestyle', '3-5 Days', false, true, true, 'GLOBAL', false, false, false, true, false, true, 'standard', 'standard', '', '{}', 0),
+('restaurant-webx-018', 'Restaurant WebX', 100, 60, 43, 'Lifestyle', '3-5 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('restaurant-web-experts-019', 'Restaurant Web Experts', 100, 62, 53, 'Lifestyle', '3-5 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('resto-guides-020', 'Resto Guides', 100, 64, 21, 'Lifestyle', '3-5 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0);
+
+-- Add more publications in subsequent batches
+INSERT INTO public.publications (
+  external_id,
+  name,
+  price,
+  da_score,
+  dr_score,
+  category,
+  tat_days,
+  sponsored,
+  indexed,
+  dofollow_link,
+  location,
+  erotic,
+  health,
+  cbd,
+  crypto,
+  gambling,
+  is_active,
+  type,
+  tier,
+  description,
+  features,
+  popularity
+) VALUES 
+('restaurant-web-expert-021', 'Restaurant Web Expert', 100, 62, 51, 'Lifestyle', '3-5 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('restaurant-snapshot-022', 'Restaurant Snapshot', 100, 63, 53, 'Lifestyle', '3-5 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('cooking-instilettos-023', 'Cooking Instilettos', 100, 67, 55, 'Lifestyle', '3-5 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('mark-meets-024', 'Mark Meets', 100, 68, 72, 'Music', '1 Day', false, true, true, 'UNITED KINGDOM', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('tech-bullion-025', 'Tech Bullion', 100, 63, 78, 'Tech', '1 Week', false, true, true, 'UNITED STATES', false, true, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('hamptons-weekly-026', 'Hamptons Weekly', 100, 64, 1, 'News', '3-5 Days', true, true, false, 'NEW YORK', false, false, true, true, false, true, 'standard', 'standard', '', '{}', 0),
+('richest-magazine-027', 'Richest Magazine', 100, 58, 2, 'News', '3-5 Days', true, true, false, 'GLOBAL', false, false, true, true, false, true, 'standard', 'standard', '', '{}', 0),
+('weed-times-028', 'Weed Times', 100, 58, 2, 'News', '3-5 Days', true, true, false, 'GLOBAL', false, false, true, true, false, true, 'standard', 'standard', '', '{}', 0),
+('cali-weekly-029', 'Cali Weekly', 100, 59, 6, 'Lifestyle', '3-5 Days', true, true, false, 'CALIFORNIA', false, false, true, true, false, true, 'standard', 'standard', '', '{}', 0),
+('miami-weekly-030', 'Miami Weekly', 100, 57, 63, 'News', '1-3 Days', true, true, false, 'FLORIDA', false, false, true, true, false, true, 'standard', 'standard', '', '{}', 0),
+('la-voice-031', 'LA Voice', 100, 63, 6, 'News', '3-5 Days', true, true, false, 'CALIFORNIA', false, false, true, true, false, true, 'standard', 'standard', '', '{}', 0),
+('la-examiner-032', 'LA Examiner', 100, 61, 18, 'News', '3-5 Days', true, true, false, 'CALIFORNIA', false, false, true, true, false, true, 'standard', 'standard', '', '{}', 0),
+('opulence-magazine-033', 'Opulence Magazine', 100, 38, 31, 'News', '3 Days', false, true, true, 'UNITED KINGDOM', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('ravish-magazine-034', 'Ravish Magazine', 100, 56, 54, 'News', '3 Days', false, true, true, 'UNITED KINGDOM', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('platter-share-035', 'Platter Share', 100, 56, 34, 'Lifestyle', '3 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('home-design-looks-036', 'Home Design Looks', 100, 51, 49, 'Real Estate', '3-5 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('the-pinnacle-list-037', 'The Pinnacle List', 100, 54, 59, 'News', '3 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('explainopedia-038', 'Explainopedia', 100, 24, 50, 'News', '3 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('ignite-magazine-039', 'Ignite Magazine', 100, 37, 26, 'News', '3 Days', false, true, true, 'UNITED KINGDOM', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0),
+('futuristic-architecture-040', 'Futuristic Architecture', 100, 77, 62, 'Real Estate', '3 Days', false, true, true, 'UNITED STATES', false, false, false, false, false, true, 'standard', 'standard', '', '{}', 0);
