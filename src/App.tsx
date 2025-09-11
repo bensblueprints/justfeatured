@@ -22,6 +22,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 import AdminUpload from "./pages/AdminUpload";
 import BrandBundles from "./pages/BrandBundles";
+import AdminPanel from "./pages/AdminPanel";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => {
               <Route path="/blog/social-proof" element={<SocialProofBlogPost />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/admin-panel" element={<AdminPanel />} />
               <Route path="/media-upload/:id" element={<MediaUpload />} />
               <Route path="/post-checkout" element={<PostCheckout />} />
               <Route path="/review-board/:id" element={<ReviewBoard />} />
