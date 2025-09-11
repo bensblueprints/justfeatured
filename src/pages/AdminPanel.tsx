@@ -10,8 +10,7 @@ import {
   SidebarMenu, 
   SidebarMenuButton, 
   SidebarMenuItem, 
-  SidebarTrigger,
-  useSidebar 
+  SidebarTrigger
 } from '@/components/ui/sidebar';
 import { 
   Users, 
@@ -22,7 +21,8 @@ import {
   Upload,
   Database,
   Crown,
-  ShieldCheck
+  ShieldCheck,
+  Edit
 } from 'lucide-react';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
@@ -40,7 +40,6 @@ type AdminSection =
   | 'press-releases'
   | 'publications'
   | 'bulk-editor'
-  | 'sync'
   | 'users';
 
 const AdminPanel = () => {
@@ -98,19 +97,13 @@ const AdminPanel = () => {
       id: 'publications' as AdminSection, 
       title: 'Publications', 
       icon: Database,
-      description: 'Manage publication database'
+      description: 'Manage publication database & sync'
     },
     { 
       id: 'bulk-editor' as AdminSection, 
       title: 'Bulk Editor', 
-      icon: Settings,
+      icon: Edit,
       description: 'Bulk edit publications'
-    },
-    { 
-      id: 'sync' as AdminSection, 
-      title: 'Spreadsheet Sync', 
-      icon: Upload,
-      description: 'Sync with external spreadsheets'
     },
     { 
       id: 'users' as AdminSection, 
@@ -131,14 +124,11 @@ const AdminPanel = () => {
       case 'publications':
         return (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Publications Management</h2>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+              <div className="xl:col-span-3">
                 <PublicationManagement />
               </div>
-              <div>
+              <div className="space-y-4">
                 <SpreadsheetSync />
               </div>
             </div>
@@ -146,15 +136,6 @@ const AdminPanel = () => {
         );
       case 'bulk-editor':
         return <PublicationBulkEditor />;
-      case 'sync':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Spreadsheet Synchronization</h2>
-            </div>
-            <SpreadsheetSync />
-          </div>
-        );
       case 'users':
         return <UserManagement />;
       default:
@@ -175,18 +156,24 @@ const AdminPanel = () => {
         <main className="flex-1 overflow-hidden">
           {/* Header */}
           <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="flex h-full items-center px-6">
-              <SidebarTrigger className="mr-4" />
-              <div className="flex items-center space-x-2">
-                {userRole === 'super_admin' ? (
-                  <Crown className="h-5 w-5 text-amber-500" />
-                ) : (
-                  <ShieldCheck className="h-5 w-5 text-primary" />
-                )}
-                <h1 className="text-xl font-semibold">Admin Panel</h1>
-                <span className="text-sm text-muted-foreground">
-                  {menuItems.find(item => item.id === activeSection)?.title}
-                </span>
+            <div className="flex h-full items-center justify-between px-6">
+              <div className="flex items-center space-x-4">
+                <SidebarTrigger />
+                <div className="flex items-center space-x-2">
+                  {userRole === 'super_admin' ? (
+                    <Crown className="h-5 w-5 text-amber-500" />
+                  ) : (
+                    <ShieldCheck className="h-5 w-5 text-primary" />
+                  )}
+                  <h1 className="text-xl font-semibold">Admin Panel</h1>
+                  <span className="text-sm text-muted-foreground">•</span>
+                  <span className="text-sm text-muted-foreground">
+                    {menuItems.find(item => item.id === activeSection)?.title}
+                  </span>
+                </div>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Role: <span className="capitalize font-medium">{userRole?.replace('_', ' ')}</span>
               </div>
             </div>
           </header>
@@ -220,36 +207,31 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   userRole
 }) => {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="border-r">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="flex items-center space-x-2">
+          <SidebarGroupLabel className="flex items-center space-x-2 px-2 py-2">
             {userRole === 'super_admin' ? (
               <Crown className="h-4 w-4 text-amber-500" />
             ) : (
               <ShieldCheck className="h-4 w-4 text-primary" />
             )}
-            <span>Administration</span>
+            <span className="font-semibold">Administration</span>
           </SidebarGroupLabel>
           
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => onSectionChange(item.id)}
-                    className={`
-                      w-full justify-start transition-colors
-                      ${activeSection === item.id 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'hover:bg-muted'
-                      }
-                    `}
+                    isActive={activeSection === item.id}
+                    className="w-full justify-start"
                   >
                     <item.icon className="h-4 w-4" />
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">{item.title}</span>
-                      <span className="text-xs opacity-70">{item.description}</span>
+                    <div className="flex flex-col items-start ml-2">
+                      <span className="font-medium text-sm">{item.title}</span>
+                      <span className="text-xs text-muted-foreground">{item.description}</span>
                     </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

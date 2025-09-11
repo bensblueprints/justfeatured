@@ -8,7 +8,7 @@ import { AuthWrapper } from "@/components/AuthWrapper";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
-import AdminDashboard from "./pages/AdminDashboard";
+
 import { MediaUpload } from "./pages/MediaUpload";
 import { PostCheckout } from "./pages/PostCheckout";
 import { ReviewBoard } from "./pages/ReviewBoard";
@@ -43,8 +43,7 @@ const App = () => {
               <Route path="/blog/trust-factor" element={<BlogPost />} />
               <Route path="/blog/social-proof" element={<SocialProofBlogPost />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              <Route path="/admin-panel" element={<AdminPanel />} />
+        <Route path="/admin" element={<AdminPanel />} />
               <Route path="/media-upload/:id" element={<MediaUpload />} />
               <Route path="/post-checkout" element={<PostCheckout />} />
               <Route path="/review-board/:id" element={<ReviewBoard />} />
