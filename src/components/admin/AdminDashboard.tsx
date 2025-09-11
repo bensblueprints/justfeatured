@@ -216,35 +216,35 @@ export const AdminDashboard = () => {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <AlertCircle className="h-4 w-4 text-orange-500" />
+                <AlertCircle className="h-4 w-4 text-destructive" />
                 <span className="text-sm">Draft</span>
               </div>
               <Badge variant="secondary">{stats.draftPressReleases}</Badge>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-yellow-500" />
+                <Clock className="h-4 w-4 text-accent" />
                 <span className="text-sm">In Review</span>
               </div>
-              <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
+              <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30">
                 {stats.inReviewPressReleases}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-4 w-4 text-success" />
                 <span className="text-sm">Approved</span>
               </div>
-              <Badge className="bg-green-100 text-green-800 border-green-200">
+              <Badge variant="outline" className="bg-success/10 text-success border-success/30">
                 {stats.approvedPressReleases}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <TrendingUp className="h-4 w-4 text-blue-500" />
+                <TrendingUp className="h-4 w-4 text-primary" />
                 <span className="text-sm">Published</span>
               </div>
-              <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
                 {stats.publishedPressReleases}
               </Badge>
             </div>
@@ -287,9 +287,9 @@ export const AdminDashboard = () => {
                     ? Math.round(((stats.approvedPressReleases + stats.publishedPressReleases) / stats.totalPressReleases) * 100) 
                     : 0}%
                 </div>
-                <div className="w-16 bg-muted rounded-full h-2">
-                  <div 
-                    className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                 <div className="w-16 bg-muted rounded-full h-2">
+                   <div 
+                     className="bg-success h-2 rounded-full transition-all duration-300"
                     style={{ 
                       width: `${stats.totalPressReleases > 0 
                         ? ((stats.approvedPressReleases + stats.publishedPressReleases) / stats.totalPressReleases) * 100 
