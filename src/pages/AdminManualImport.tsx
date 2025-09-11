@@ -54,11 +54,15 @@ const AdminManualImport = () => {
       const gambling = cols[15]?.toLowerCase().trim() === 'y' || cols[15]?.toLowerCase().trim() === 'yes';
       
       if (name && name !== 'New' && name !== 'On Hold' && name !== 'Lowered' && name !== 'Raised' && name !== 'Has a new URL') {
+        // Generate unique external_id using name and timestamp
+        const external_id = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now()}`;
+        
         publications.push({
+          external_id: external_id,
           name: name,
-          price: sellPrice, // Use sell price as main price
-          da_score: daScore,
-          dr_score: drScore,
+          price: Number(sellPrice), // Ensure it's a proper number
+          da_score: Number(daScore),
+          dr_score: Number(drScore),
           category: category,
           location: location,
           tat_days: tatDays,
@@ -75,8 +79,9 @@ const AdminManualImport = () => {
           cbd: cbd,
           crypto: crypto,
           gambling: gambling,
-          status: 'active',
-          is_active: true
+          status: 'active' as const,
+          is_active: true,
+          popularity: 50
         });
       }
     }
@@ -101,10 +106,13 @@ const AdminManualImport = () => {
       
       for (const pub of publications) {
         try {
+          console.log('Importing publication:', { name: pub.name, price: pub.price, external_id: pub.external_id });
           await addPublication(pub);
           imported++;
+          console.log('Successfully imported:', pub.name);
         } catch (e) {
-          console.error('Failed to import:', pub.name, e);
+          console.error('Failed to import publication:', pub.name, 'Error:', e);
+          console.error('Publication data:', pub);
           errors++;
         }
       }
