@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { parseCSVContent, convertToSupabaseFormat, importPublicationsToSupabase } from "@/utils/csvPublicationImporter";
+import { addPublication } from "@/lib/publications";
 import { Link } from "react-router-dom";
 import { Shield, CheckCircle2, AlertTriangle } from "lucide-react";
 
@@ -16,12 +18,100 @@ const AdminManualImport = () => {
   const [error, setError] = useState<string | null>(null);
   const [offset, setOffset] = useState<number>(() => Number(localStorage.getItem('csv-import-offset') || 0));
   const [total, setTotal] = useState<number>(0);
+  const [directData, setDirectData] = useState<string>('');
+  const [isImportingDirect, setIsImportingDirect] = useState(false);
 
   useEffect(() => {
     document.title = "Manual CSV Import • Admin";
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute("content", "Admin manual CSV import for publications");
   }, []);
+
+  const parseDirectData = (data: string) => {
+    const lines = data.trim().split('\n');
+    const publications = [];
+    
+    for (const line of lines) {
+      const cols = line.split('\t');
+      if (cols.length < 10) continue;
+      
+      // Parse the tab-separated data
+      const name = cols[0]?.trim();
+      const price1 = cols[2]?.replace(/[$,]/g, '') || '0';
+      const price2 = cols[3]?.replace(/[$,]/g, '') || '0';
+      const daScore = parseInt(cols[5]) || 0;
+      const drScore = parseInt(cols[6]) || 0;
+      const category = cols[7]?.trim() || 'News';
+      const tatDays = cols[8]?.trim() || '1-2 Weeks';
+      const location = cols[cols.length - 1]?.trim() || 'GLOBAL';
+      
+      // Use the higher price as the main price
+      const price = Math.max(parseFloat(price1), parseFloat(price2));
+      
+      if (name && name !== 'New' && name !== 'On Hold' && name !== 'Lowered' && name !== 'Raised' && name !== 'Has a new URL') {
+        publications.push({
+          name: name,
+          price: price,
+          da_score: daScore,
+          dr_score: drScore,
+          category: category,
+          location: location,
+          tat_days: tatDays,
+          contact_info: 'Contact via Just Featured',
+          monthly_readers: 100000,
+          type: 'premium',
+          tier: price > 5000 ? 'premium' : 'standard',
+          features: ['Press Release Placement'],
+          dofollow_link: true,
+          indexed: true,
+          status: 'active',
+          is_active: true
+        });
+      }
+    }
+    
+    return publications;
+  };
+
+  const importDirectData = async () => {
+    if (!directData.trim()) {
+      toast({ title: 'Error', description: 'Please paste the publication data first', variant: 'destructive' });
+      return;
+    }
+
+    setIsImportingDirect(true);
+    setResult(null);
+    setError(null);
+    
+    try {
+      const publications = parseDirectData(directData);
+      let imported = 0;
+      let errors = 0;
+      
+      for (const pub of publications) {
+        try {
+          await addPublication(pub);
+          imported++;
+        } catch (e) {
+          console.error('Failed to import:', pub.name, e);
+          errors++;
+        }
+      }
+      
+      setResult({ imported, errors, total: publications.length });
+      toast({ 
+        title: 'Import complete', 
+        description: `Imported ${imported}/${publications.length} publications` 
+      });
+      
+    } catch (e: any) {
+      const msg = e?.message || 'Failed to import direct data';
+      setError(msg);
+      toast({ title: 'Import failed', description: msg, variant: 'destructive' });
+    } finally {
+      setIsImportingDirect(false);
+    }
+  };
 
   const runImport = async () => {
     setIsImporting(true);
@@ -105,14 +195,41 @@ const AdminManualImport = () => {
           <CardTitle>Manual Publications Import</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <p className="text-sm text-muted-foreground">
-            This tool imports the bundled CSV from the repository and writes publications in batches.
-          </p>
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-medium">Direct Data Import</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Paste tab-separated publication data directly below:
+              </p>
+              <Textarea
+                value={directData}
+                onChange={(e) => setDirectData(e.target.value)}
+                placeholder="Paste your publication data here..."
+                className="min-h-32"
+              />
+              <Button 
+                onClick={importDirectData} 
+                disabled={isImportingDirect || !directData.trim()}
+                className="mt-3"
+              >
+                {isImportingDirect ? 'Importing...' : 'Import Direct Data'}
+              </Button>
+            </div>
+            
+            <div className="border-t pt-4">
+              <h3 className="text-lg font-medium">CSV File Import</h3>
+              <p className="text-sm text-muted-foreground">
+                This tool imports the bundled CSV from the repository and writes publications in batches.
+              </p>
+            </div>
+          </div>
 
-          {isImporting && (
+          {(isImporting || isImportingDirect) && (
             <div className="space-y-2">
               <Progress value={undefined} />
-              <div className="text-sm text-muted-foreground">Importing… please wait</div>
+              <div className="text-sm text-muted-foreground">
+                {isImportingDirect ? 'Importing direct data…' : 'Importing CSV…'} please wait
+              </div>
             </div>
           )}
 
