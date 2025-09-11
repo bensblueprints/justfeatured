@@ -1,20 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Upload, FileText, CheckCircle, AlertCircle, Database } from "lucide-react";
+import { Upload, FileText, CheckCircle, AlertCircle, Database, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { processAndImportCSV } from "@/utils/csvPublicationImporter";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 
 export const CSVImportManager = () => {
   const { toast } = useToast();
+  const { isAdmin, isLoading } = useAdminCheck();
   const [isImporting, setIsImporting] = useState(false);
   const [importResult, setImportResult] = useState<{
     imported: number;
     errors: number;
     total: number;
   } | null>(null);
+
+  // Don't render anything if not admin or still loading
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-sm text-muted-foreground">Checking permissions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <Card className="border-red-200 bg-red-50">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-3 text-red-800">
+            <Shield className="w-5 h-5" />
+            <div>
+              <h4 className="font-medium">Admin Access Required</h4>
+              <p className="text-sm text-red-600">
+                You need admin privileges to access the CSV import functionality.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

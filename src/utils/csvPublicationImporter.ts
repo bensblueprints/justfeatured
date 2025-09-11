@@ -142,12 +142,13 @@ export const convertToSupabaseFormat = (csvData: CSVRowData[]) => {
 
 export const importPublicationsToSupabase = async (publications: any[]) => {
   try {
-    // Check if user is admin
+    // Check if user is authenticated
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      throw new Error('User not authenticated');
+      throw new Error('Authentication required. Please log in to continue.');
     }
 
+    // Check if user has admin privileges
     const { data: roleData } = await supabase
       .from('user_roles')
       .select('role')
@@ -155,7 +156,7 @@ export const importPublicationsToSupabase = async (publications: any[]) => {
       .maybeSingle();
 
     if (!roleData || !['admin', 'super_admin'].includes(roleData.role)) {
-      throw new Error('Insufficient permissions');
+      throw new Error('Admin access required. You do not have permission to import publications.');
     }
 
     // Import in batches to avoid hitting limits
