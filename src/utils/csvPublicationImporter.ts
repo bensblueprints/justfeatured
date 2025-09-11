@@ -17,6 +17,10 @@ interface CSVRowData {
   CBD: string;
   CRYPTO: string;
   GAMBLING: string;
+  'Website URL'?: string;
+  Description?: string;
+  Type?: string;
+  Tier?: string;
 }
 
 export const parseCsvLine = (line: string): string[] => {
@@ -52,42 +56,92 @@ export const parseCsvLine = (line: string): string[] => {
 };
 
 export const parseCSVContent = (csvContent: string): CSVRowData[] => {
-  const lines = csvContent.split('\n').filter(line => line.trim());
-  const headers = parseCsvLine(lines[0]);
-  
-  const publications: CSVRowData[] = [];
-  
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseCsvLine(lines[i]);
-    
-    // Skip rows that don't have a publication name or price
-    if (!values[1] || !values[3] || values[1].trim() === '' || values[3].trim() === '') {
-      continue;
+  const lines = csvContent.split('\n').filter((l) => l.trim().length > 0)
+
+  // Find the header row (the first line that contains a PUBLICATION column)
+  let headerIndex = -1
+  for (let i = 0; i < lines.length; i++) {
+    const cols = parseCsvLine(lines[i])
+    if (cols.some((c) => c.toLowerCase().includes('publication'))) {
+      headerIndex = i
+      break
     }
-    
-    const row: CSVRowData = {
-      PUBLICATION: values[1]?.trim() || '',
-      PRICE: values[3]?.trim() || '0',
-      DA: values[4]?.trim() || '0',
-      DR: values[5]?.trim() || '0',
-      GENRE: values[6]?.trim() || 'News',
-      TAT: values[7]?.trim() || '1-3 Days',
-      SPONSORED: values[8]?.trim() || 'N',
-      INDEXED: values[9]?.trim() || 'Y',
-      DOFOLLOW: values[10]?.trim() || 'N',
-      'REGION / LOCATION': values[11]?.trim() || 'GLOBAL',
-      EROTIC: values[12]?.trim() || '',
-      HEALTH: values[13]?.trim() || '',
-      CBD: values[14]?.trim() || '',
-      CRYPTO: values[15]?.trim() || '',
-      GAMBLING: values[16]?.trim() || ''
-    };
-    
-    publications.push(row);
   }
-  
-  return publications;
-};
+  if (headerIndex === -1) {
+    throw new Error('CSV header row not found. Make sure a PUBLICATION column exists.')
+  }
+
+  const rawHeaders = parseCsvLine(lines[headerIndex])
+
+  // Normalize headers to canonical keys
+  const normalize = (h: string) => {
+    const s = h.trim().toLowerCase()
+      .replace(/\$/g, '')
+      .replace(/\s+/g, ' ')
+      .replace(/\//g, ' / ')
+    if (s.includes('publication')) return 'PUBLICATION'
+    if (s === 'price' || s.includes('price')) return 'PRICE'
+    if (s === 'da') return 'DA'
+    if (s === 'dr') return 'DR'
+    if (s.includes('genre') || s.includes('category')) return 'GENRE'
+    if (s === 'tat' || s.includes('tat')) return 'TAT'
+    if (s.includes('sponsored')) return 'SPONSORED'
+    if (s.includes('indexed')) return 'INDEXED'
+    if (s.includes('dofollow')) return 'DOFOLLOW'
+    if (s.includes('region') || s.includes('location')) return 'REGION / LOCATION'
+    if (s.includes('erotic') || s.includes('adult')) return 'EROTIC'
+    if (s.includes('health')) return 'HEALTH'
+    if (s === 'cbd') return 'CBD'
+    if (s.includes('crypto')) return 'CRYPTO'
+    if (s.includes('gambling')) return 'GAMBLING'
+    if (s.includes('website')) return 'Website URL'
+    if (s.includes('description')) return 'Description'
+    if (s === 'type') return 'Type'
+    if (s === 'tier') return 'Tier'
+    return h.trim()
+  }
+
+  const headers = rawHeaders.map(normalize)
+
+  const rows: CSVRowData[] = []
+  for (let i = headerIndex + 1; i < lines.length; i++) {
+    const values = parseCsvLine(lines[i])
+    const rowObj: any = {}
+    headers.forEach((h, idx) => {
+      rowObj[h] = (values[idx] ?? '').trim()
+    })
+
+    const name = (rowObj['PUBLICATION'] as string) || ''
+    const price = (rowObj['PRICE'] as string) || ''
+
+    // Skip rows without essential fields
+    if (!name && !price) continue
+
+    rows.push({
+      PUBLICATION: name,
+      PRICE: price,
+      DA: rowObj['DA'] || '0',
+      DR: rowObj['DR'] || '0',
+      GENRE: rowObj['GENRE'] || 'News',
+      TAT: rowObj['TAT'] || '1-3 Days',
+      SPONSORED: rowObj['SPONSORED'] || 'N',
+      INDEXED: rowObj['INDEXED'] || 'Y',
+      DOFOLLOW: rowObj['DOFOLLOW'] || 'N',
+      'REGION / LOCATION': rowObj['REGION / LOCATION'] || 'GLOBAL',
+      EROTIC: rowObj['EROTIC'] || '',
+      HEALTH: rowObj['HEALTH'] || '',
+      CBD: rowObj['CBD'] || '',
+      CRYPTO: rowObj['CRYPTO'] || '',
+      GAMBLING: rowObj['GAMBLING'] || '',
+      'Website URL': rowObj['Website URL'] || '',
+      Description: rowObj['Description'] || '',
+      Type: rowObj['Type'] || 'standard',
+      Tier: rowObj['Tier'] || 'standard',
+    })
+  }
+
+  return rows
+}
 
 export const convertToSupabaseFormat = (csvData: CSVRowData[]) => {
   return csvData.map((row, index) => {
@@ -169,10 +223,7 @@ export const importPublicationsToSupabase = async (publications: any[]) => {
       
       const { data, error } = await supabase
         .from('publications')
-        .upsert(batch, { 
-          onConflict: 'name',
-          ignoreDuplicates: false 
-        });
+        .insert(batch);
 
       if (error) {
         console.error('Batch import error:', error);
