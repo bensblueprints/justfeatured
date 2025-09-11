@@ -2,10 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ExternalLink, Clock, CheckCircle, Globe, X } from "lucide-react";
+import { ExternalLink, Clock, CheckCircle, Globe, X, Edit } from "lucide-react";
 import { Publication } from "@/types";
 import { useState, useEffect } from "react";
 import { BrandFetchService } from "@/utils/brandFetch";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { PublicationEditDialog } from "@/components/PublicationEditDialog";
 
 interface PublicationCardProps {
   publication: Publication;
@@ -14,8 +16,10 @@ interface PublicationCardProps {
   onUpdate?: () => void;
 }
 
-export const PublicationCard = ({ publication, selected, onSelectionChange }: PublicationCardProps) => {
+export const PublicationCard = ({ publication, selected, onSelectionChange, onUpdate }: PublicationCardProps) => {
   const [logo, setLogo] = useState<string>(publication.logo_url || '');
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { isAdmin } = useAdminCheck();
 
   // Fetch logo on component mount - prioritize cached logo from database
   useEffect(() => {
@@ -126,10 +130,10 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
             </Badge>
           </div>
 
-          {/* Price - Large and prominent */}
+          {/* Price - Large and prominent with doubled pricing */}
           <div className="text-center">
             <div className="text-4xl font-bold text-primary">
-              {formatPrice(publication.price)}
+              {formatPrice((publication.price || 0) * 2)}
             </div>
           </div>
 
@@ -251,6 +255,16 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
               Visit
             </Button>
           )}
+          {isAdmin && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditDialogOpen(true)}
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Edit
+            </Button>
+          )}
           <Button
             variant={selected ? "default" : "outline"}
             size="sm"
@@ -260,6 +274,17 @@ export const PublicationCard = ({ publication, selected, onSelectionChange }: Pu
             {selected ? 'Selected ✓' : 'Select'}
           </Button>
         </div>
+        
+        {/* Edit Dialog */}
+        <PublicationEditDialog
+          publication={publication}
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          onUpdate={() => {
+            onUpdate?.();
+            setIsEditDialogOpen(false);
+          }}
+        />
       </CardFooter>
     </Card>
   );

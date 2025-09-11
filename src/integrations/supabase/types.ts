@@ -177,39 +177,99 @@ export type Database = {
       publications: {
         Row: {
           category: string
+          cbd: boolean | null
           contact_info: string
           created_at: string | null
+          crypto: boolean | null
+          da_score: number | null
+          description: string | null
+          dofollow_link: boolean | null
+          dr_score: number | null
+          erotic: boolean | null
+          external_id: string | null
+          features: string[] | null
+          gambling: boolean | null
+          health: boolean | null
           id: string
+          indexed: boolean | null
+          is_active: boolean | null
+          location: string | null
           logo_url: string | null
           monthly_readers: number
           name: string
+          popularity: number | null
           price: number
+          sponsored: boolean | null
           status: Database["public"]["Enums"]["publication_status"] | null
+          tat_days: string | null
+          tier: string | null
+          type: string | null
           updated_at: string | null
+          website_url: string | null
         }
         Insert: {
           category: string
+          cbd?: boolean | null
           contact_info: string
           created_at?: string | null
+          crypto?: boolean | null
+          da_score?: number | null
+          description?: string | null
+          dofollow_link?: boolean | null
+          dr_score?: number | null
+          erotic?: boolean | null
+          external_id?: string | null
+          features?: string[] | null
+          gambling?: boolean | null
+          health?: boolean | null
           id?: string
+          indexed?: boolean | null
+          is_active?: boolean | null
+          location?: string | null
           logo_url?: string | null
           monthly_readers?: number
           name: string
+          popularity?: number | null
           price?: number
+          sponsored?: boolean | null
           status?: Database["public"]["Enums"]["publication_status"] | null
+          tat_days?: string | null
+          tier?: string | null
+          type?: string | null
           updated_at?: string | null
+          website_url?: string | null
         }
         Update: {
           category?: string
+          cbd?: boolean | null
           contact_info?: string
           created_at?: string | null
+          crypto?: boolean | null
+          da_score?: number | null
+          description?: string | null
+          dofollow_link?: boolean | null
+          dr_score?: number | null
+          erotic?: boolean | null
+          external_id?: string | null
+          features?: string[] | null
+          gambling?: boolean | null
+          health?: boolean | null
           id?: string
+          indexed?: boolean | null
+          is_active?: boolean | null
+          location?: string | null
           logo_url?: string | null
           monthly_readers?: number
           name?: string
+          popularity?: number | null
           price?: number
+          sponsored?: boolean | null
           status?: Database["public"]["Enums"]["publication_status"] | null
+          tat_days?: string | null
+          tier?: string | null
+          type?: string | null
           updated_at?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
