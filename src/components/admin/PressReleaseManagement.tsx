@@ -168,152 +168,156 @@ export const PressReleaseManagement = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span className="flex items-center">
-            <FileText className="w-5 h-5 mr-2" />
-            Press Release Management
-          </span>
-          <div className="flex items-center space-x-2">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="in_review">In Review</SelectItem>
-                <SelectItem value="revision_requested">Needs Revision</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="published">Published</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search press releases..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-64"
-              />
+    <div className="w-full max-w-none">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between flex-wrap gap-4">
+            <span className="flex items-center">
+              <FileText className="w-5 h-5 mr-2" />
+              Press Release Management
+            </span>
+            <div className="flex items-center space-x-2 flex-wrap gap-2">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="in_review">In Review</SelectItem>
+                  <SelectItem value="revision_requested">Needs Revision</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search press releases..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
             </div>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {filteredPressReleases.length === 0 ? (
-          <div className="text-center py-8">
-            <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Press Releases Found</h3>
-            <p className="text-muted-foreground">
-              {searchTerm || statusFilter !== "all" 
-                ? "No press releases match your search criteria." 
-                : "No press releases have been created yet."
-              }
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Version</TableHead>
-                  <TableHead>Words</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredPressReleases.map((item) => (
-                  <TableRow key={item.pressRelease.id}>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        {getStatusIcon(item.pressRelease.status)}
-                        <div>
-                          <div className="font-medium truncate max-w-[250px]">
-                            {item.pressRelease.title}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            ID: {item.pressRelease.id.slice(0, 8)}...
-                          </div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="flex items-center text-sm">
-                          <Building className="w-3 h-3 mr-1" />
-                          {item.client.company_name}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {item.client.contact_person_name}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        v{item.pressRelease.version_number || 1}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm">
-                        {item.pressRelease.word_count || 0} words
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Select 
-                        value={item.pressRelease.status as string} 
-                        onValueChange={(value) => updateStatus(item.pressRelease.id, value)}
-                      >
-                        <SelectTrigger className="w-auto">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="draft">Draft</SelectItem>
-                          <SelectItem value="in_review">In Review</SelectItem>
-                          <SelectItem value="revision_requested">Needs Revision</SelectItem>
-                          <SelectItem value="approved">Approved</SelectItem>
-                          <SelectItem value="published">Published</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center text-sm">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        {new Date(item.pressRelease.created_at).toLocaleDateString()}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => navigate(`/review-board/${item.client.id}`)}
-                        >
-                          <Edit className="w-3 h-3 mr-1" />
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => navigate(`/review-board/${item.client.id}`)}
-                        >
-                          <Eye className="w-3 h-3 mr-1" />
-                          View
-                        </Button>
-                      </div>
-                    </TableCell>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {filteredPressReleases.length === 0 ? (
+            <div className="text-center py-8 px-6">
+              <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No Press Releases Found</h3>
+              <p className="text-muted-foreground">
+                {searchTerm || statusFilter !== "all" 
+                  ? "No press releases match your search criteria." 
+                  : "No press releases have been created yet."
+                }
+              </p>
+            </div>
+          ) : (
+            <div className="w-full overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[250px]">Title</TableHead>
+                    <TableHead className="min-w-[200px]">Client</TableHead>
+                    <TableHead className="min-w-[80px]">Version</TableHead>
+                    <TableHead className="min-w-[80px]">Words</TableHead>
+                    <TableHead className="min-w-[150px]">Status</TableHead>
+                    <TableHead className="min-w-[120px]">Created</TableHead>
+                    <TableHead className="text-right min-w-[150px]">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                </TableHeader>
+                <TableBody>
+                  {filteredPressReleases.map((item) => (
+                    <TableRow key={item.pressRelease.id}>
+                      <TableCell className="min-w-[250px]">
+                        <div className="flex items-center space-x-2">
+                          {getStatusIcon(item.pressRelease.status)}
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium truncate">
+                              {item.pressRelease.title}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              ID: {item.pressRelease.id.slice(0, 8)}...
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="min-w-[200px]">
+                        <div>
+                          <div className="flex items-center text-sm">
+                            <Building className="w-3 h-3 mr-1 flex-shrink-0" />
+                            <span className="truncate">{item.client.company_name}</span>
+                          </div>
+                          <div className="text-sm text-muted-foreground truncate">
+                            {item.client.contact_person_name}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="min-w-[80px]">
+                        <Badge variant="outline">
+                          v{item.pressRelease.version_number || 1}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="min-w-[80px]">
+                        <span className="text-sm">
+                          {item.pressRelease.word_count || 0} words
+                        </span>
+                      </TableCell>
+                      <TableCell className="min-w-[150px]">
+                        <Select 
+                          value={item.pressRelease.status as string} 
+                          onValueChange={(value) => updateStatus(item.pressRelease.id, value)}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="draft">Draft</SelectItem>
+                            <SelectItem value="in_review">In Review</SelectItem>
+                            <SelectItem value="revision_requested">Needs Revision</SelectItem>
+                            <SelectItem value="approved">Approved</SelectItem>
+                            <SelectItem value="published">Published</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="min-w-[120px]">
+                        <div className="flex items-center text-sm">
+                          <Calendar className="w-3 h-3 mr-1 flex-shrink-0" />
+                          <span className="truncate">
+                            {new Date(item.pressRelease.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right min-w-[150px]">
+                        <div className="flex items-center justify-end space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => navigate(`/review-board/${item.client.id}`)}
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => navigate(`/review-board/${item.client.id}`)}
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            View
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };

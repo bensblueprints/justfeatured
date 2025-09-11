@@ -190,8 +190,10 @@ const AdminPanel = () => {
           </header>
 
           {/* Content */}
-          <div className="flex-1 overflow-auto p-6">
-            {renderContent()}
+          <div className="flex-1 overflow-auto">
+            <div className="p-6 max-w-full">
+              {renderContent()}
+            </div>
           </div>
         </main>
       </div>
