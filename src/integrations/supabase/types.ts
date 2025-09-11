@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      approval_history: {
+        Row: {
+          action: string
+          comment: string | null
+          created_at: string | null
+          id: string
+          press_release_id: string | null
+          status: Database["public"]["Enums"]["press_release_status"]
+          user_id: string
+        }
+        Insert: {
+          action: string
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          press_release_id?: string | null
+          status: Database["public"]["Enums"]["press_release_status"]
+          user_id: string
+        }
+        Update: {
+          action?: string
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          press_release_id?: string | null
+          status?: Database["public"]["Enums"]["press_release_status"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_history_press_release_id_fkey"
+            columns: ["press_release_id"]
+            isOneToOne: false
+            referencedRelation: "press_releases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_subscribers: {
         Row: {
           created_at: string | null
@@ -82,51 +120,90 @@ export type Database = {
       post_checkout_info: {
         Row: {
           additional_info: string | null
+          additional_notes: string | null
           budget_range: string | null
+          business_description: string | null
           company_name: string
+          company_website: string | null
           contact_email: string
+          contact_person_name: string | null
           contact_phone: string | null
           created_at: string | null
+          custom_press_release: string | null
+          email: string | null
           id: string
+          important_dates: string | null
           industry: string | null
+          industry_sector: string | null
           key_messages: string | null
+          key_products_services: string | null
+          phone_number: string | null
           preferred_timeline: string | null
+          preferred_tone: string | null
+          recent_achievements: string | null
           status: Database["public"]["Enums"]["checkout_status"] | null
           target_audience: string | null
           updated_at: string | null
           user_id: string
+          write_own_release: boolean | null
         }
         Insert: {
           additional_info?: string | null
+          additional_notes?: string | null
           budget_range?: string | null
+          business_description?: string | null
           company_name: string
+          company_website?: string | null
           contact_email: string
+          contact_person_name?: string | null
           contact_phone?: string | null
           created_at?: string | null
+          custom_press_release?: string | null
+          email?: string | null
           id?: string
+          important_dates?: string | null
           industry?: string | null
+          industry_sector?: string | null
           key_messages?: string | null
+          key_products_services?: string | null
+          phone_number?: string | null
           preferred_timeline?: string | null
+          preferred_tone?: string | null
+          recent_achievements?: string | null
           status?: Database["public"]["Enums"]["checkout_status"] | null
           target_audience?: string | null
           updated_at?: string | null
           user_id: string
+          write_own_release?: boolean | null
         }
         Update: {
           additional_info?: string | null
+          additional_notes?: string | null
           budget_range?: string | null
+          business_description?: string | null
           company_name?: string
+          company_website?: string | null
           contact_email?: string
+          contact_person_name?: string | null
           contact_phone?: string | null
           created_at?: string | null
+          custom_press_release?: string | null
+          email?: string | null
           id?: string
+          important_dates?: string | null
           industry?: string | null
+          industry_sector?: string | null
           key_messages?: string | null
+          key_products_services?: string | null
+          phone_number?: string | null
           preferred_timeline?: string | null
+          preferred_tone?: string | null
+          recent_achievements?: string | null
           status?: Database["public"]["Enums"]["checkout_status"] | null
           target_audience?: string | null
           updated_at?: string | null
           user_id?: string
+          write_own_release?: boolean | null
         }
         Relationships: []
       }
@@ -140,6 +217,7 @@ export type Database = {
           title: string
           updated_at: string | null
           user_id: string
+          version_number: number | null
           word_count: number
         }
         Insert: {
@@ -151,6 +229,7 @@ export type Database = {
           title: string
           updated_at?: string | null
           user_id: string
+          version_number?: number | null
           word_count?: number
         }
         Update: {
@@ -162,6 +241,7 @@ export type Database = {
           title?: string
           updated_at?: string | null
           user_id?: string
+          version_number?: number | null
           word_count?: number
         }
         Relationships: [
@@ -275,16 +355,19 @@ export type Database = {
       }
       user_roles: {
         Row: {
+          created_at: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
+          created_at?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
+          created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
@@ -305,7 +388,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role:
+        | "admin"
+        | "moderator"
+        | "user"
+        | "super_admin"
+        | "editor"
+        | "customer"
       checkout_status: "pending" | "in_progress" | "completed" | "cancelled"
       press_release_status:
         | "draft"
@@ -313,6 +402,8 @@ export type Database = {
         | "approved"
         | "published"
         | "rejected"
+        | "in_review"
+        | "revision_requested"
       publication_status: "active" | "inactive"
     }
     CompositeTypes: {
@@ -441,7 +532,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: [
+        "admin",
+        "moderator",
+        "user",
+        "super_admin",
+        "editor",
+        "customer",
+      ],
       checkout_status: ["pending", "in_progress", "completed", "cancelled"],
       press_release_status: [
         "draft",
@@ -449,6 +547,8 @@ export const Constants = {
         "approved",
         "published",
         "rejected",
+        "in_review",
+        "revision_requested",
       ],
       publication_status: ["active", "inactive"],
     },
