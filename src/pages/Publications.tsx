@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { PublicationCard } from "@/components/PublicationCard";
+import { PublicationListView } from "@/components/PublicationListView";
 import { AIPresAgentDialog } from "@/components/AIPresAgentDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, ShoppingCart, Filter, DollarSign, Building } from "lucide-react";
+import { Search, ShoppingCart, Filter, DollarSign, Building, Grid3X3, List } from "lucide-react";
 import { fetchPublications } from "@/lib/publications";
 import { Publication, CartItem } from "@/types";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
@@ -25,6 +26,7 @@ export const Publications = () => {
   const [industryFilter, setIndustryFilter] = useState<string>("all");
   const [publications, setPublications] = useState<Publication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
   
   const LOAD_MORE_COUNT = 18;
 
@@ -162,7 +164,29 @@ export const Publications = () => {
               Choose from {publications.length}+ premium publications to get your story featured
             </p>
           </div>
-          <div className="mt-4 md:mt-0">
+          <div className="mt-4 md:mt-0 flex items-center gap-4">
+            {/* View Toggle */}
+            <div className="flex items-center border rounded-lg p-1 bg-background">
+              <Button
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("cards")}
+                className="h-8 px-3"
+              >
+                <Grid3X3 className="h-4 w-4 mr-1" />
+                Cards
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className="h-8 px-3"
+              >
+                <List className="h-4 w-4 mr-1" />
+                List
+              </Button>
+            </div>
+            
             <ProtectedInteraction>
               <div>
                 <AIPresAgentDialog />
@@ -270,54 +294,65 @@ export const Publications = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Publications Grid */}
+          {/* Publications Content */}
           <div className="flex-1">
-            <div className="mb-6 flex items-center justify-between">
-              <p className="text-muted-foreground">
-                Showing {visiblePublications.length} of {filteredPublications.length} publications
-                {loading && " (Loading...)"}
-              </p>
-              {hasMorePublications && (
-                <p className="text-sm text-muted-foreground">
-                  {filteredPublications.length - visibleCount} more available
-                </p>
-              )}
-            </div>
+            {viewMode === "list" ? (
+              <PublicationListView
+                publications={publications}
+                loading={loading}
+                selectedPublications={selectedPublications}
+                onSelectionChange={handleSelectionChange}
+              />
+            ) : (
+              <>
+                <div className="mb-6 flex items-center justify-between">
+                  <p className="text-muted-foreground">
+                    Showing {visiblePublications.length} of {filteredPublications.length} publications
+                    {loading && " (Loading...)"}
+                  </p>
+                  {hasMorePublications && (
+                    <p className="text-sm text-muted-foreground">
+                      {filteredPublications.length - visibleCount} more available
+                    </p>
+                  )}
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-              {visiblePublications.map((publication) => (
-                <ProtectedInteraction key={publication.id}>
-                  <div>
-                    <PublicationCard
-                      publication={publication}
-                      selected={selectedPublications.includes(publication.id)}
-                      onSelectionChange={(selected) => handleSelectionChange(publication.id, selected)}
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+                  {visiblePublications.map((publication) => (
+                    <ProtectedInteraction key={publication.id}>
+                      <div>
+                        <PublicationCard
+                          publication={publication}
+                          selected={selectedPublications.includes(publication.id)}
+                          onSelectionChange={(selected) => handleSelectionChange(publication.id, selected)}
+                        />
+                      </div>
+                    </ProtectedInteraction>
+                  ))}
+                </div>
+
+                {/* Load More Button */}
+                {hasMorePublications && (
+                  <div className="flex justify-center mb-8">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={() => setVisibleCount(prev => prev + LOAD_MORE_COUNT)}
+                      className="min-w-[200px]"
+                    >
+                      Load More Publications ({filteredPublications.length - visibleCount} remaining)
+                    </Button>
                   </div>
-                </ProtectedInteraction>
-              ))}
-            </div>
+                )}
 
-            {/* Load More Button */}
-            {hasMorePublications && (
-              <div className="flex justify-center mb-8">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setVisibleCount(prev => prev + LOAD_MORE_COUNT)}
-                  className="min-w-[200px]"
-                >
-                  Load More Publications ({filteredPublications.length - visibleCount} remaining)
-                </Button>
-              </div>
-            )}
-
-            {!hasMorePublications && filteredPublications.length > 18 && (
-              <div className="text-center py-4 mb-8">
-                <p className="text-muted-foreground">
-                  You've viewed all {filteredPublications.length} publications. Try adjusting your filters to see different results.
-                </p>
-              </div>
+                {!hasMorePublications && filteredPublications.length > 18 && (
+                  <div className="text-center py-4 mb-8">
+                    <p className="text-muted-foreground">
+                      You've viewed all {filteredPublications.length} publications. Try adjusting your filters to see different results.
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
