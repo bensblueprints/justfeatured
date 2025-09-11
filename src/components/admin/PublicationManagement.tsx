@@ -47,6 +47,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandFetchService } from "@/utils/brandFetch";
+import { CSVPublicationImporter } from "@/components/admin/CSVPublicationImporter";
 
 interface Publication {
   id: string;
@@ -1067,6 +1068,12 @@ export const PublicationManagement = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            {/* Repository Import Section */}
+            <div className="border-b pb-4 mb-4">
+              <CSVPublicationImporter onImportComplete={fetchPublications} />
+            </div>
+            
+            {/* Manual CSV Upload */}
             <div className="flex gap-2 items-end">
               <div className="flex-1">
                 <Label htmlFor="csv-file">Upload CSV File</Label>
@@ -1088,23 +1095,9 @@ export const PublicationManagement = () => {
             </div>
             
             <div className="border-t pt-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium">Import Repository Publications</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Import all publications from the repository CSV file
-                  </p>
-                </div>
-                <Button 
-                  onClick={handleImportRepositoryCSV}
-                  disabled={uploading}
-                  variant="outline"
-                >
-                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                  Import All Publications
-                </Button>
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground">
+              For manual CSV uploads, use the same format as the repository file.
+            </p>
           </div>
         </CardContent>
       </Card>
