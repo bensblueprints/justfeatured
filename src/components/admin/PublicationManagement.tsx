@@ -719,6 +719,146 @@ export const PublicationManagement = () => {
     }
   };
 
+  const handleImportRepositoryCSV = async () => {
+    setUploading(true);
+    try {
+      // Fetch the CSV file from the repository
+      const response = await fetch('/Just Featured PR Sheet - All Publications.csv');
+      if (!response.ok) {
+        throw new Error('CSV file not found in repository');
+      }
+      
+      const text = await response.text();
+      const lines = text.split('\n');
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      
+      const publications = [];
+      for (let i = 2; i < lines.length; i++) { // Start from line 2 to skip the "WRITING COST IS INCLUDED" row
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        // Parse CSV with proper comma handling for quoted values
+        const values = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let j = 0; j < line.length; j++) {
+          const char = line[j];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            values.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        values.push(current.trim());
+        
+        const row: any = {};
+        headers.forEach((header, index) => {
+          if (values[index]) {
+            row[header] = values[index].trim().replace(/"/g, '');
+          }
+        });
+        
+        // Only process rows with actual publication data
+        if (row.PUBLICATION && row.PUBLICATION !== '' && row.PRICE) {
+          // Clean up the publication name
+          row.PUBLICATION = row.PUBLICATION.replace(/^,+|,+$/g, '').trim();
+          
+          if (row.PUBLICATION !== '' && row.PUBLICATION !== 'PUBLICATION') {
+            // Convert boolean values
+            const convertBoolean = (value: string) => {
+              if (!value) return false;
+              const val = value.toUpperCase();
+              return val === 'Y' || val === 'YES' || val === 'TRUE' || val === 'DISCREET';
+            };
+
+            // Parse price - remove $ symbol and convert to number
+            const parsePrice = (priceStr: string) => {
+              if (!priceStr) return 0;
+              const cleaned = priceStr.replace(/[$,]/g, '');
+              return parseInt(cleaned) || 0;
+            };
+
+            const publication = {
+              external_id: crypto.randomUUID(),
+              name: row.PUBLICATION,
+              type: 'standard',
+              category: row.GENRE || 'News',
+              price: parsePrice(row.PRICE),
+              tat_days: row.TAT || '1-2 Weeks',
+              description: '',
+              features: [],
+              website_url: null,
+              tier: 'standard',
+              da_score: parseInt(row.DA) || 0,
+              dr_score: parseInt(row.DR) || 0,
+              location: row['REGION / LOCATION'] || null,
+              dofollow_link: convertBoolean(row.DOFOLLOW),
+              sponsored: convertBoolean(row.SPONSORED),
+              indexed: convertBoolean(row.INDEXED || 'Y'),
+              erotic: convertBoolean(row.EROTIC),
+              health: convertBoolean(row.HEALTH),
+              cbd: convertBoolean(row.CBD),
+              crypto: convertBoolean(row.CRYPTO),
+              gambling: convertBoolean(row.GAMBLING),
+              is_active: true,
+              popularity: 0,
+            };
+
+            publications.push(publication);
+          }
+        }
+      }
+
+      console.log(`Found ${publications.length} publications to import`);
+      
+      if (publications.length === 0) {
+        toast({
+          title: "Error",
+          description: "No valid publications found in CSV",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Import in batches to avoid overwhelming the database
+      const batchSize = 50;
+      let importedCount = 0;
+      
+      for (let i = 0; i < publications.length; i += batchSize) {
+        const batch = publications.slice(i, i + batchSize);
+        const { error } = await supabase.from('publications').insert(batch);
+        
+        if (error) {
+          console.error('Error importing batch:', error);
+          throw error;
+        }
+        
+        importedCount += batch.length;
+        console.log(`Imported ${importedCount}/${publications.length} publications`);
+      }
+      
+      toast({
+        title: "Success",
+        description: `Successfully imported ${importedCount} publications from repository!`,
+      });
+      
+      fetchPublications();
+    } catch (error: any) {
+      console.error('Error importing repository CSV:', error);
+      toast({
+        title: "Error",
+        description: `Failed to import repository CSV: ${error.message}`,
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleExportCSV = () => {
     try {
       // Create CSV headers
@@ -926,24 +1066,45 @@ export const PublicationManagement = () => {
           <CardTitle className="text-lg">CSV Upload</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
-              <Label htmlFor="csv-file">Upload CSV File</Label>
-              <Input
-                id="csv-file"
-                type="file"
-                accept=".csv"
-                ref={fileInputRef}
-                onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
-              />
+          <div className="space-y-4">
+            <div className="flex gap-2 items-end">
+              <div className="flex-1">
+                <Label htmlFor="csv-file">Upload CSV File</Label>
+                <Input
+                  id="csv-file"
+                  type="file"
+                  accept=".csv"
+                  ref={fileInputRef}
+                  onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+                />
+              </div>
+              <Button 
+                onClick={handleCSVUpload}
+                disabled={!csvFile || uploading}
+              >
+                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                Upload
+              </Button>
             </div>
-            <Button 
-              onClick={handleCSVUpload}
-              disabled={!csvFile || uploading}
-            >
-              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-              Upload
-            </Button>
+            
+            <div className="border-t pt-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium">Import Repository Publications</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Import all publications from the repository CSV file
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleImportRepositoryCSV}
+                  disabled={uploading}
+                  variant="outline"
+                >
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                  Import All Publications
+                </Button>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
