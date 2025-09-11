@@ -24,6 +24,7 @@ import AdminUpload from "./pages/AdminUpload";
 import BrandBundles from "./pages/BrandBundles";
 import AdminPanel from "./pages/AdminPanel";
 import AdminSetup from "./pages/AdminSetup";
+import AdminManualImport from "./pages/AdminManualImport";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => {
               <Route path="/admin-upload" element={<AdminUpload />} />
               <Route path="/brand-bundles" element={<BrandBundles />} />
               <Route path="/admin-setup" element={<AdminSetup />} />
+              <Route path="/admin-manual-import" element={<AdminManualImport />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
