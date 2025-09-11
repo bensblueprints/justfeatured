@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { PublicationCard } from "@/components/PublicationCard";
 import { PublicationListView } from "@/components/PublicationListView";
+import { SpreadsheetSync } from "@/components/SpreadsheetSync";
 import { AIPresAgentDialog } from "@/components/AIPresAgentDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,8 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, ShoppingCart, Filter, DollarSign, Building, Grid3X3, List } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Search, ShoppingCart, Filter, DollarSign, Building, Grid3X3, List, Upload } from "lucide-react";
 import { fetchPublications } from "@/lib/publications";
+import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 import { Publication, CartItem } from "@/types";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 
@@ -24,27 +27,13 @@ export const Publications = () => {
   const [visibleCount, setVisibleCount] = useState(18);
   const [priceRange, setPriceRange] = useState<string>("all");
   const [industryFilter, setIndustryFilter] = useState<string>("all");
-  const [publications, setPublications] = useState<Publication[]>([]);
-  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
+  const [showSpreadsheetSync, setShowSpreadsheetSync] = useState(false);
   
   const LOAD_MORE_COUNT = 18;
 
-  // Fetch publications from database
-  useEffect(() => {
-    const loadPublications = async () => {
-      try {
-        const data = await fetchPublications();
-        setPublications(data);
-      } catch (error) {
-        console.error('Error loading publications:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPublications();
-  }, []);
+  // Use real-time publications sync
+  const { publications, loading, refreshPublications } = usePublicationsSync();
 
   const filteredPublications = useMemo(() => {
     if (loading || publications.length === 0) {
@@ -165,6 +154,27 @@ export const Publications = () => {
             </p>
           </div>
           <div className="mt-4 md:mt-0 flex items-center gap-4">
+            {/* Spreadsheet Sync */}
+            <Dialog open={showSpreadsheetSync} onOpenChange={setShowSpreadsheetSync}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Sync Spreadsheet
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Sync Publications from Spreadsheet</DialogTitle>
+                </DialogHeader>
+                <SpreadsheetSync 
+                  onSyncComplete={() => {
+                    setShowSpreadsheetSync(false);
+                    refreshPublications();
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
+
             {/* View Toggle */}
             <div className="flex items-center border rounded-lg p-1 bg-background">
               <Button
