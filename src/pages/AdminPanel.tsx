@@ -28,6 +28,7 @@ import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import { ClientManagement } from '@/components/admin/ClientManagement';
 import { UserManagement } from '@/components/admin/UserManagement';
+import { CSVImportManager } from '@/components/admin/CSVImportManager';
 import { PressReleaseManagement } from '@/components/admin/PressReleaseManagement';
 import { PublicationBulkEditor } from '@/components/admin/PublicationBulkEditor';
 import { PublicationManagement } from '@/components/admin/PublicationManagement';
@@ -124,6 +125,7 @@ const AdminPanel = () => {
       case 'publications':
         return (
           <div className="space-y-6">
+            <CSVImportManager />
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
               <div className="xl:col-span-3">
                 <PublicationManagement />
