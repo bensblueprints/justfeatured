@@ -68,9 +68,9 @@ export const ClientManagement = () => {
   useEffect(() => {
     const filtered = clients.filter(item => 
       item.client.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.client.contact_person_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.client.industry_sector.toLowerCase().includes(searchTerm.toLowerCase())
+      (item.client.contact_person_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.client.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.client.industry_sector || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredClients(filtered);
   }, [clients, searchTerm]);
@@ -96,8 +96,27 @@ export const ClientManagement = () => {
           .maybeSingle();
 
         clientsWithPressReleases.push({
-          client,
-          pressRelease: pressReleaseData || undefined
+          client: {
+            ...client,
+            industry_sector: client.industry_sector || client.industry || 'other',
+            contact_person_name: client.contact_person_name || 'N/A',
+            email: client.email || client.contact_email || 'N/A',
+            phone_number: client.phone_number || client.contact_phone || 'N/A',
+            company_website: client.company_website || '',
+            business_description: client.business_description || '',
+            recent_achievements: client.recent_achievements || '',
+            key_products_services: client.key_products_services || '',
+            target_audience: client.target_audience || '',
+            preferred_tone: client.preferred_tone || 'professional',
+            important_dates: client.important_dates || '',
+            additional_notes: client.additional_notes || client.additional_info || '',
+            write_own_release: client.write_own_release || false,
+            custom_press_release: client.custom_press_release || ''
+          } as any,
+          pressRelease: pressReleaseData ? {
+            ...pressReleaseData,
+            version_number: pressReleaseData.version_number || 1
+          } as any : undefined
         });
       }
 
@@ -200,17 +219,17 @@ export const ClientManagement = () => {
                       <div>
                         <div className="flex items-center text-sm">
                           <Mail className="w-3 h-3 mr-1" />
-                          {item.client.contact_person_name}
+                          {item.client.contact_person_name || 'N/A'}
                         </div>
                         <div className="flex items-center text-sm text-muted-foreground">
                           <Phone className="w-3 h-3 mr-1" />
-                          {item.client.email}
+                          {item.client.email || 'N/A'}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">
-                        {item.client.industry_sector}
+                        {item.client.industry_sector || 'Other'}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -226,7 +245,7 @@ export const ClientManagement = () => {
                             {item.pressRelease.title}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            v{item.pressRelease.version_number} • {item.pressRelease.word_count || 0} words
+                            v{item.pressRelease.version_number || 1} • {item.pressRelease.word_count || 0} words
                           </div>
                         </div>
                       ) : (

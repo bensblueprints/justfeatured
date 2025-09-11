@@ -82,8 +82,8 @@ export const UserManagement = () => {
         usersWithRoles.push({
           user_id: userRole.user_id,
           email: userRole.user_id.slice(0, 8) + "@example.com", // Placeholder
-          role: userRole.role,
-          created_at: userRole.created_at
+          role: userRole.role as UserRole,
+          created_at: userRole.created_at || new Date().toISOString()
         });
       }
 
@@ -140,7 +140,7 @@ export const UserManagement = () => {
 
       const { error } = await supabase
         .from('user_roles')
-        .update({ role: newRole })
+        .update({ role: newRole as any })
         .eq('user_id', userId);
 
       if (error) throw error;

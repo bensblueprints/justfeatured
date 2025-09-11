@@ -111,7 +111,28 @@ export const CSVPublicationImporter = () => {
           contact_info: `contact@${pub.name.toLowerCase().replace(/\s+/g, '')}.com`, // Generate contact info
           monthly_readers: Math.floor(Math.random() * 1000000) + 10000, // Random monthly readers
           logo_url: null,
-          status: 'active' as const
+          status: 'active' as const,
+          // Extended fields from our migration
+          type: 'standard',
+          tier: 'standard',
+          tat_days: pub.tat_days,
+          description: null,
+          features: [],
+          website_url: null,
+          popularity: Math.floor(Math.random() * 100),
+          is_active: true,
+          da_score: pub.da_score,
+          dr_score: pub.dr_score,
+          location: pub.location,
+          dofollow_link: pub.dofollow_link,
+          sponsored: pub.sponsored,
+          indexed: pub.indexed,
+          erotic: pub.erotic,
+          health: pub.health,
+          cbd: pub.cbd,
+          crypto: pub.crypto,
+          gambling: pub.gambling,
+          external_id: `csv_import_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         };
 
         const { error } = await supabase

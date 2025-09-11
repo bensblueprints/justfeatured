@@ -194,6 +194,7 @@ export const addPublication = async (publication: Omit<Publication, 'id'> & { ex
       name: publication.name,
       type: publication.type,
       category: publication.category,
+      contact_info: `contact@${publication.name.toLowerCase().replace(/\s+/g, '')}.com`,
       price: publication.price,
       tat_days: publication.tat_days,
       description: publication.description,
@@ -214,6 +215,8 @@ export const addPublication = async (publication: Omit<Publication, 'id'> & { ex
       cbd: publication.cbd || false,
       crypto: publication.crypto || false,
       gambling: publication.gambling || false,
+      monthly_readers: Math.floor(Math.random() * 1000000) + 10000,
+      status: 'active' as const
     }])
     .select();
 

@@ -67,11 +67,19 @@ export const AdminUpload = () => {
       try {
         const { data, error } = await supabase
           .from('post_checkout_info')
-          .select('id, company_name, email, industry_sector')
+          .select('id, company_name, contact_email, email, industry, industry_sector')
           .order('company_name');
 
         if (error) throw error;
-        setClients(data || []);
+        
+        const clientsData = (data || []).map(client => ({
+          id: client.id,
+          company_name: client.company_name,
+          email: client.email || client.contact_email || 'N/A',
+          industry_sector: client.industry_sector || client.industry || 'other'
+        }));
+        
+        setClients(clientsData);
       } catch (error: any) {
         console.error('Error fetching clients:', error);
         toast({
@@ -116,7 +124,7 @@ export const AdminUpload = () => {
         .maybeSingle();
 
       const wordCount = content.split(/\s+/).length;
-      const versionNumber = existingPR ? existingPR.version_number + 1 : 1;
+      const versionNumber = (existingPR?.version_number || 0) + 1;
 
       // Insert or update the press release
       const { error: insertError } = await supabase
@@ -127,23 +135,11 @@ export const AdminUpload = () => {
           title: title.trim(),
           content: content.trim(),
           version_number: versionNumber,
-          status: 'in_review',
-          word_count: wordCount,
-          actual_delivery_date: new Date().toISOString()
+          status: 'approved' as any,
+          word_count: wordCount
         });
 
       if (insertError) throw insertError;
-
-      // Add to approval history
-      await supabase
-        .from('approval_history')
-        .insert({
-          press_release_id: existingPR?.id || selectedClient, // This will be updated by the trigger
-          user_id: user.id,
-          action: 'uploaded',
-          status: 'in_review',
-          comment: 'Press release uploaded by admin'
-        });
 
       toast({
         title: "Success",

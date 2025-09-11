@@ -79,8 +79,11 @@ export const PressReleaseManagement = () => {
       if (prError) throw prError;
 
       const pressReleasesWithClients: PressReleaseWithClient[] = (pressReleasesData || []).map(pr => ({
-        pressRelease: pr,
-        client: pr.post_checkout_info
+        pressRelease: {
+          ...pr,
+          version_number: pr.version_number || 1
+        } as any,
+        client: pr.post_checkout_info as any
       }));
 
       setPressReleases(pressReleasesWithClients);
@@ -96,11 +99,11 @@ export const PressReleaseManagement = () => {
     }
   };
 
-  const updateStatus = async (pressReleaseId: string, newStatus: ReviewStatus) => {
+  const updateStatus = async (pressReleaseId: string, newStatus: string) => {
     try {
       const { error } = await supabase
         .from('press_releases')
-        .update({ status: newStatus })
+        .update({ status: newStatus as any })
         .eq('id', pressReleaseId);
 
       if (error) throw error;
@@ -108,7 +111,7 @@ export const PressReleaseManagement = () => {
       // Update local state
       setPressReleases(prev => prev.map(item => 
         item.pressRelease.id === pressReleaseId 
-          ? { ...item, pressRelease: { ...item.pressRelease, status: newStatus } }
+          ? { ...item, pressRelease: { ...item.pressRelease, status: newStatus as any } }
           : item
       ));
 
@@ -253,7 +256,7 @@ export const PressReleaseManagement = () => {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">
-                        v{item.pressRelease.version_number}
+                        v{item.pressRelease.version_number || 1}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -263,8 +266,8 @@ export const PressReleaseManagement = () => {
                     </TableCell>
                     <TableCell>
                       <Select 
-                        value={item.pressRelease.status} 
-                        onValueChange={(value) => updateStatus(item.pressRelease.id, value as ReviewStatus)}
+                        value={item.pressRelease.status as string} 
+                        onValueChange={(value) => updateStatus(item.pressRelease.id, value)}
                       >
                         <SelectTrigger className="w-auto">
                           <SelectValue />
