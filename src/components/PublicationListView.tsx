@@ -136,15 +136,6 @@ export const PublicationListView = ({
     <div className="space-y-6">
       {/* Filters */}
       <div className="flex flex-col lg:flex-row gap-4 p-4 bg-muted/50 rounded-lg">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search publications..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10"
-          />
-        </div>
         
         <Select value={sponsoredFilter} onValueChange={setSponsoredFilter}>
           <SelectTrigger className="w-[200px]">
