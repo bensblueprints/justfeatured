@@ -1,9 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Supabase admin client (service role) for DB updates
+const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 interface BrandLogo {
   type: string;
@@ -76,6 +82,15 @@ serve(async (req) => {
 
     const data: BrandResponse = await response.json();
     const bestLogo = getBestLogo(data.logos);
+
+    // Attempt to persist logo to publications table (service role)
+    if (bestLogo) {
+      try {
+        await updatePublicationLogo(websiteUrl, domain, bestLogo);
+      } catch (e) {
+        console.error('Failed to update publication logo in DB:', e);
+      }
+    }
 
     return new Response(
       JSON.stringify({ 
@@ -159,4 +174,30 @@ function getFallbackLogo(websiteUrl: string | undefined): string {
   
   const domain = extractDomain(websiteUrl);
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+}
+
+async function updatePublicationLogo(websiteUrl: string, domain: string, logoUrl: string) {
+  try {
+    // First try exact match on website_url
+    const { error: exactError } = await supabase
+      .from('publications')
+      .update({ logo_url: logoUrl })
+      .eq('website_url', websiteUrl);
+
+    if (exactError) {
+      console.error('Exact match update error:', exactError);
+    }
+
+    // Also try domain match if exact didn't affect rows or URLs stored differ
+    const { error: domainError } = await supabase
+      .from('publications')
+      .update({ logo_url: logoUrl })
+      .ilike('website_url', `%${domain}%`);
+
+    if (domainError) {
+      console.error('Domain match update error:', domainError);
+    }
+  } catch (err) {
+    console.error('Unexpected error updating publication logo:', err);
+  }
 }

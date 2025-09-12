@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Publication } from '@/types';
 import { fetchPublications } from '@/lib/publications';
+import { BrandFetchService } from '@/utils/brandFetch';
 
 export const usePublicationsSync = () => {
   const [publications, setPublications] = useState<Publication[]>([]);
@@ -13,6 +14,11 @@ export const usePublicationsSync = () => {
       try {
         const data = await fetchPublications();
         setPublications(data);
+        // Kick off background logo fetch for items missing logos (will also update DB in edge function)
+        const missing = data.filter(p => !p.logo_url && p.website_url).map(p => p.website_url!)
+        if (missing.length) {
+          BrandFetchService.prefetchLogos(missing).catch(() => {/* ignore */});
+        }
       } catch (error) {
         console.error('Error loading publications:', error);
       } finally {
