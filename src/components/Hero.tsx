@@ -166,7 +166,7 @@ export const Hero = () => {
                               <img 
                                 src={publication.logoUrl} 
                                 alt={publication.name}
-                                className="h-[63px] w-auto object-contain transition-all duration-300 hover:scale-105"
+                                className="h-24 md:h-28 w-auto object-contain transition-all duration-300 hover:scale-105"
                                 loading="lazy"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
@@ -210,7 +210,7 @@ export const Hero = () => {
                      <img 
                        src={publication.logoUrl} 
                        alt={publication.name}
-                       className="h-[63px] w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
+                       className="h-24 md:h-28 w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
                        
                        loading="lazy"
                        onError={(e) => {
