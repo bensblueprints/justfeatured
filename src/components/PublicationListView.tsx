@@ -251,7 +251,6 @@ export const PublicationListView = ({
                 Location {getSortIcon("location")}
               </TableHead>
               <TableHead>Features</TableHead>
-              <TableHead className="w-20">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -280,20 +279,6 @@ export const PublicationListView = ({
                       >
                         <ShoppingCart className="h-3 w-3 mr-1" />
                         {selectedPublications.includes(publication.id) ? "Remove" : "Add to Cart"}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          if (publication.website_url) {
-                            window.open(publication.website_url, '_blank');
-                          }
-                        }}
-                        disabled={!publication.website_url}
-                        className="h-7 px-3 text-xs w-full"
-                      >
-                        <Globe className="h-3 w-3 mr-1" />
-                        View Sample
                       </Button>
                     </div>
                   </div>
@@ -327,21 +312,6 @@ export const PublicationListView = ({
                       <Badge variant="secondary" className="text-xs">
                         +{getFeatureBadges(publication).length - 3}
                       </Badge>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    {publication.website_url && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => window.open(publication.website_url, '_blank')}
-                        className="h-8 w-8 p-0"
-                        title="Visit Website"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
                     )}
                   </div>
                 </TableCell>

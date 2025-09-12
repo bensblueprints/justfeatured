@@ -118,15 +118,6 @@ export const CartDrawer = ({
                     </Button>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm pr-8">{publication.name}</CardTitle>
-                      <div className="text-xs text-muted-foreground mb-2">
-                        {publication.website_url ? (() => {
-                          try {
-                            return new URL(publication.website_url).hostname;
-                          } catch {
-                            return publication.website_url;
-                          }
-                        })() : 'No website available'}
-                      </div>
                       <div className="flex items-center justify-between">
                         <Badge variant="outline" className="text-xs">
                           {publication.category}
@@ -144,17 +135,6 @@ export const CartDrawer = ({
                           <span>DR: {publication.dr_score || 0}</span>
                         </div>
                       </div>
-                      {publication.website_url && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => window.open(publication.website_url, '_blank')}
-                          className="mt-2 h-6 px-2 text-xs w-full"
-                        >
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          View Sample
-                        </Button>
-                      )}
                     </CardContent>
                   </Card>
                 ))}
