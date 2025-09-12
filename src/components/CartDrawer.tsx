@@ -69,7 +69,7 @@ export const CartDrawer = ({
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-[400px] sm:w-[540px]">
+      <SheetContent className="w-full sm:w-[400px] md:w-[540px] flex flex-col">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
@@ -103,7 +103,7 @@ export const CartDrawer = ({
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full min-h-0">
             <ScrollArea className="flex-1 mt-6">
               <div className="space-y-4">
                 {cartItems.map((publication) => (
@@ -141,19 +141,20 @@ export const CartDrawer = ({
               </div>
             </ScrollArea>
 
-            <div className="mt-6 space-y-4 border-t pt-4">
-              <div className="flex items-center justify-between">
+            <div className="mt-auto space-y-4 border-t pt-4 bg-background/95 backdrop-blur-sm">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={onClearCart}
                   disabled={selectedPublications.length === 0}
+                  className="w-full sm:w-auto"
                 >
                   Clear Cart
                 </Button>
-                <div className="text-right">
+                <div className="text-right w-full sm:w-auto">
                   <p className="text-sm text-muted-foreground">Total</p>
-                  <p className="text-2xl font-bold text-primary">
+                  <p className="text-xl sm:text-2xl font-bold text-primary">
                     {formatPrice(totalAmount)}
                   </p>
                 </div>
@@ -162,11 +163,11 @@ export const CartDrawer = ({
               <Button 
                 onClick={handleCheckout}
                 disabled={selectedPublications.length === 0}
-                className="w-full h-12 text-lg"
+                className="w-full h-12 text-base sm:text-lg sticky bottom-0"
                 size="lg"
               >
                 Proceed to Checkout
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
           </div>
