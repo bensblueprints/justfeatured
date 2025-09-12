@@ -209,26 +209,6 @@ export const PublicationListView = ({
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={selectedPublications.length === paginatedPublications.length && paginatedPublications.length > 0}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      paginatedPublications.forEach(pub => {
-                        if (!selectedPublications.includes(pub.id)) {
-                          onSelectionChange(pub.id, true);
-                        }
-                      });
-                    } else {
-                      paginatedPublications.forEach(pub => {
-                        if (selectedPublications.includes(pub.id)) {
-                          onSelectionChange(pub.id, false);
-                        }
-                      });
-                    }
-                  }}
-                />
-              </TableHead>
               <TableHead className="cursor-pointer hover:bg-muted" onClick={() => handleSort("name")}>
                 Publication {getSortIcon("name")}
               </TableHead>
@@ -256,12 +236,6 @@ export const PublicationListView = ({
           <TableBody>
             {paginatedPublications.map((publication) => (
               <TableRow key={publication.id} className="hover:bg-muted/30">
-                <TableCell>
-                  <Checkbox
-                    checked={selectedPublications.includes(publication.id)}
-                    onCheckedChange={(checked) => onSelectionChange(publication.id, !!checked)}
-                  />
-                </TableCell>
                 <TableCell className="font-medium min-w-[250px]">
                   <div className="space-y-2">
                     <div className="truncate" title={publication.name}>
