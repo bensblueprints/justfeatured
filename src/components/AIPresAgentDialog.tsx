@@ -17,6 +17,12 @@ export const AIPresAgentDialog = () => {
   const [activeTab, setActiveTab] = useState("strategy");
   const [workflowStep, setWorkflowStep] = useState<'strategy' | 'research' | 'approval' | 'draft' | 'complete'>('strategy');
   const [formData, setFormData] = useState({
+    // Business Information
+    companyName: '',
+    contactPersonName: '',
+    contactEmail: '',
+    contactPhone: '',
+    companyWebsite: '',
     budget: '',
     businessType: '',
     industry: '',
@@ -24,7 +30,6 @@ export const AIPresAgentDialog = () => {
     targetAudience: ''
   });
   const [pressReleaseData, setPressReleaseData] = useState({
-    companyName: '',
     announcement: '',
     keyBenefits: '',
     targetMarket: '',
@@ -34,7 +39,6 @@ export const AIPresAgentDialog = () => {
   const [recommendation, setRecommendation] = useState('');
   const [researchResults, setResearchResults] = useState('');
   const [draftedPressRelease, setDraftedPressRelease] = useState('');
-  const [suggestedPublications, setSuggestedPublications] = useState('');
   const { toast } = useToast();
 
   const handleFullWorkflow = async (e: React.FormEvent) => {
@@ -79,7 +83,7 @@ export const AIPresAgentDialog = () => {
           industry: formData.industry,
           businessType: formData.businessType,
           announcement: pressReleaseData.announcement || `${formData.businessType} announcement in ${formData.industry}`,
-          companyName: pressReleaseData.companyName || 'Your Company'
+          companyName: formData.companyName || 'Your Company'
         }
       });
 
@@ -109,7 +113,7 @@ export const AIPresAgentDialog = () => {
   };
 
   const handleApprovalAndDraft = async () => {
-    if (!pressReleaseData.companyName || !pressReleaseData.announcement) {
+    if (!formData.companyName || !pressReleaseData.announcement) {
       toast({
         title: "Missing Information",
         description: "Please fill in company name and announcement details first.",
@@ -130,6 +134,7 @@ export const AIPresAgentDialog = () => {
       const draftResponse = await supabase.functions.invoke('ai-press-agent', {
         body: {
           action: 'draft',
+          companyName: formData.companyName,
           ...pressReleaseData,
           industry: formData.industry,
           researchData: researchResults
@@ -161,87 +166,13 @@ export const AIPresAgentDialog = () => {
     }
   };
 
-  const handleResearchSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('ai-press-agent', {
-        body: {
-          action: 'research',
-          industry: formData.industry,
-          businessType: formData.businessType,
-          announcement: pressReleaseData.announcement,
-          companyName: pressReleaseData.companyName
-        }
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data?.success) {
-        setResearchResults(data.research);
-        toast({
-          title: "Research Complete",
-          description: "Industry research and competitor analysis ready!",
-        });
-      } else {
-        throw new Error(data?.error || 'Failed to complete research');
-      }
-    } catch (error) {
-      console.error('Error conducting research:', error);
-      toast({
-        title: "Error",
-        description: "Failed to conduct research. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDraftSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('ai-press-agent', {
-        body: {
-          action: 'draft',
-          ...pressReleaseData,
-          industry: formData.industry,
-          researchData: researchResults
-        }
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data?.success) {
-        setDraftedPressRelease(data.pressRelease);
-        toast({
-          title: "Press Release Drafted",
-          description: "Your professional press release is ready for review!",
-        });
-      } else {
-        throw new Error(data?.error || 'Failed to draft press release');
-      }
-    } catch (error) {
-      console.error('Error drafting press release:', error);
-      toast({
-        title: "Error",
-        description: "Failed to draft press release. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const resetForm = () => {
     setFormData({
+      companyName: '',
+      contactPersonName: '',
+      contactEmail: '',
+      contactPhone: '',
+      companyWebsite: '',
       budget: '',
       businessType: '',
       industry: '',
@@ -249,7 +180,6 @@ export const AIPresAgentDialog = () => {
       targetAudience: ''
     });
     setPressReleaseData({
-      companyName: '',
       announcement: '',
       keyBenefits: '',
       targetMarket: '',
@@ -259,7 +189,6 @@ export const AIPresAgentDialog = () => {
     setRecommendation('');
     setResearchResults('');
     setDraftedPressRelease('');
-    setSuggestedPublications('');
     setWorkflowStep('strategy');
     setActiveTab('strategy');
   };
@@ -302,24 +231,8 @@ export const AIPresAgentDialog = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="strategy" className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Strategy
-            </TabsTrigger>
-            <TabsTrigger value="research" className="flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              Research
-            </TabsTrigger>
-            <TabsTrigger value="draft" className="flex items-center gap-2">
-              <PenTool className="h-4 w-4" />
-              Draft PR
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Strategy Tab */}
-          <TabsContent value="strategy" className="space-y-6">
+        <div className="space-y-6">
+          {workflowStep === 'strategy' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -333,8 +246,66 @@ export const AIPresAgentDialog = () => {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleFullWorkflow} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="companyName">Company Name *</Label>
+                        <Input
+                          id="companyName"
+                          placeholder="e.g., TechCorp Inc."
+                          value={formData.companyName}
+                          onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="contactPersonName">Contact Person *</Label>
+                        <Input
+                          id="contactPersonName"
+                          placeholder="e.g., John Smith"
+                          value={formData.contactPersonName}
+                          onChange={(e) => setFormData(prev => ({ ...prev, contactPersonName: e.target.value }))}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="contactEmail">Contact Email *</Label>
+                        <Input
+                          id="contactEmail"
+                          type="email"
+                          placeholder="e.g., john@company.com"
+                          value={formData.contactEmail}
+                          onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="contactPhone">Contact Phone</Label>
+                        <Input
+                          id="contactPhone"
+                          placeholder="e.g., (555) 123-4567"
+                          value={formData.contactPhone}
+                          onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
                     <div>
-                      <Label htmlFor="budget">Budget (USD)</Label>
+                      <Label htmlFor="companyWebsite">Company Website</Label>
+                      <Input
+                        id="companyWebsite"
+                        placeholder="e.g., https://company.com"
+                        value={formData.companyWebsite}
+                        onChange={(e) => setFormData(prev => ({ ...prev, companyWebsite: e.target.value }))}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="budget">Budget (USD) *</Label>
                       <Input
                         id="budget"
                         type="number"
@@ -347,36 +318,38 @@ export const AIPresAgentDialog = () => {
                       />
                     </div>
 
-                    <div>
-                      <Label htmlFor="businessType">Business Type</Label>
-                      <Select value={formData.businessType} onValueChange={(value) => setFormData(prev => ({ ...prev, businessType: value }))}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select business type" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border border-border shadow-lg z-50">
-                          {businessTypes.map((type) => (
-                            <SelectItem key={type} value={type}>{type}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="businessType">Business Type *</Label>
+                        <Select value={formData.businessType} onValueChange={(value) => setFormData(prev => ({ ...prev, businessType: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select business type" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background border border-border shadow-lg z-50">
+                            {businessTypes.map((type) => (
+                              <SelectItem key={type} value={type}>{type}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="industry">Industry *</Label>
+                        <Select value={formData.industry} onValueChange={(value) => setFormData(prev => ({ ...prev, industry: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select industry" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background border border-border shadow-lg z-50">
+                            {industries.map((industry) => (
+                              <SelectItem key={industry} value={industry}>{industry}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
 
                     <div>
-                      <Label htmlFor="industry">Industry</Label>
-                      <Select value={formData.industry} onValueChange={(value) => setFormData(prev => ({ ...prev, industry: value }))}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select industry" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border border-border shadow-lg z-50">
-                          {industries.map((industry) => (
-                            <SelectItem key={industry} value={industry}>{industry}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="goals">PR Goals</Label>
+                      <Label htmlFor="goals">PR Goals *</Label>
                       <Textarea
                         id="goals"
                         placeholder="e.g., Brand awareness, product launch, thought leadership, crisis management..."
@@ -388,7 +361,7 @@ export const AIPresAgentDialog = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="targetAudience">Target Audience</Label>
+                      <Label htmlFor="targetAudience">Target Audience *</Label>
                       <Textarea
                         id="targetAudience"
                         placeholder="e.g., Tech professionals, consumers, investors, media..."
@@ -431,393 +404,172 @@ export const AIPresAgentDialog = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {workflowStep === 'strategy' && !recommendation ? (
-                    <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
-                      <Bot className="h-12 w-12 mb-4 opacity-50" />
-                      <p className="text-lg font-medium mb-2">Ready to Analyze</p>
-                      <p className="text-sm">
-                        Fill out the form to get your personalized press release strategy.
-                      </p>
-                    </div>
-                  ) : workflowStep === 'approval' ? (
-                    <div className="space-y-4">
-                      <div className="bg-gradient-card p-4 rounded-lg border">
-                        <h4 className="font-semibold mb-2">AI Strategy & Research Results:</h4>
-                        <div className="prose prose-sm max-w-none">
-                          <div className="whitespace-pre-wrap text-sm leading-relaxed mb-4">
-                            {recommendation}
-                          </div>
-                          <hr className="my-4" />
-                          <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                            {researchResults}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-                        <h4 className="font-semibold text-yellow-800 mb-2">Ready to Continue?</h4>
-                        <p className="text-sm text-yellow-700 mb-4">
-                          Please fill in your press release details below, then approve to continue with drafting your press release.
-                        </p>
-                        
-                        <div className="space-y-3">
-                          <div>
-                            <Label htmlFor="companyNameApproval">Company Name</Label>
-                            <Input
-                              id="companyNameApproval"
-                              placeholder="e.g., TechCorp Inc."
-                              value={pressReleaseData.companyName}
-                              onChange={(e) => setPressReleaseData(prev => ({ ...prev, companyName: e.target.value }))}
-                              required
-                            />
-                          </div>
-                          
-                          <div>
-                            <Label htmlFor="announcementApproval">What are you announcing?</Label>
-                            <Textarea
-                              id="announcementApproval"
-                              placeholder="e.g., New product launch, funding round, partnership, expansion..."
-                              value={pressReleaseData.announcement}
-                              onChange={(e) => setPressReleaseData(prev => ({ ...prev, announcement: e.target.value }))}
-                              required
-                              rows={2}
-                            />
-                          </div>
-                          
-                          <div>
-                            <Label htmlFor="keyBenefitsApproval">Key Benefits/Impact</Label>
-                            <Textarea
-                              id="keyBenefitsApproval"
-                              placeholder="e.g., 50% cost reduction, improved efficiency, market expansion..."
-                              value={pressReleaseData.keyBenefits}
-                              onChange={(e) => setPressReleaseData(prev => ({ ...prev, keyBenefits: e.target.value }))}
-                              required
-                              rows={2}
-                            />
-                          </div>
-                          
-                          <div>
-                            <Label htmlFor="companyBackgroundApproval">Company Background</Label>
-                            <Textarea
-                              id="companyBackgroundApproval"
-                              placeholder="Brief company description, founding year, mission..."
-                              value={pressReleaseData.companyBackground}
-                              onChange={(e) => setPressReleaseData(prev => ({ ...prev, companyBackground: e.target.value }))}
-                              required
-                              rows={2}
-                            />
-                          </div>
-                        </div>
-                        
-                        <Button 
-                          onClick={handleApprovalAndDraft}
-                          className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
-                          disabled={isLoading || !pressReleaseData.companyName || !pressReleaseData.announcement}
-                        >
-                          {isLoading ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Drafting Press Release...
-                            </>
-                          ) : (
-                            <>
-                              <PenTool className="h-4 w-4 mr-2" />
-                              Approve & Draft Press Release
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  ) : workflowStep === 'complete' && draftedPressRelease ? (
-                    <div className="space-y-4">
-                      <div className="bg-gradient-card p-4 rounded-lg border max-h-96 overflow-y-auto">
-                        <h4 className="font-semibold mb-2">Your Professional Press Release:</h4>
-                        <div className="prose prose-sm max-w-none">
-                          <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                            {draftedPressRelease}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          onClick={() => navigator.clipboard.writeText(draftedPressRelease)}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          Copy to Clipboard
-                        </Button>
-                        <Button 
-                          onClick={() => {
-                            resetForm();
-                            setWorkflowStep('strategy');
-                          }}
-                          className="flex-1"
-                        >
-                          Start New Project
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-gradient-card p-4 rounded-lg border">
-                      <div className="prose prose-sm max-w-none">
-                        <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {recommendation}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
+                    <Bot className="h-12 w-12 mb-4 opacity-50" />
+                    <p className="text-lg font-medium mb-2">Ready to Analyze</p>
+                    <p className="text-sm">
+                      Fill out the form to get your personalized press release strategy.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
+          )}
 
-          {/* Research Tab */}
-          <TabsContent value="research" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Search className="h-5 w-5" />
-                    Press Release Research
-                  </CardTitle>
-                  <CardDescription>
-                    Let AI research your industry and find the best examples
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleResearchSubmit} className="space-y-4">
-                    <div>
-                      <Label htmlFor="companyName">Company Name</Label>
-                      <Input
-                        id="companyName"
-                        placeholder="e.g., TechCorp Inc."
-                        value={pressReleaseData.companyName}
-                        onChange={(e) => setPressReleaseData(prev => ({ ...prev, companyName: e.target.value }))}
-                        required
-                      />
+          {workflowStep === 'approval' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Strategy & Research Results
+                </CardTitle>
+                <CardDescription>
+                  Review and approve to continue with press release drafting
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-gradient-card p-4 rounded-lg border">
+                  <h4 className="font-semibold mb-2">AI Strategy & Research Results:</h4>
+                  <div className="prose prose-sm max-w-none">
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed mb-4">
+                      {recommendation}
                     </div>
-
+                    <hr className="my-4" />
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                      {researchResults}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                  <h4 className="font-semibold text-yellow-800 mb-2">Ready to Continue?</h4>
+                  <p className="text-sm text-yellow-700 mb-4">
+                    Please fill in your press release details below, then approve to continue with drafting your press release.
+                  </p>
+                  
+                  <div className="space-y-3">
                     <div>
-                      <Label htmlFor="announcement">What are you announcing?</Label>
+                      <Label htmlFor="announcementApproval">What are you announcing? *</Label>
                       <Textarea
-                        id="announcement"
+                        id="announcementApproval"
                         placeholder="e.g., New product launch, funding round, partnership, expansion..."
                         value={pressReleaseData.announcement}
                         onChange={(e) => setPressReleaseData(prev => ({ ...prev, announcement: e.target.value }))}
                         required
-                        rows={3}
+                        rows={2}
                       />
                     </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-gradient-hero text-white hover:bg-gradient-hero/90"
-                      disabled={isLoading || !formData.industry}
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Researching...
-                        </>
-                      ) : (
-                        <>
-                          <Search className="h-4 w-4 mr-2" />
-                          Research with Perplexity
-                        </>
-                      )}
-                    </Button>
                     
-                    {!formData.industry && (
-                      <p className="text-sm text-muted-foreground">
-                        Complete the Strategy tab first to enable research
-                      </p>
-                    )}
-                  </form>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Research Results
-                  </CardTitle>
-                  <CardDescription>
-                    Industry insights and competitive analysis
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {researchResults ? (
-                    <div className="space-y-4">
-                      <div className="bg-gradient-card p-4 rounded-lg border max-h-96 overflow-y-auto">
-                        <div className="prose prose-sm max-w-none">
-                          <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                            {researchResults}
-                          </div>
-                        </div>
-                      </div>
-                      <Button 
-                        onClick={() => setActiveTab('draft')}
-                        className="w-full"
-                      >
-                        Continue to Draft PR
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
-                      <Search className="h-12 w-12 mb-4 opacity-50" />
-                      <p className="text-lg font-medium mb-2">Ready to Research</p>
-                      <p className="text-sm">
-                        Provide your announcement details to get industry research.
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Draft Tab */}
-          <TabsContent value="draft" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PenTool className="h-5 w-5" />
-                    Press Release Details
-                  </CardTitle>
-                  <CardDescription>
-                    Provide details for your press release draft
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleDraftSubmit} className="space-y-4">
                     <div>
-                      <Label htmlFor="keyBenefits">Key Benefits/Impact</Label>
+                      <Label htmlFor="keyBenefitsApproval">Key Benefits/Impact *</Label>
                       <Textarea
-                        id="keyBenefits"
+                        id="keyBenefitsApproval"
                         placeholder="e.g., 50% cost reduction, improved efficiency, market expansion..."
                         value={pressReleaseData.keyBenefits}
                         onChange={(e) => setPressReleaseData(prev => ({ ...prev, keyBenefits: e.target.value }))}
                         required
-                        rows={3}
+                        rows={2}
                       />
                     </div>
-
+                    
                     <div>
-                      <Label htmlFor="targetMarket">Target Market</Label>
+                      <Label htmlFor="targetMarketApproval">Target Market *</Label>
                       <Input
-                        id="targetMarket"
+                        id="targetMarketApproval"
                         placeholder="e.g., Enterprise customers, SMBs, consumers..."
                         value={pressReleaseData.targetMarket}
                         onChange={(e) => setPressReleaseData(prev => ({ ...prev, targetMarket: e.target.value }))}
                         required
                       />
                     </div>
-
+                    
                     <div>
-                      <Label htmlFor="quotes">Key Quotes (Optional)</Label>
+                      <Label htmlFor="companyBackgroundApproval">Company Background *</Label>
                       <Textarea
-                        id="quotes"
-                        placeholder="e.g., CEO quote, customer testimonial..."
-                        value={pressReleaseData.quotes}
-                        onChange={(e) => setPressReleaseData(prev => ({ ...prev, quotes: e.target.value }))}
-                        rows={3}
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="companyBackground">Company Background</Label>
-                      <Textarea
-                        id="companyBackground"
+                        id="companyBackgroundApproval"
                         placeholder="Brief company description, founding year, mission..."
                         value={pressReleaseData.companyBackground}
                         onChange={(e) => setPressReleaseData(prev => ({ ...prev, companyBackground: e.target.value }))}
                         required
-                        rows={3}
+                        rows={2}
                       />
                     </div>
 
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-gradient-hero text-white hover:bg-gradient-hero/90"
-                      disabled={isLoading || !pressReleaseData.companyName}
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Drafting...
-                        </>
-                      ) : (
-                        <>
-                          <PenTool className="h-4 w-4 mr-2" />
-                          Draft Press Release
-                        </>
-                      )}
-                    </Button>
-                    
-                    {!pressReleaseData.companyName && (
-                      <p className="text-sm text-muted-foreground">
-                        Complete the Research tab first to enable drafting
-                      </p>
+                    <div>
+                      <Label htmlFor="quotesApproval">Key Quotes (Optional)</Label>
+                      <Textarea
+                        id="quotesApproval"
+                        placeholder="e.g., CEO quote, customer testimonial..."
+                        value={pressReleaseData.quotes}
+                        onChange={(e) => setPressReleaseData(prev => ({ ...prev, quotes: e.target.value }))}
+                        rows={2}
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleApprovalAndDraft}
+                    className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
+                    disabled={isLoading || !formData.companyName || !pressReleaseData.announcement}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Drafting Press Release...
+                      </>
+                    ) : (
+                      <>
+                        <PenTool className="h-4 w-4 mr-2" />
+                        Approve & Draft Press Release
+                      </>
                     )}
-                  </form>
-                </CardContent>
-              </Card>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Your Press Release
-                  </CardTitle>
-                  <CardDescription>
-                    AI-generated professional press release
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {draftedPressRelease ? (
-                    <div className="space-y-4">
-                      <div className="bg-gradient-card p-4 rounded-lg border max-h-96 overflow-y-auto">
-                        <div className="prose prose-sm max-w-none">
-                          <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                            {draftedPressRelease}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          onClick={() => navigator.clipboard.writeText(draftedPressRelease)}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          Copy to Clipboard
-                        </Button>
-                        <Button 
-                          onClick={() => {
-                            resetForm();
-                            setIsOpen(false);
-                          }}
-                          className="flex-1"
-                        >
-                          Start New Project
-                        </Button>
-                      </div>
+          {workflowStep === 'complete' && draftedPressRelease && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Your Professional Press Release
+                </CardTitle>
+                <CardDescription>
+                  AI-generated professional press release ready for distribution
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-gradient-card p-4 rounded-lg border max-h-96 overflow-y-auto">
+                  <div className="prose prose-sm max-w-none">
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                      {draftedPressRelease}
                     </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
-                      <PenTool className="h-12 w-12 mb-4 opacity-50" />
-                      <p className="text-lg font-medium mb-2">Ready to Draft</p>
-                      <p className="text-sm">
-                        Provide your press release details to generate a professional draft.
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => navigator.clipboard.writeText(draftedPressRelease)}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Copy to Clipboard
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      resetForm();
+                      setWorkflowStep('strategy');
+                    }}
+                    className="flex-1"
+                  >
+                    Start New Project
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
