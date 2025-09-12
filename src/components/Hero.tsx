@@ -166,7 +166,7 @@ export const Hero = () => {
                               <img 
                                 src={publication.logoUrl} 
                                 alt={publication.name}
-                                className="h-24 md:h-28 w-auto object-contain transition-all duration-300 hover:scale-105"
+                                className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-105"
                                 loading="lazy"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
