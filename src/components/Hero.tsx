@@ -157,21 +157,28 @@ export const Hero = () => {
             <div className="mb-8">
               <h3 className="text-xl font-bold mb-6 text-center text-white">Featured in 200+ Major News Outlets</h3>
               <div className="relative">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center justify-items-center">
-                  {featuredPublications.map((publication, index) => (
-                    <img
-                      key={`${publication.name}-${index}`}
-                      src={publication.logoUrl}
-                      alt={publication.name}
-                      className="h-20 md:h-24 lg:h-28 w-auto object-contain"
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
-                    />
-                  ))}
-                </div>
+                
+                 <div className="overflow-hidden">
+                   <div className="flex animate-scroll whitespace-nowrap items-center h-32">
+                     {duplicatedPublications.map((publication, index) => (
+                        <div key={`${publication.name}-${index}`} className="flex items-center h-full space-x-8 mx-6">
+                          <div className="flex items-center h-full space-x-3">
+                              <img 
+                                src={publication.logoUrl} 
+                                alt={publication.name}
+                                className="h-full w-[500px] md:w-[600px] object-fill transition-all duration-300 hover:scale-105"
+                                loading="lazy"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                }}
+                             />
+                          </div>
+                          
+                        </div>
+                     ))}
+                   </div>
+                 </div>
               </div>
             </div>
           </div>
