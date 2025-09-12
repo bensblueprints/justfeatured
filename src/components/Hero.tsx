@@ -42,6 +42,12 @@ export const Hero = () => {
       tier: 'Premium'
     },
     {
+      name: 'Maxim',
+      logoUrl: '/assets/logos/maxim.png',
+      website_url: 'https://maxim.com',
+      tier: 'Premium'
+    },
+    {
       name: 'Business Insider',
       logoUrl: '/assets/logos/business-insider.png',
       website_url: 'https://businessinsider.com',
