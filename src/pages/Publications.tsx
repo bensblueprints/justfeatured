@@ -219,21 +219,23 @@ export const Publications = () => {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Mobile-Optimized Filters */}
         <div className="mb-8 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search publications..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search publications..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Sort and View Toggle Row */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
@@ -244,12 +246,34 @@ export const Publications = () => {
                 <SelectItem value="name">Name A-Z</SelectItem>
               </SelectContent>
             </Select>
+
+            {/* Mobile View Toggle */}
+            <div className="flex items-center border rounded-lg p-1 bg-background sm:hidden w-full">
+              <Button
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("cards")}
+                className="h-8 px-3 flex-1"
+              >
+                <Grid3X3 className="h-4 w-4 mr-1" />
+                Cards
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className="h-8 px-3 flex-1"
+              >
+                <List className="h-4 w-4 mr-1" />
+                List
+              </Button>
+            </div>
           </div>
 
-          {/* Additional Filters Row */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          {/* Price and Industry Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Select value={priceRange} onValueChange={setPriceRange}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger>
                 <DollarSign className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Price Range" />
               </SelectTrigger>
@@ -264,9 +288,9 @@ export const Publications = () => {
             </Select>
 
             <Select value={industryFilter} onValueChange={setIndustryFilter}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger>
                 <Building className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Industry/Location" />
+                <SelectValue placeholder="Industry" />
               </SelectTrigger>
               <SelectContent className="bg-background border border-border shadow-lg z-50">
                 <SelectItem value="all">All Industries</SelectItem>
@@ -292,27 +316,24 @@ export const Publications = () => {
             </Select>
           </div>
 
-          {/* Category Filter Dropdown */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">Filter by Category</label>
-            <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="w-full bg-background border border-border">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent className="z-50 bg-background border border-border shadow-lg">
-                <SelectItem value="all">All ({tabCounts.all})</SelectItem>
-                <SelectItem value="nonsponsored">NonSponsored ({tabCounts.nonsponsored})</SelectItem>
-                <SelectItem value="dofollow">DoFollow ({tabCounts.dofollow})</SelectItem>
-                <SelectItem value="bestsellers">Best Sellers ({tabCounts.bestsellers})</SelectItem>
-                <SelectItem value="listicles">Listicles ({tabCounts.listicles})</SelectItem>
-                <SelectItem value="bundles">PR Bundles ({tabCounts.bundles})</SelectItem>
-                <SelectItem value="print">Print ({tabCounts.print})</SelectItem>
-                <SelectItem value="digitaltv">Digital TV ({tabCounts.digitaltv})</SelectItem>
-                <SelectItem value="broadcasttv">Broadcast TV ({tabCounts.broadcasttv})</SelectItem>
-                <SelectItem value="socialpost">Social Post ({tabCounts.socialpost})</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Category Filter */}
+          <Select value={activeTab} onValueChange={setActiveTab}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent className="z-50 bg-background border border-border shadow-lg">
+              <SelectItem value="all">All ({tabCounts.all})</SelectItem>
+              <SelectItem value="nonsponsored">NonSponsored ({tabCounts.nonsponsored})</SelectItem>
+              <SelectItem value="dofollow">DoFollow ({tabCounts.dofollow})</SelectItem>
+              <SelectItem value="bestsellers">Best Sellers ({tabCounts.bestsellers})</SelectItem>
+              <SelectItem value="listicles">Listicles ({tabCounts.listicles})</SelectItem>
+              <SelectItem value="bundles">PR Bundles ({tabCounts.bundles})</SelectItem>
+              <SelectItem value="print">Print ({tabCounts.print})</SelectItem>
+              <SelectItem value="digitaltv">Digital TV ({tabCounts.digitaltv})</SelectItem>
+              <SelectItem value="broadcasttv">Broadcast TV ({tabCounts.broadcasttv})</SelectItem>
+              <SelectItem value="socialpost">Social Post ({tabCounts.socialpost})</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -381,14 +402,14 @@ export const Publications = () => {
             )}
           </div>
 
-          {/* Sticky Checkout Sidebar */}
+          {/* Mobile-Optimized Checkout Sidebar */}
           <div className="lg:w-80">
-            <Card className="sticky top-24 bg-gradient-card">
-              <CardContent className="p-6">
+            <Card className="sticky top-4 lg:top-24 bg-gradient-card">
+              <CardContent className="p-4 lg:p-6">
                 <div className="flex items-center mb-4">
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  <h3 className="text-lg font-semibold">
-                    Selected Publications ({selectedPublications.length})
+                  <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />
+                  <h3 className="text-base lg:text-lg font-semibold">
+                    Selected ({selectedPublications.length})
                   </h3>
                 </div>
 
