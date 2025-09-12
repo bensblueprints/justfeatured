@@ -12,17 +12,19 @@ export const PublicationsMarketplace = () => {
   const { publications, loading } = usePublicationsSync();
 
   // Featured publications strictly limited to DB-listed ones, in desired order
-  const featuredPublicationNames = ['Reuters','Bloomberg','Forbes','Time','Yahoo','Business Insider','Fox News','Benzinga','Billboard'];
+  const featuredPublicationNames = ['Reuters','Bloomberg','Forbes USA','Time.com','Yahoo','Business Insider','Fox News','Benzinga','Billboard'];
 
   const normalize = (s?: string) => (s || '').toLowerCase().trim();
 
   const matchesTarget = (pubName: string, target: string) => {
     const p = normalize(pubName);
     const t = normalize(target);
-    return p === t || p.includes(t) ||
+    return p === t || 
       (t === 'yahoo' && p.includes('yahoo finance')) ||
-      (t === 'time' && (p.includes('time magazine') || p === 'time')) ||
-      (t === 'fox news' && p.includes('fox news channel'));
+      (t === 'time.com' && (p === 'time.com' || p === 'time magazine')) ||
+      (t === 'forbes usa' && p.includes('forbes usa')) ||
+      (t === 'fox news' && p.includes('fox news channel')) ||
+      (p.includes(t) && t !== 'time' && t !== 'forbes'); // Avoid generic "time" or "forbes" matches
   };
 
   // Local logo overrides from uploaded assets

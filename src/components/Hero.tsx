@@ -190,7 +190,7 @@ export const Hero = () => {
                               <img 
                                 src={publication.logoUrl} 
                                 alt={publication.name}
-                                className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-105"
+                                className="h-[63px] w-auto object-contain transition-all duration-300 hover:scale-105"
                                 loading="lazy"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
@@ -231,17 +231,17 @@ export const Hero = () => {
              <div className="flex justify-center items-center gap-8 flex-wrap">
                {featuredPublications.map((publication, index) => (
                  <div key={`bottom-${publication.name}-${index}`} className="h-12 flex items-center">
-                    <img 
-                      src={publication.logoUrl} 
-                      alt={publication.name}
-                      className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
-                      
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
-                   />
+                     <img 
+                       src={publication.logoUrl} 
+                       alt={publication.name}
+                       className="h-[63px] w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
+                       
+                       loading="lazy"
+                       onError={(e) => {
+                         const target = e.target as HTMLImageElement;
+                         target.style.display = 'none';
+                       }}
+                    />
                  </div>
                ))}
              </div>
