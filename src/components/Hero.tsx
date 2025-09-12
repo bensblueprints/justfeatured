@@ -9,10 +9,10 @@ export const Hero = () => {
   const { publications } = usePublicationsSync();
 
 
-  // Curated marquee logos using uploaded logos
+  // Only show the specific publications that are in the database
   const featuredPublications = [
     {
-      name: 'Forbes',
+      name: 'Forbes USA',
       logoUrl: '/assets/logos/forbes.png',
       website_url: 'https://forbes.com',
       tier: 'Premium'
@@ -42,12 +42,6 @@ export const Hero = () => {
       tier: 'Premium'
     },
     {
-      name: 'Maxim',
-      logoUrl: '/assets/logos/maxim.png',
-      website_url: 'https://maxim.com',
-      tier: 'Premium'
-    },
-    {
       name: 'Business Insider',
       logoUrl: '/assets/logos/business-insider.png',
       website_url: 'https://businessinsider.com',
@@ -69,24 +63,6 @@ export const Hero = () => {
       name: 'Billboard',
       logoUrl: '/assets/logos/billboard.png',
       website_url: 'https://billboard.com',
-      tier: 'Premium'
-    },
-    {
-      name: 'The Hollywood Reporter',
-      logoUrl: '/assets/logos/hollywood-reporter.png',
-      website_url: 'https://hollywoodreporter.com',
-      tier: 'Premium'
-    },
-    {
-      name: 'Rolling Stone',
-      logoUrl: '/assets/logos/rolling-stone.png',
-      website_url: 'https://rollingstone.com',
-      tier: 'Premium'
-    },
-    {
-      name: 'Hypebeast',
-      logoUrl: '/assets/logos/hypebeast.png',
-      website_url: 'https://hypebeast.com',
       tier: 'Premium'
     }
   ];
