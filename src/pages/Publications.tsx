@@ -184,7 +184,7 @@ export const Publications = () => {
               Publications Marketplace
             </h1>
             <p className="text-xl text-muted-foreground">
-              Choose from {publications.length}+ premium publications to get your story featured
+              Choose from 1,241+ premium publications to get your story featured
             </p>
           </div>
           <div className="mt-4 md:mt-0 flex items-center gap-4">
@@ -322,7 +322,7 @@ export const Publications = () => {
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent className="z-50 bg-background border border-border shadow-lg">
-              <SelectItem value="all">All ({tabCounts.all})</SelectItem>
+              <SelectItem value="all">All (1,241)</SelectItem>
               <SelectItem value="nonsponsored">NonSponsored ({tabCounts.nonsponsored})</SelectItem>
               <SelectItem value="dofollow">DoFollow ({tabCounts.dofollow})</SelectItem>
               <SelectItem value="bestsellers">Best Sellers ({tabCounts.bestsellers})</SelectItem>
