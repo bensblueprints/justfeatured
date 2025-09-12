@@ -27,7 +27,7 @@ export const Hero = () => {
       logoUrl: '/assets/logos/reuters.png',
       website_url: 'https://reuters.com',
       tier: 'Premium',
-      dbId: null // Not available in database
+      dbId: '2555e631-6648-4027-ae1e-774c5b112679' // Reuters (Press Release)
     },
     {
       name: 'Bloomberg',
@@ -41,21 +41,21 @@ export const Hero = () => {
       logoUrl: '/assets/logos/time.png',
       website_url: 'https://time.com',
       tier: 'Premium',
-      dbId: null // Not available in database
+      dbId: '52711bd4-884c-497f-8b30-f88d7c55a3c2' // Time.com
     },
     {
       name: 'Yahoo',
       logoUrl: '/assets/logos/yahoo.png',
       website_url: 'https://yahoo.com',
       tier: 'Premium',
-      dbId: null // Not available in database
+      dbId: 'e0caea04-e8ce-4304-9dbf-ceeb7c0a9087' // Yahoo News/Finance
     },
     {
       name: 'Business Insider',
       logoUrl: '/assets/logos/business-insider.png',
       website_url: 'https://businessinsider.com',
       tier: 'Premium',
-      dbId: null // Not available in database
+      dbId: '24fc0876-3602-48e2-9e45-23bd69162a68' // Yahoo/Business Insider/AP News
     },
     {
       name: 'Benzinga',
