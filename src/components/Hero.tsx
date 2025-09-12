@@ -220,10 +220,10 @@ export const Hero = () => {
           {/* Premium Social Proof */}
           <div className="text-center animate-fade-in" style={{ animationDelay: '0.8s' }}>
             <p className="text-sm mb-6 uppercase tracking-wider font-semibold opacity-80" style={{ color: '#FFB6C1' }}>
-              AS SEEN IN
+              Get Seen In
             </p>
              <div className="flex justify-center items-center gap-8 flex-wrap">
-               {featuredPublications.slice(0, 12).map((publication, index) => (
+               {featuredPublications.map((publication, index) => (
                  <div key={`bottom-${publication.name}-${index}`} className="h-12 flex items-center">
                     <img 
                       src={publication.logoUrl} 
