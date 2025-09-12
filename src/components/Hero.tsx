@@ -153,14 +153,14 @@ export const Hero = () => {
               <div className="relative">
                 
                  <div className="overflow-hidden">
-                   <div className="flex animate-scroll whitespace-nowrap items-center h-32">
+                   <div className="flex animate-scroll whitespace-nowrap items-center h-56">
                      {duplicatedPublications.map((publication, index) => (
                         <div key={`${publication.name}-${index}`} className="flex items-center h-full space-x-8 mx-6">
                           <div className="flex items-center h-full space-x-3">
                               <img 
                                 src={publication.logoUrl} 
                                 alt={publication.name}
-                                className="h-20 w-auto object-contain transition-all duration-300 hover:scale-105"
+                                className="h-48 w-auto object-contain transition-all duration-300 hover:scale-105"
                                 loading="lazy"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
