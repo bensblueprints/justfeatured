@@ -11,11 +11,34 @@ export const PublicationsMarketplace = () => {
   const [logos, setLogos] = useState<Record<string, string>>({});
   const { publications, loading } = usePublicationsSync();
 
-  // Get top publications based on popularity
-  const popularPublications = publications
-    .filter(pub => pub.is_active && pub.price > 0) // Only show publications with valid prices
-    .sort((a, b) => b.popularity - a.popularity)
-    .slice(0, 8);
+  // Featured publications from uploaded logos
+  const featuredPublicationNames = [
+    'Forbes', 'Reuters', 'Bloomberg', 'TIME', 'Yahoo', 'Business Insider', 
+    'Fox News', 'Benzinga', 'Billboard', 'The Hollywood Reporter', 'Rolling Stone', 
+    'Hypebeast', 'Maxim'
+  ];
+
+  // Get publications prioritizing the featured ones from uploaded logos
+  const popularPublications = (() => {
+    const featured = publications.filter(pub => 
+      pub.is_active && 
+      featuredPublicationNames.some(name => 
+        pub.name.toLowerCase().includes(name.toLowerCase()) || 
+        name.toLowerCase().includes(pub.name.toLowerCase())
+      )
+    );
+    
+    // If we have fewer than 8 featured publications, fill with other popular ones
+    const remaining = publications
+      .filter(pub => 
+        pub.is_active && 
+        pub.price > 0 && 
+        !featured.some(f => f.id === pub.id)
+      )
+      .sort((a, b) => b.popularity - a.popularity);
+    
+    return [...featured, ...remaining].slice(0, 8);
+  })();
 
   // Fetch logos on component mount
   useEffect(() => {
