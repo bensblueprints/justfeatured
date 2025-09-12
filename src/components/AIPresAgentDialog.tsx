@@ -15,6 +15,7 @@ export const AIPresAgentDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("strategy");
+  const [workflowStep, setWorkflowStep] = useState<'strategy' | 'research' | 'approval' | 'draft' | 'complete'>('strategy');
   const [formData, setFormData] = useState({
     budget: '',
     businessType: '',
@@ -33,14 +34,22 @@ export const AIPresAgentDialog = () => {
   const [recommendation, setRecommendation] = useState('');
   const [researchResults, setResearchResults] = useState('');
   const [draftedPressRelease, setDraftedPressRelease] = useState('');
+  const [suggestedPublications, setSuggestedPublications] = useState('');
   const { toast } = useToast();
 
-  const handleStrategySubmit = async (e: React.FormEvent) => {
+  const handleFullWorkflow = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setWorkflowStep('strategy');
 
     try {
-      const { data, error } = await supabase.functions.invoke('ai-press-agent', {
+      // Step 1: Get AI Strategy
+      toast({
+        title: "Starting AI Analysis",
+        description: "Getting your personalized strategy...",
+      });
+
+      const strategyResponse = await supabase.functions.invoke('ai-press-agent', {
         body: {
           action: 'strategy',
           budget: formData.budget,
@@ -51,26 +60,102 @@ export const AIPresAgentDialog = () => {
         }
       });
 
-      if (error) {
-        throw error;
+      if (strategyResponse.error || !strategyResponse.data?.success) {
+        throw new Error(strategyResponse.data?.error || 'Failed to generate strategy');
       }
 
-      if (data?.success) {
-        setRecommendation(data.recommendation);
-        toast({
-          title: "AI Strategy Generated",
-          description: "Your personalized press strategy is ready!",
-        });
-      } else {
-        throw new Error(data?.error || 'Failed to generate recommendation');
+      setRecommendation(strategyResponse.data.recommendation);
+      setWorkflowStep('research');
+
+      // Step 2: Conduct Research 
+      toast({
+        title: "Conducting Research",
+        description: "Researching your industry with Perplexity...",
+      });
+
+      const researchResponse = await supabase.functions.invoke('ai-press-agent', {
+        body: {
+          action: 'research',
+          industry: formData.industry,
+          businessType: formData.businessType,
+          announcement: pressReleaseData.announcement || `${formData.businessType} announcement in ${formData.industry}`,
+          companyName: pressReleaseData.companyName || 'Your Company'
+        }
+      });
+
+      if (researchResponse.error || !researchResponse.data?.success) {
+        throw new Error(researchResponse.data?.error || 'Failed to complete research');
       }
+
+      setResearchResults(researchResponse.data.research);
+      setWorkflowStep('approval');
+
+      toast({
+        title: "Strategy & Research Complete",
+        description: "Review the recommendations and approve to continue with drafting.",
+      });
+
     } catch (error) {
-      console.error('Error getting AI recommendation:', error);
+      console.error('Error in full workflow:', error);
       toast({
         title: "Error",
-        description: "Failed to generate AI recommendation. Please try again.",
+        description: "Failed to complete analysis. Please try again.",
         variant: "destructive",
       });
+      setWorkflowStep('strategy');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleApprovalAndDraft = async () => {
+    if (!pressReleaseData.companyName || !pressReleaseData.announcement) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in company name and announcement details first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    setWorkflowStep('draft');
+
+    try {
+      toast({
+        title: "Drafting Press Release",
+        description: "Creating your professional press release...",
+      });
+
+      const draftResponse = await supabase.functions.invoke('ai-press-agent', {
+        body: {
+          action: 'draft',
+          ...pressReleaseData,
+          industry: formData.industry,
+          researchData: researchResults
+        }
+      });
+
+      if (draftResponse.error || !draftResponse.data?.success) {
+        throw new Error(draftResponse.data?.error || 'Failed to draft press release');
+      }
+
+      setDraftedPressRelease(draftResponse.data.pressRelease);
+      setWorkflowStep('complete');
+
+      toast({
+        title: "Press Release Complete",
+        description: "Your professional press release is ready!",
+      });
+
+    } catch (error) {
+      console.error('Error drafting press release:', error);
+      toast({
+        title: "Error",
+        description: "Failed to draft press release. Please try again.",
+        variant: "destructive",
+      });
+      setWorkflowStep('approval');
     } finally {
       setIsLoading(false);
     }
@@ -174,6 +259,8 @@ export const AIPresAgentDialog = () => {
     setRecommendation('');
     setResearchResults('');
     setDraftedPressRelease('');
+    setSuggestedPublications('');
+    setWorkflowStep('strategy');
     setActiveTab('strategy');
   };
 
@@ -245,7 +332,7 @@ export const AIPresAgentDialog = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleStrategySubmit} className="space-y-4">
+                  <form onSubmit={handleFullWorkflow} className="space-y-4">
                     <div>
                       <Label htmlFor="budget">Budget (USD)</Label>
                       <Input
@@ -344,29 +431,139 @@ export const AIPresAgentDialog = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {recommendation ? (
-                    <div className="space-y-4">
-                      <div className="bg-gradient-card p-4 rounded-lg border">
-                        <div className="prose prose-sm max-w-none">
-                          <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                            {recommendation}
-                          </div>
-                        </div>
-                      </div>
-                      <Button 
-                        onClick={() => setActiveTab('research')}
-                        className="w-full"
-                      >
-                        Continue to Research
-                      </Button>
-                    </div>
-                  ) : (
+                  {workflowStep === 'strategy' && !recommendation ? (
                     <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
                       <Bot className="h-12 w-12 mb-4 opacity-50" />
                       <p className="text-lg font-medium mb-2">Ready to Analyze</p>
                       <p className="text-sm">
                         Fill out the form to get your personalized press release strategy.
                       </p>
+                    </div>
+                  ) : workflowStep === 'approval' ? (
+                    <div className="space-y-4">
+                      <div className="bg-gradient-card p-4 rounded-lg border">
+                        <h4 className="font-semibold mb-2">AI Strategy & Research Results:</h4>
+                        <div className="prose prose-sm max-w-none">
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed mb-4">
+                            {recommendation}
+                          </div>
+                          <hr className="my-4" />
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                            {researchResults}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                        <h4 className="font-semibold text-yellow-800 mb-2">Ready to Continue?</h4>
+                        <p className="text-sm text-yellow-700 mb-4">
+                          Please fill in your press release details below, then approve to continue with drafting your press release.
+                        </p>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <Label htmlFor="companyNameApproval">Company Name</Label>
+                            <Input
+                              id="companyNameApproval"
+                              placeholder="e.g., TechCorp Inc."
+                              value={pressReleaseData.companyName}
+                              onChange={(e) => setPressReleaseData(prev => ({ ...prev, companyName: e.target.value }))}
+                              required
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="announcementApproval">What are you announcing?</Label>
+                            <Textarea
+                              id="announcementApproval"
+                              placeholder="e.g., New product launch, funding round, partnership, expansion..."
+                              value={pressReleaseData.announcement}
+                              onChange={(e) => setPressReleaseData(prev => ({ ...prev, announcement: e.target.value }))}
+                              required
+                              rows={2}
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="keyBenefitsApproval">Key Benefits/Impact</Label>
+                            <Textarea
+                              id="keyBenefitsApproval"
+                              placeholder="e.g., 50% cost reduction, improved efficiency, market expansion..."
+                              value={pressReleaseData.keyBenefits}
+                              onChange={(e) => setPressReleaseData(prev => ({ ...prev, keyBenefits: e.target.value }))}
+                              required
+                              rows={2}
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="companyBackgroundApproval">Company Background</Label>
+                            <Textarea
+                              id="companyBackgroundApproval"
+                              placeholder="Brief company description, founding year, mission..."
+                              value={pressReleaseData.companyBackground}
+                              onChange={(e) => setPressReleaseData(prev => ({ ...prev, companyBackground: e.target.value }))}
+                              required
+                              rows={2}
+                            />
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          onClick={handleApprovalAndDraft}
+                          className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
+                          disabled={isLoading || !pressReleaseData.companyName || !pressReleaseData.announcement}
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Drafting Press Release...
+                            </>
+                          ) : (
+                            <>
+                              <PenTool className="h-4 w-4 mr-2" />
+                              Approve & Draft Press Release
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : workflowStep === 'complete' && draftedPressRelease ? (
+                    <div className="space-y-4">
+                      <div className="bg-gradient-card p-4 rounded-lg border max-h-96 overflow-y-auto">
+                        <h4 className="font-semibold mb-2">Your Professional Press Release:</h4>
+                        <div className="prose prose-sm max-w-none">
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                            {draftedPressRelease}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => navigator.clipboard.writeText(draftedPressRelease)}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          Copy to Clipboard
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            resetForm();
+                            setWorkflowStep('strategy');
+                          }}
+                          className="flex-1"
+                        >
+                          Start New Project
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-gradient-card p-4 rounded-lg border">
+                      <div className="prose prose-sm max-w-none">
+                        <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                          {recommendation}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </CardContent>
