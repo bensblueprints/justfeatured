@@ -42,15 +42,11 @@ const ALL_FIELDS = [
 
 /**
  * Fetch all publications from the database with security filtering
+ * Contact information is automatically masked for non-admin users
  */
 export const fetchPublications = async (): Promise<Publication[]> => {
-  const fields = ALL_FIELDS.join(',');
-
   const { data, error } = await supabase
-    .from('publications')
-    .select(fields)
-    .eq('is_active', true)
-    .order('popularity', { ascending: false });
+    .rpc('get_publications_for_user');
 
   if (error) {
     console.error('Error fetching publications:', error);
@@ -58,7 +54,8 @@ export const fetchPublications = async (): Promise<Publication[]> => {
   }
 
   // Transform database records to match the Publication type
-  return data.map((record: any) => ({
+  // Contact info is already masked by the database function for non-admins
+  return data?.map((record: any) => ({
     id: record.id,
     external_id: record.external_id,
     name: record.name,
@@ -86,101 +83,99 @@ export const fetchPublications = async (): Promise<Publication[]> => {
     gambling: record.gambling,
     created_at: record.created_at,
     updated_at: record.updated_at,
-  }));
+  })) || [];
 };
 
 /**
- * Fetch publications by tier
+ * Fetch publications by tier (secured)
  */
 export const fetchPublicationsByTier = async (tier: string): Promise<Publication[]> => {
   const { data, error } = await supabase
-    .from('publications')
-    .select('*')
-    .eq('tier', tier)
-    .eq('is_active', true)
-    .order('price', { ascending: false });
+    .rpc('get_publications_for_user');
 
   if (error) {
     console.error('Error fetching publications by tier:', error);
     return [];
   }
 
-  return data.map(record => ({
-    id: record.id,
-    external_id: record.external_id,
-    name: record.name,
-    type: record.type,
-    category: record.category,
-    price: record.price,
-    tat_days: record.tat_days,
-    description: record.description,
-    features: record.features || [],
-    logo_url: record.logo_url,
-    website_url: record.website_url,
-    tier: record.tier,
-    popularity: record.popularity || 0,
-    is_active: record.is_active,
-    da_score: record.da_score,
-    dr_score: record.dr_score,
-    location: record.location,
-    dofollow_link: record.dofollow_link,
-    sponsored: record.sponsored,
-    indexed: record.indexed,
-    erotic: record.erotic,
-    health: record.health,
-    cbd: record.cbd,
-    crypto: record.crypto,
-    gambling: record.gambling,
-    created_at: record.created_at,
-    updated_at: record.updated_at,
-  }));
+  return (data || [])
+    .filter(record => record.tier === tier)
+    .sort((a, b) => (b.price || 0) - (a.price || 0))
+    .map(record => ({
+      id: record.id,
+      external_id: record.external_id,
+      name: record.name,
+      type: record.type,
+      category: record.category,
+      price: record.price,
+      tat_days: record.tat_days,
+      description: record.description,
+      features: record.features || [],
+      logo_url: record.logo_url,
+      website_url: record.website_url,
+      tier: record.tier,
+      popularity: record.popularity || 0,
+      is_active: record.is_active,
+      da_score: record.da_score,
+      dr_score: record.dr_score,
+      location: record.location,
+      dofollow_link: record.dofollow_link,
+      sponsored: record.sponsored,
+      indexed: record.indexed,
+      erotic: record.erotic,
+      health: record.health,
+      cbd: record.cbd,
+      crypto: record.crypto,
+      gambling: record.gambling,
+      created_at: record.created_at,
+      updated_at: record.updated_at,
+    }));
 };
 
 /**
- * Fetch publications by category
+ * Fetch publications by category (secured)
  */
 export const fetchPublicationsByCategory = async (category: string): Promise<Publication[]> => {
   const { data, error } = await supabase
-    .from('publications')
-    .select('*')
-    .eq('category', category)
-    .eq('is_active', true)
-    .order('price', { ascending: false });
+    .rpc('get_publications_for_user');
 
   if (error) {
     console.error('Error fetching publications by category:', error);
     return [];
   }
 
-  return data.map(record => ({
-    id: record.id,
-    external_id: record.external_id,
-    name: record.name,
-    type: record.type,
-    category: record.category,
-    price: record.price,
-    tat_days: record.tat_days,
-    description: record.description,
-    features: record.features || [],
-    logo_url: record.logo_url,
-    website_url: record.website_url,
-    tier: record.tier,
-    popularity: record.popularity || 0,
-    is_active: record.is_active,
-    da_score: record.da_score,
-    dr_score: record.dr_score,
-    location: record.location,
-    dofollow_link: record.dofollow_link,
-    sponsored: record.sponsored,
-    indexed: record.indexed,
-    erotic: record.erotic,
-    health: record.health,
-    cbd: record.cbd,
-    crypto: record.crypto,
-    gambling: record.gambling,
-    created_at: record.created_at,
-    updated_at: record.updated_at,
-  }));
+  return (data || [])
+    .filter(record => record.category === category)
+    .sort((a, b) => (b.price || 0) - (a.price || 0))
+    .map(record => ({
+      id: record.id,
+      external_id: record.external_id,
+      name: record.name,
+      type: record.type,
+      category: record.category,
+      price: record.price,
+      tat_days: record.tat_days,
+      description: record.description,
+      features: record.features || [],
+      logo_url: record.logo_url,
+      website_url: record.website_url,
+      tier: record.tier,
+      popularity: record.popularity || 0,
+      is_active: record.is_active,
+      da_score: record.da_score,
+      dr_score: record.dr_score,
+      location: record.location,
+      dofollow_link: record.dofollow_link,
+      sponsored: record.sponsored,
+      indexed: record.indexed,
+      erotic: record.erotic,
+      health: record.health,
+      cbd: record.cbd,
+      crypto: record.crypto,
+      gambling: record.gambling,
+      created_at: record.created_at,
+      updated_at: record.updated_at,
+    }));
 };
 
 /**

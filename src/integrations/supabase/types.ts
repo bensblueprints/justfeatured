@@ -117,6 +117,21 @@ export type Database = {
           },
         ]
       }
+      popup_emails: {
+        Row: {
+          created_at: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       post_checkout_info: {
         Row: {
           additional_info: string | null
@@ -379,6 +394,41 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_publications_for_user: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          category: string
+          cbd: boolean
+          contact_info: string
+          created_at: string
+          crypto: boolean
+          da_score: number
+          description: string
+          dofollow_link: boolean
+          dr_score: number
+          erotic: boolean
+          external_id: string
+          features: string[]
+          gambling: boolean
+          health: boolean
+          id: string
+          indexed: boolean
+          is_active: boolean
+          location: string
+          logo_url: string
+          monthly_readers: number
+          name: string
+          popularity: number
+          price: number
+          sponsored: boolean
+          status: Database["public"]["Enums"]["publication_status"]
+          tat_days: string
+          tier: string
+          type: string
+          updated_at: string
+          website_url: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
