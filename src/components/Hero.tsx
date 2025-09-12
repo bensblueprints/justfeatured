@@ -9,9 +9,9 @@ export const Hero = () => {
   const { publications } = usePublicationsSync();
 
 
-  // Get featured publications prioritizing premium outlets and quality logos
+  // Get featured publications with valid logos only
   const featuredPublications = publications
-    .filter(pub => pub.is_active && pub.tier) // Only active publications with tier info
+    .filter(pub => pub.is_active && pub.tier && pub.logo_url) // Only active publications with actual logo URLs
     .sort((a, b) => {
       // Prioritize by tier (Premium > Standard > Basic), then by popularity
       const tierOrder = { 'Premium': 3, 'Standard': 2, 'Basic': 1 };
@@ -20,10 +20,10 @@ export const Hero = () => {
       if (aTier !== bTier) return bTier - aTier;
       return (b.popularity || 0) - (a.popularity || 0);
     })
-    .slice(0, 80) // Increase to 80 publications for better representation
+    .slice(0, 80)
     .map(pub => ({
       name: pub.name,
-      logoUrl: pub.logo_url || `https://logo.clearbit.com/${pub.website_url?.replace(/https?:\/\//, '').split('/')[0]}`,
+      logoUrl: pub.logo_url!, // We know it exists due to filter
       tier: pub.tier,
       website_url: pub.website_url
     }));
@@ -124,31 +124,22 @@ export const Hero = () => {
                  <div className="overflow-hidden">
                    <div className="flex animate-scroll whitespace-nowrap">
                      {duplicatedPublications.map((publication, index) => (
-                       <div key={`${publication.name}-${index}`} className="flex items-center space-x-8 mx-6">
-                         <div className="flex items-center space-x-3">
-                            <img 
-                              src={publication.logoUrl} 
-                              alt={publication.name}
-                              className="h-8 w-auto object-contain filter brightness-0 invert opacity-90 hover:opacity-100 transition-all duration-300"
-                              style={{ maxHeight: '32px', maxWidth: '120px' }}
-                             onError={(e) => {
-                               // Enhanced fallback with premium styling
-                               const target = e.target as HTMLImageElement;
-                               const fallbackUrl = `https://www.google.com/s2/favicons?domain=${publication.website_url || publication.name.toLowerCase().replace(/\s+/g, '') + '.com'}&sz=64`;
-                               if (target.src !== fallbackUrl) {
-                                 target.src = fallbackUrl;
-                               } else {
+                        <div key={`${publication.name}-${index}`} className="flex items-center space-x-8 mx-6">
+                          <div className="flex items-center space-x-3">
+                             <img 
+                               src={publication.logoUrl} 
+                               alt={publication.name}
+                               className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-105"
+                               style={{ maxHeight: '48px', maxWidth: '120px' }}
+                               loading="lazy"
+                               onError={(e) => {
+                                 const target = e.target as HTMLImageElement;
                                  target.style.display = 'none';
-                                 target.nextElementSibling!.classList.remove('hidden');
-                               }
-                             }}
-                           />
-                           <div className="hidden bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-white font-bold text-sm border border-white/30 shadow-lg">
-                             {publication.name}
-                           </div>
-                         </div>
-                         <span className="text-white/60 text-lg">•</span>
-                       </div>
+                               }}
+                            />
+                          </div>
+                          <span className="text-white/60 text-lg">•</span>
+                        </div>
                      ))}
                    </div>
                  </div>
@@ -178,27 +169,19 @@ export const Hero = () => {
               AS SEEN IN
             </p>
              <div className="flex justify-center items-center gap-8 flex-wrap">
-               {featuredPublications.slice(0, 8).map((publication, index) => (
+               {featuredPublications.slice(0, 12).map((publication, index) => (
                  <div key={`bottom-${publication.name}-${index}`} className="h-12 flex items-center">
                     <img 
                       src={publication.logoUrl} 
                       alt={publication.name}
-                      className="h-12 w-auto max-w-28 object-contain bg-white/20 backdrop-blur-sm rounded-lg p-2 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer shadow-lg border border-white/20"
-                     onError={(e) => {
-                       // Enhanced fallback with better logos
-                       const target = e.target as HTMLImageElement;
-                       const fallbackUrl = `https://www.google.com/s2/favicons?domain=${publication.website_url || publication.name.toLowerCase().replace(/\s+/g, '') + '.com'}&sz=64`;
-                       if (target.src !== fallbackUrl) {
-                         target.src = fallbackUrl;
-                       } else {
-                         target.style.display = 'none';
-                         target.nextElementSibling!.classList.remove('hidden');
-                       }
-                     }}
+                      className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
+                      style={{ maxHeight: '48px', maxWidth: '120px' }}
+                      loading="lazy"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
                    />
-                   <div className="hidden h-12 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center justify-center text-white font-bold text-sm border border-white/30 shadow-lg">
-                     {publication.name}
-                   </div>
                  </div>
                ))}
              </div>
