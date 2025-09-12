@@ -210,7 +210,7 @@ export const Hero = () => {
                      <img 
                        src={publication.logoUrl} 
                        alt={publication.name}
-                       className="h-24 md:h-28 w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
+                       className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
                        
                        loading="lazy"
                        onError={(e) => {
