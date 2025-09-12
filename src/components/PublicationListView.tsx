@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Search, Eye, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Eye, ExternalLink, ShoppingCart } from "lucide-react";
 import { Publication } from "@/types";
 
 interface PublicationListViewProps {
@@ -264,8 +264,19 @@ export const PublicationListView = ({
                   />
                 </TableCell>
                 <TableCell className="font-medium max-w-[200px]">
-                  <div className="truncate" title={publication.name}>
-                    {publication.name}
+                  <div className="space-y-2">
+                    <div className="truncate" title={publication.name}>
+                      {publication.name}
+                    </div>
+                    <Button
+                      variant={selectedPublications.includes(publication.id) ? "secondary" : "default"}
+                      size="sm"
+                      onClick={() => onSelectionChange(publication.id, !selectedPublications.includes(publication.id))}
+                      className="h-6 px-3 text-xs"
+                    >
+                      <ShoppingCart className="h-3 w-3 mr-1" />
+                      {selectedPublications.includes(publication.id) ? "Remove" : "Add to Cart"}
+                    </Button>
                   </div>
                 </TableCell>
                 <TableCell>
