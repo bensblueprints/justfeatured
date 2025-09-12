@@ -68,9 +68,9 @@ serve(async (req) => {
 
         // Extract domain from the first email
         const email = emails[0];
-        const domain = email.split('@')[1];
+        const emailParts = email.split('@');
         
-        if (!domain) {
+        if (emailParts.length !== 2 || !emailParts[1]) {
           console.log(`Invalid email format for: ${publication.name} - ${email}`);
           results.push({ 
             id: publication.id, 
@@ -81,7 +81,15 @@ serve(async (req) => {
           continue;
         }
 
-        // Create website URL
+        // Get the clean domain (remove any contact@ or other prefixes)
+        let domain = emailParts[1].toLowerCase().trim();
+        
+        // Remove common subdomains if they exist
+        if (domain.startsWith('www.')) {
+          domain = domain.substring(4);
+        }
+        
+        // Create website URL with just the root domain
         const websiteUrl = `https://${domain}`;
         
         console.log(`Extracted domain for ${publication.name}: ${domain} -> ${websiteUrl}`);
