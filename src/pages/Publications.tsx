@@ -294,43 +294,27 @@ export const Publications = () => {
             </Select>
           </div>
 
-          {/* Category Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2">
-              <TabsList className="col-span-full grid grid-cols-10 h-auto p-1">
-                <TabsTrigger value="all" className="text-xs px-2 py-2">
-                  All ({tabCounts.all})
-                </TabsTrigger>
-                <TabsTrigger value="nonsponsored" className="text-xs px-2 py-2">
-                  NonSponsored ({tabCounts.nonsponsored})
-                </TabsTrigger>
-                <TabsTrigger value="dofollow" className="text-xs px-2 py-2">
-                  DoFollow ({tabCounts.dofollow})
-                </TabsTrigger>
-                <TabsTrigger value="bestsellers" className="text-xs px-2 py-2">
-                  Best Sellers ({tabCounts.bestsellers})
-                </TabsTrigger>
-                <TabsTrigger value="listicles" className="text-xs px-2 py-2">
-                  Listicles ({tabCounts.listicles})
-                </TabsTrigger>
-                <TabsTrigger value="bundles" className="text-xs px-2 py-2">
-                  PR Bundles ({tabCounts.bundles})
-                </TabsTrigger>
-                <TabsTrigger value="print" className="text-xs px-2 py-2">
-                  Print ({tabCounts.print})
-                </TabsTrigger>
-                <TabsTrigger value="digitaltv" className="text-xs px-2 py-2">
-                  Digital TV ({tabCounts.digitaltv})
-                </TabsTrigger>
-                <TabsTrigger value="broadcasttv" className="text-xs px-2 py-2">
-                  Broadcast TV ({tabCounts.broadcasttv})
-                </TabsTrigger>
-                <TabsTrigger value="socialpost" className="text-xs px-2 py-2">
-                  Social Post ({tabCounts.socialpost})
-                </TabsTrigger>
-              </TabsList>
-            </div>
-          </Tabs>
+          {/* Category Filter Dropdown */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-2">Filter by Category</label>
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="w-full bg-background border border-border">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent className="z-50 bg-background border border-border shadow-lg">
+                <SelectItem value="all">All ({tabCounts.all})</SelectItem>
+                <SelectItem value="nonsponsored">NonSponsored ({tabCounts.nonsponsored})</SelectItem>
+                <SelectItem value="dofollow">DoFollow ({tabCounts.dofollow})</SelectItem>
+                <SelectItem value="bestsellers">Best Sellers ({tabCounts.bestsellers})</SelectItem>
+                <SelectItem value="listicles">Listicles ({tabCounts.listicles})</SelectItem>
+                <SelectItem value="bundles">PR Bundles ({tabCounts.bundles})</SelectItem>
+                <SelectItem value="print">Print ({tabCounts.print})</SelectItem>
+                <SelectItem value="digitaltv">Digital TV ({tabCounts.digitaltv})</SelectItem>
+                <SelectItem value="broadcasttv">Broadcast TV ({tabCounts.broadcasttv})</SelectItem>
+                <SelectItem value="socialpost">Social Post ({tabCounts.socialpost})</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
