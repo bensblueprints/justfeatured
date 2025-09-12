@@ -1,68 +1,93 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Star, TrendingUp, Zap, Sparkles, CheckCircle } from "lucide-react";
+import { ArrowRight, Star, TrendingUp, Zap, Sparkles, CheckCircle, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
+import { useCart } from "@/hooks/useCart";
+import { useToast } from "@/hooks/use-toast";
 
 export const Hero = () => {
   const navigate = useNavigate();
   const { publications } = usePublicationsSync();
+  const { addToCart, isInCart } = useCart();
+  const { toast } = useToast();
 
 
-  // Only show the specific publications that are in the database
+  // Match publications from database with static display data
   const featuredPublications = [
     {
       name: 'Forbes USA',
       logoUrl: '/assets/logos/forbes.png',
       website_url: 'https://forbes.com',
-      tier: 'Premium'
+      tier: 'Premium',
+      dbId: '77e9cab4-0da1-4b79-8d3e-b816047be5c1'
     },
     {
       name: 'Reuters',
       logoUrl: '/assets/logos/reuters.png',
       website_url: 'https://reuters.com',
-      tier: 'Premium'
+      tier: 'Premium',
+      dbId: null // Not available in database
     },
     {
       name: 'Bloomberg',
       logoUrl: '/assets/logos/bloomberg.png',
       website_url: 'https://bloomberg.com',
-      tier: 'Premium'
+      tier: 'Premium',
+      dbId: '83a6bd7d-0ac9-4ac8-a531-ac3a9cc525e1'
     },
     {
       name: 'TIME',
       logoUrl: '/assets/logos/time.png',
       website_url: 'https://time.com',
-      tier: 'Premium'
+      tier: 'Premium',
+      dbId: null // Not available in database
     },
     {
       name: 'Yahoo',
       logoUrl: '/assets/logos/yahoo.png',
       website_url: 'https://yahoo.com',
-      tier: 'Premium'
+      tier: 'Premium',
+      dbId: null // Not available in database
     },
     {
       name: 'Business Insider',
       logoUrl: '/assets/logos/business-insider.png',
       website_url: 'https://businessinsider.com',
-      tier: 'Premium'
+      tier: 'Premium',
+      dbId: null // Not available in database
     },
     {
       name: 'Benzinga',
       logoUrl: '/assets/logos/benzinga.png',
       website_url: 'https://benzinga.com',
-      tier: 'Premium'
+      tier: 'Premium',
+      dbId: '723edcb8-e551-4e1a-9d6e-34a9b376a046'
     },
     {
       name: 'Billboard',
       logoUrl: '/assets/logos/billboard.png',
       website_url: 'https://billboard.com',
-      tier: 'Premium'
+      tier: 'Premium',
+      dbId: null // Not available in database
     }
   ];
 
-  // Duplicate for seamless scrolling
-  const duplicatedPublications = [...featuredPublications, ...featuredPublications];
+  const handleAddToCart = (publication: any) => {
+    if (publication.dbId) {
+      addToCart(publication.dbId);
+      toast({
+        title: "Added to Cart",
+        description: `${publication.name} has been added to your cart.`,
+      });
+    } else {
+      toast({
+        title: "Publication Unavailable",
+        description: `${publication.name} is not available for selection at the moment.`,
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <section className="hero-section purple-section relative min-h-screen overflow-hidden">
@@ -152,19 +177,46 @@ export const Hero = () => {
               <p className="text-lg md:text-xl mb-6 uppercase tracking-wider font-bold text-white">
                 Get Featured In 1241 Publications
               </p>
-              <div className="flex justify-center items-center gap-8 flex-wrap">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
                 {featuredPublications.map((publication, index) => (
-                  <div key={`featured-${publication.name}-${index}`} className="h-12 flex items-center">
+                  <div key={`featured-${publication.name}-${index}`} className="flex flex-col items-center bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                    <div className="h-16 flex items-center justify-center mb-3 w-full">
                       <img 
                         src={publication.logoUrl} 
                         alt={publication.name}
-                        className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
+                        className="h-12 w-auto object-contain transition-all duration-300"
                         loading="lazy"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
                         }}
-                     />
+                      />
+                    </div>
+                    <h3 className="text-white text-sm font-medium text-center mb-3 min-h-[2rem] flex items-center">
+                      {publication.name}
+                    </h3>
+                    <Button
+                      onClick={() => handleAddToCart(publication)}
+                      disabled={!publication.dbId || isInCart(publication.dbId)}
+                      className="w-full bg-primary hover:bg-primary/80 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      size="sm"
+                    >
+                      {publication.dbId ? (
+                        isInCart(publication.dbId) ? (
+                          <>
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Added
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="h-4 w-4 mr-1" />
+                            Add to Cart
+                          </>
+                        )
+                      ) : (
+                        'Unavailable'
+                      )}
+                    </Button>
                   </div>
                 ))}
               </div>
