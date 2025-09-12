@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 import { useState, useEffect } from "react";
 import { BrandFetchService } from "@/utils/brandFetch";
+import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 
 export const Hero = () => {
   const navigate = useNavigate();
   const [brandLogos, setBrandLogos] = useState<{ [key: string]: string }>({});
+  const { publications } = usePublicationsSync();
 
   // Define brands to fetch logos for
   const featuredBrands = [
@@ -126,7 +128,7 @@ export const Hero = () => {
               <Button 
                 className="bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 hover:border-white/50 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 group shadow-lg hover:shadow-xl"
               >
-                BROWSE OVER 1,200 PUBLICATIONS
+                BROWSE OVER {publications.length} PUBLICATIONS
                 <Sparkles className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
               </Button>
             </ProtectedInteraction>
