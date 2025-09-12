@@ -39,6 +39,7 @@ interface SyncStatus {
   processed: number;
   added: number;
   updated: number;
+  skipped: number;
   errors: number;
   currentItem?: string;
 }
@@ -66,6 +67,40 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
         
         return row;
       });
+  };
+
+  const checkForChanges = (existing: any, newData: any): string[] => {
+    const changes: string[] = [];
+    const fieldsToCheck = [
+      'price', 'da_score', 'dr_score', 'category', 'tat_days', 'description',
+      'website_url', 'location', 'dofollow_link', 'sponsored', 'indexed',
+      'erotic', 'health', 'cbd', 'crypto', 'gambling', 'type', 'tier'
+    ];
+
+    fieldsToCheck.forEach(field => {
+      const existingValue = existing[field];
+      const newValue = newData[field];
+      
+      // Handle different types of comparisons
+      if (typeof existingValue === 'boolean' && typeof newValue === 'boolean') {
+        if (existingValue !== newValue) {
+          changes.push(field);
+        }
+      } else if (typeof existingValue === 'number' && typeof newValue === 'number') {
+        if (Math.abs(existingValue - newValue) > 0.01) { // Handle floating point precision
+          changes.push(field);
+        }
+      } else {
+        // String comparison (handle nulls and undefined)
+        const existingStr = (existingValue || '').toString().trim();
+        const newStr = (newValue || '').toString().trim();
+        if (existingStr !== newStr) {
+          changes.push(field);
+        }
+      }
+    });
+
+    return changes;
   };
 
   const convertToPublication = (row: CSVRow, index: number) => {
@@ -138,7 +173,7 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
 
     setIsProcessing(true);
     setErrors([]);
-    setSyncStatus({ total: 0, processed: 0, added: 0, updated: 0, errors: 0 });
+    setSyncStatus({ total: 0, processed: 0, added: 0, updated: 0, skipped: 0, errors: 0 });
 
     try {
       console.log('Starting spreadsheet processing...');
@@ -162,9 +197,10 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
 
       setSyncStatus(prev => prev ? { ...prev, total: rows.length } : null);
 
-      const errorList: string[] = [];
       let added = 0;
       let updated = 0;
+      let skipped = 0;
+      const errorList: string[] = [];
 
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
@@ -185,15 +221,24 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
           console.log(`Publication "${publicationData.name}" exists: ${existsAlready}`);
           
           if (existsAlready) {
-            // Update existing publication
+            // Update existing publication if there are changes
             const existingPub = existingPublications.find(p => 
               p.name.toLowerCase().trim() === publicationData.name.toLowerCase().trim()
             );
+            
             if (existingPub?.external_id) {
-              console.log(`Updating publication: ${publicationData.name}`);
-              await updatePublication(existingPub.external_id, publicationData);
-              updated++;
-              console.log(`Successfully updated: ${publicationData.name}`);
+              // Compare fields to see if update is needed
+              const hasChanges = checkForChanges(existingPub, publicationData);
+              
+              if (hasChanges.length > 0) {
+                console.log(`Updating publication "${publicationData.name}" - Changes detected in: ${hasChanges.join(', ')}`);
+                await updatePublication(existingPub.external_id, publicationData);
+                updated++;
+                console.log(`Successfully updated: ${publicationData.name}`);
+              } else {
+                console.log(`Skipping "${publicationData.name}" - No changes detected`);
+                skipped++;
+              }
             }
           } else {
             // Add new publication
@@ -216,12 +261,13 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
         }
       }
 
-      console.log(`Processing complete. Added: ${added}, Updated: ${updated}, Errors: ${errorList.length}`);
+      console.log(`Processing complete. Added: ${added}, Updated: ${updated}, Skipped: ${skipped}, Errors: ${errorList.length}`);
 
       setSyncStatus(prev => prev ? { 
         ...prev, 
         added, 
         updated, 
+        skipped,
         errors: errorList.length,
         currentItem: undefined
       } : null);
@@ -232,7 +278,7 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
 
       toast({
         title: isSuccess ? "Sync Complete" : "Sync Completed with Errors",
-        description: `Added ${added} new publications, updated ${updated} existing ones. ${errorList.length} errors.`,
+        description: `Added ${added} new, updated ${updated}, skipped ${skipped} unchanged. ${errorList.length} errors.`,
         variant: isSuccess ? "default" : "destructive",
       });
 
@@ -332,8 +378,8 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
                 <span className="font-medium text-blue-600">{syncStatus.updated}</span>
               </div>
               <div className="flex justify-between">
-                <span>Processed:</span>
-                <span className="font-medium">{syncStatus.processed}</span>
+                <span>Skipped:</span>
+                <span className="font-medium text-gray-600">{syncStatus.skipped}</span>
               </div>
               <div className="flex justify-between">
                 <span>Errors:</span>
@@ -363,7 +409,7 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
           <Alert className="border-green-200 bg-green-50">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-700 text-xs">
-              Sync completed! {syncStatus.added} added, {syncStatus.updated} updated.
+              Sync completed! {syncStatus.added} added, {syncStatus.updated} updated, {syncStatus.skipped} skipped.
             </AlertDescription>
           </Alert>
         )}
