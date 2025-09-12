@@ -64,6 +64,24 @@ export const Hero = () => {
       logoUrl: '/assets/logos/billboard.png',
       website_url: 'https://billboard.com',
       tier: 'Premium'
+    },
+    {
+      name: 'The Hollywood Reporter',
+      logoUrl: '/assets/logos/hollywood-reporter.png',
+      website_url: 'https://hollywoodreporter.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Rolling Stone',
+      logoUrl: '/assets/logos/rolling-stone.png',
+      website_url: 'https://rollingstone.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Hypebeast',
+      logoUrl: '/assets/logos/hypebeast.png',
+      website_url: 'https://hypebeast.com',
+      tier: 'Premium'
     }
   ];
 
