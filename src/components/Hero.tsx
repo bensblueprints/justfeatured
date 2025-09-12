@@ -1,100 +1,65 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Star, TrendingUp, Zap, Sparkles, CheckCircle, ShoppingCart } from "lucide-react";
+import { ArrowRight, Star, TrendingUp, Zap, Sparkles, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
-import { useCart } from "@/hooks/useCart";
-import { useToast } from "@/hooks/use-toast";
 
 export const Hero = () => {
   const navigate = useNavigate();
   const { publications } = usePublicationsSync();
-  const { addToCart, isInCart } = useCart();
-  const { toast } = useToast();
 
 
-  // Get most popular publications from database (top tier publications)
-  const getPopularPublications = () => {
-    if (!publications || publications.length === 0) {
-      // Fallback to static data if database isn't loaded yet
-      return [
-        {
-          id: 'forbes-static',
-          name: 'Forbes USA',
-          logo_url: '/assets/logos/forbes.png',
-          website_url: 'https://forbes.com',
-          tier: 'Premium'
-        },
-        {
-          id: 'reuters-static',
-          name: 'Reuters',
-          logo_url: '/assets/logos/reuters.png',
-          website_url: 'https://reuters.com',
-          tier: 'Premium'
-        },
-        {
-          id: 'bloomberg-static',
-          name: 'Bloomberg',
-          logo_url: '/assets/logos/bloomberg.png',
-          website_url: 'https://bloomberg.com',
-          tier: 'Premium'
-        },
-        {
-          id: 'time-static',
-          name: 'TIME',
-          logo_url: '/assets/logos/time.png',
-          website_url: 'https://time.com',
-          tier: 'Premium'
-        },
-        {
-          id: 'yahoo-static',
-          name: 'Yahoo',
-          logo_url: '/assets/logos/yahoo.png',
-          website_url: 'https://yahoo.com',
-          tier: 'Premium'
-        },
-        {
-          id: 'business-insider-static',
-          name: 'Business Insider',
-          logo_url: '/assets/logos/business-insider.png',
-          website_url: 'https://businessinsider.com',
-          tier: 'Premium'
-        },
-        {
-          id: 'benzinga-static',
-          name: 'Benzinga',
-          logo_url: '/assets/logos/benzinga.png',
-          website_url: 'https://benzinga.com',
-          tier: 'Premium'
-        },
-        {
-          id: 'billboard-static',
-          name: 'Billboard',
-          logo_url: '/assets/logos/billboard.png',
-          website_url: 'https://billboard.com',
-          tier: 'Premium'
-        }
-      ];
+  // Only show the specific publications that are in the database
+  const featuredPublications = [
+    {
+      name: 'Forbes USA',
+      logoUrl: '/assets/logos/forbes.png',
+      website_url: 'https://forbes.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Reuters',
+      logoUrl: '/assets/logos/reuters.png',
+      website_url: 'https://reuters.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Bloomberg',
+      logoUrl: '/assets/logos/bloomberg.png',
+      website_url: 'https://bloomberg.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'TIME',
+      logoUrl: '/assets/logos/time.png',
+      website_url: 'https://time.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Yahoo',
+      logoUrl: '/assets/logos/yahoo.png',
+      website_url: 'https://yahoo.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Business Insider',
+      logoUrl: '/assets/logos/business-insider.png',
+      website_url: 'https://businessinsider.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Benzinga',
+      logoUrl: '/assets/logos/benzinga.png',
+      website_url: 'https://benzinga.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Billboard',
+      logoUrl: '/assets/logos/billboard.png',
+      website_url: 'https://billboard.com',
+      tier: 'Premium'
     }
-    
-    // Return top tier publications from database, sorted by popularity
-    return publications
-      .filter(pub => pub.tier === 'premium' && pub.logo_url)
-      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
-      .slice(0, 8);
-  };
-
-  const featuredPublications = getPopularPublications();
-
-  const handleAddToCart = (publication: any) => {
-    if (publication.id) {
-      addToCart(publication.id);
-      toast({
-        title: "Added to Cart",
-        description: `${publication.name} has been added to your cart.`,
-      });
-    }
-  };
+  ];
 
   // Duplicate for seamless scrolling
   const duplicatedPublications = [...featuredPublications, ...featuredPublications];
@@ -189,30 +154,17 @@ export const Hero = () => {
               </p>
               <div className="flex justify-center items-center gap-8 flex-wrap">
                 {featuredPublications.map((publication, index) => (
-                  <div key={`featured-${publication.name}-${index}`} className="relative group">
-                    <div 
-                      className="h-12 flex items-center cursor-pointer transition-all duration-300 hover:scale-110 relative"
-                      onClick={() => handleAddToCart(publication)}
-                    >
+                  <div key={`featured-${publication.name}-${index}`} className="h-12 flex items-center">
                       <img 
-                        src={publication.logo_url} 
+                        src={publication.logoUrl} 
                         alt={publication.name}
-                        className="h-10 md:h-12 w-auto object-contain"
+                        className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
                         loading="lazy"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
                         }}
-                      />
-                      
-                      {/* Add to Cart Overlay */}
-                      <div className="absolute inset-0 bg-primary/90 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <div className="flex items-center gap-2 text-white font-semibold text-sm">
-                          <ShoppingCart className="h-4 w-4" />
-                          {isInCart(publication.id) ? 'In Cart' : 'Add to Cart'}
-                        </div>
-                      </div>
-                    </div>
+                     />
                   </div>
                 ))}
               </div>
