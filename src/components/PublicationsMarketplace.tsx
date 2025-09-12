@@ -4,34 +4,16 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { BrandFetchService } from "@/utils/brandFetch";
-import { fetchPublicationsByTier } from "@/lib/publications";
-import { Publication } from "@/types";
+import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 
 export const PublicationsMarketplace = () => {
   const navigate = useNavigate();
   const [logos, setLogos] = useState<Record<string, string>>({});
-  const [publications, setPublications] = useState<Publication[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { publications, loading } = usePublicationsSync();
 
-  // Fetch publications from database
-  useEffect(() => {
-    const loadPublications = async () => {
-      try {
-        const data = await fetchPublicationsByTier('starter');
-        setPublications(data);
-      } catch (error) {
-        console.error('Error loading publications:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPublications();
-  }, []);
-
-  // Get starter package publications
+  // Get top publications based on popularity
   const popularPublications = publications
-    .filter(pub => pub.is_active && (pub.type === 'starter' || pub.tier === 'starter'))
+    .filter(pub => pub.is_active && pub.price > 0) // Only show publications with valid prices
     .sort((a, b) => b.popularity - a.popularity)
     .slice(0, 8);
 
@@ -61,13 +43,12 @@ export const PublicationsMarketplace = () => {
   }, [publications, popularPublications]);
 
   const formatPrice = (price: number) => {
-    if (price >= 1000000) {
-      return `$${(price / 1000000).toFixed(0)}k`;
-    } else if (price >= 100000) {
-      return `$${(price / 100000).toFixed(0)}00`;
-    } else {
-      return `$${price}`;
-    }
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
   };
 
   const getTierColor = (type: string) => {
@@ -89,7 +70,7 @@ export const PublicationsMarketplace = () => {
             Most Popular Publications
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Get featured in these top-rated news outlets trusted by thousands of businesses. Browse over 1,200 publications.
+            Get featured in these top-rated news outlets trusted by thousands of businesses. Browse over {publications.length} publications.
           </p>
         </div>
 
@@ -139,14 +120,7 @@ export const PublicationsMarketplace = () => {
                   {publication.name}
                 </CardTitle>
                 <div className={`text-lg font-bold ${publication.type === 'exclusive' ? 'text-white' : 'text-primary'}`}>
-                  {publication.type === 'starter' ? (
-                    <>
-                      <span className="line-through text-muted-foreground text-sm">$497</span>{" "}
-                      <span>$97</span>
-                    </>
-                  ) : (
-                    formatPrice(publication.price)
-                  )}
+                  {formatPrice(publication.price)}
                 </div>
                 <p className={`text-xs ${publication.type === 'exclusive' ? 'text-white/80' : 'text-muted-foreground'}`}>
                   {publication.tat_days} days delivery
