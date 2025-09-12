@@ -9,24 +9,63 @@ export const Hero = () => {
   const { publications } = usePublicationsSync();
 
 
-  // Get featured publications with valid logos only
-  const featuredPublications = publications
-    .filter(pub => pub.is_active && pub.tier && pub.logo_url) // Only active publications with actual logo URLs
-    .sort((a, b) => {
-      // Prioritize by tier (Premium > Standard > Basic), then by popularity
-      const tierOrder = { 'Premium': 3, 'Standard': 2, 'Basic': 1 };
-      const aTier = tierOrder[a.tier as keyof typeof tierOrder] || 0;
-      const bTier = tierOrder[b.tier as keyof typeof tierOrder] || 0;
-      if (aTier !== bTier) return bTier - aTier;
-      return (b.popularity || 0) - (a.popularity || 0);
-    })
-    .slice(0, 80)
-    .map(pub => ({
-      name: pub.name,
-      logoUrl: pub.logo_url!, // We know it exists due to filter
-      tier: pub.tier,
-      website_url: pub.website_url
-    }));
+  // Curated marquee logos provided by user (natural aspect ratio images)
+  const featuredPublications = [
+    {
+      name: 'Forbes',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/78/Forbes_logo.svg',
+      website_url: 'https://forbes.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'USA Today',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/80/USA_Today_%282020%29.svg',
+      website_url: 'https://usatoday.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'TIME',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Time_Magazine_logo.svg',
+      website_url: 'https://time.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Fox News',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Fox_News_Channel_logo.svg',
+      website_url: 'https://foxnews.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'CBS News',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2b/CBS_News_logo_2020.svg',
+      website_url: 'https://cbsnews.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'NBC',
+      logoUrl: '/lovable-uploads/nbc-logo.png',
+      website_url: 'https://nbc.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Associated Press',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/83/Associated_Press_logo_2012.svg',
+      website_url: 'https://apnews.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Reuters',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/59/Reuters_logo.svg',
+      website_url: 'https://reuters.com',
+      tier: 'Premium'
+    },
+    {
+      name: "Harper's Bazaar",
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Harper%27s_Bazaar_logo.svg',
+      website_url: 'https://harpersbazaar.com',
+      tier: 'Premium'
+    }
+  ];
 
   // Duplicate for seamless scrolling
   const duplicatedPublications = [...featuredPublications, ...featuredPublications];
