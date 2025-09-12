@@ -69,38 +69,37 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
       });
   };
 
-  const checkForChanges = (existing: any, newData: any): string[] => {
-    const changes: string[] = [];
+  const checkForChanges = (existing: any, newData: any): boolean => {
     const fieldsToCheck = [
       'price', 'da_score', 'dr_score', 'category', 'tat_days', 'description',
       'website_url', 'location', 'dofollow_link', 'sponsored', 'indexed',
       'erotic', 'health', 'cbd', 'crypto', 'gambling', 'type', 'tier'
     ];
 
-    fieldsToCheck.forEach(field => {
+    for (const field of fieldsToCheck) {
       const existingValue = existing[field];
       const newValue = newData[field];
       
       // Handle different types of comparisons
       if (typeof existingValue === 'boolean' && typeof newValue === 'boolean') {
         if (existingValue !== newValue) {
-          changes.push(field);
+          return true;
         }
       } else if (typeof existingValue === 'number' && typeof newValue === 'number') {
-        if (Math.abs(existingValue - newValue) > 0.01) { // Handle floating point precision
-          changes.push(field);
+        if (Math.abs(existingValue - newValue) > 0.01) {
+          return true;
         }
       } else {
         // String comparison (handle nulls and undefined)
-        const existingStr = (existingValue || '').toString().trim();
-        const newStr = (newValue || '').toString().trim();
+        const existingStr = String(existingValue || '').trim();
+        const newStr = String(newValue || '').trim();
         if (existingStr !== newStr) {
-          changes.push(field);
+          return true;
         }
       }
-    });
+    }
 
-    return changes;
+    return false;
   };
 
   const convertToPublication = (row: CSVRow, index: number) => {
@@ -230,8 +229,8 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
               // Compare fields to see if update is needed
               const hasChanges = checkForChanges(existingPub, publicationData);
               
-              if (hasChanges.length > 0) {
-                console.log(`Updating publication "${publicationData.name}" - Changes detected in: ${hasChanges.join(', ')}`);
+              if (hasChanges) {
+                console.log(`Updating publication "${publicationData.name}" - Changes detected`);
                 await updatePublication(existingPub.external_id, publicationData);
                 updated++;
                 console.log(`Successfully updated: ${publicationData.name}`);
