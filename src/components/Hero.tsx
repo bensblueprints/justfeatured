@@ -48,12 +48,6 @@ export const Hero = () => {
       tier: 'Premium'
     },
     {
-      name: 'Fox News',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Fox_News_Channel_logo.svg',
-      website_url: 'https://foxnews.com',
-      tier: 'Premium'
-    },
-    {
       name: 'Benzinga',
       logoUrl: '/assets/logos/benzinga.png',
       website_url: 'https://benzinga.com',
@@ -166,7 +160,7 @@ export const Hero = () => {
                               <img 
                                 src={publication.logoUrl} 
                                 alt={publication.name}
-                                className="h-full w-[500px] md:w-[600px] object-fill transition-all duration-300 hover:scale-105"
+                                className="h-20 w-auto object-contain transition-all duration-300 hover:scale-105"
                                 loading="lazy"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
