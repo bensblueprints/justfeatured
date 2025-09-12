@@ -271,6 +271,48 @@ export const updatePublication = async (external_id: string, updates: Partial<Pu
 };
 
 /**
+ * Update an existing publication by id
+ */
+export const updatePublicationById = async (id: string, updates: Partial<Publication>) => {
+  const { data, error } = await supabase
+    .from('publications')
+    .update({
+      name: updates.name,
+      type: updates.type,
+      category: updates.category,
+      price: updates.price,
+      tat_days: updates.tat_days,
+      description: updates.description,
+      features: updates.features,
+      logo_url: updates.logo_url,
+      website_url: updates.website_url,
+      tier: updates.tier,
+      popularity: updates.popularity,
+      is_active: updates.is_active,
+      da_score: updates.da_score,
+      dr_score: updates.dr_score,
+      location: updates.location,
+      dofollow_link: updates.dofollow_link,
+      sponsored: updates.sponsored,
+      indexed: updates.indexed,
+      erotic: updates.erotic,
+      health: updates.health,
+      cbd: updates.cbd,
+      crypto: updates.crypto,
+      gambling: updates.gambling,
+    })
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    console.error('Error updating publication by id:', error);
+    throw error;
+  }
+
+  return data[0];
+};
+
+/**
  * Delete a publication
  */
 export const deletePublication = async (external_id: string) => {

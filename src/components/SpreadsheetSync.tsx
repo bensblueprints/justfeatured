@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { Upload, FileSpreadsheet, RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
-import { addPublication, updatePublication, fetchPublications } from "@/lib/publications";
+import { addPublication, updatePublication, updatePublicationById, fetchPublications } from "@/lib/publications";
 
 interface CSVRow {
   PUBLICATION?: string;
@@ -200,6 +200,7 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
       let updated = 0;
       let skipped = 0;
       const errorList: string[] = [];
+      const newItemsByName = new Map<string, any>();
 
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
@@ -219,34 +220,45 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
           const existsAlready = existingNames.has(publicationData.name.toLowerCase().trim());
           console.log(`Publication "${publicationData.name}" exists: ${existsAlready}`);
           
-          if (existsAlready) {
-            // Update existing publication if there are changes
-            const existingPub = existingPublications.find(p => 
-              p.name.toLowerCase().trim() === publicationData.name.toLowerCase().trim()
-            );
-            
-            if (existingPub?.external_id) {
-              // Compare fields to see if update is needed
-              const hasChanges = checkForChanges(existingPub, publicationData);
-              
-              if (hasChanges) {
-                console.log(`Updating publication "${publicationData.name}" - Changes detected`);
-                await updatePublication(existingPub.external_id, publicationData);
-                updated++;
-                console.log(`Successfully updated: ${publicationData.name}`);
-              } else {
-                console.log(`Skipping "${publicationData.name}" - No changes detected`);
-                skipped++;
-              }
-            }
-          } else {
-            // Add new publication
-            console.log(`Adding new publication: ${publicationData.name}`);
-            const result = await addPublication(publicationData);
-            console.log(`Successfully added: ${publicationData.name}`, result);
-            added++;
-            existingNames.add(publicationData.name.toLowerCase().trim());
-          }
+           if (existsAlready) {
+             // Update existing publication if there are changes
+             const key = publicationData.name.toLowerCase().trim();
+             const existingPubFromDb = existingPublications.find(p => 
+               p.name.toLowerCase().trim() === key
+             );
+             const existingPub = existingPubFromDb || newItemsByName.get(key);
+             
+             const hasChanges = existingPub ? checkForChanges(existingPub, publicationData) : true;
+             
+             if (hasChanges) {
+               console.log(`Updating publication "${publicationData.name}" - Changes detected`);
+               if (existingPub?.external_id) {
+                 await updatePublication(existingPub.external_id, publicationData);
+               } else if (existingPub?.id) {
+                 await updatePublicationById(existingPub.id, publicationData);
+               } else {
+                 // Fallback: create if somehow not found
+                 const result = await addPublication(publicationData);
+                 newItemsByName.set(key, result);
+                 added++;
+                 existingNames.add(key);
+                 continue;
+               }
+               updated++;
+               console.log(`Successfully updated: ${publicationData.name}`);
+             } else {
+               console.log(`Skipping "${publicationData.name}" - No changes detected`);
+               skipped++;
+             }
+           } else {
+             // Add new publication
+             console.log(`Adding new publication: ${publicationData.name}`);
+             const result = await addPublication(publicationData);
+             console.log(`Successfully added: ${publicationData.name}`, result);
+             newItemsByName.set(publicationData.name.toLowerCase().trim(), result);
+             added++;
+             existingNames.add(publicationData.name.toLowerCase().trim());
+           }
 
           // Small delay to prevent overwhelming the database
           if (i % 5 === 0 && i > 0) {
