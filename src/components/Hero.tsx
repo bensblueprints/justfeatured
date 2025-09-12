@@ -146,33 +146,27 @@ export const Hero = () => {
             </ProtectedInteraction>
           </div>
 
-          {/* Floating Publication Cards */}
+          {/* Featured Publications */}
           <div className="relative mb-16 animate-slide-up" style={{ animationDelay: '0.6s' }}>
-            <div className="mb-8">
-              <h3 className="text-xl font-bold mb-6 text-center text-white">Featured in 200+ Major News Outlets</h3>
-              <div className="relative">
-                
-                 <div className="overflow-hidden">
-                   <div className="flex animate-scroll whitespace-nowrap items-center h-56">
-                     {duplicatedPublications.map((publication, index) => (
-                        <div key={`${publication.name}-${index}`} className="flex items-center h-full space-x-8 mx-6">
-                          <div className="flex items-center h-full space-x-3">
-                              <img 
-                                src={publication.logoUrl} 
-                                alt={publication.name}
-                                className="h-48 w-auto object-contain transition-all duration-300 hover:scale-105"
-                                loading="lazy"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                }}
-                             />
-                          </div>
-                          
-                        </div>
-                     ))}
-                   </div>
-                 </div>
+            <div className="text-center mb-8">
+              <p className="text-lg md:text-xl mb-6 uppercase tracking-wider font-bold text-white">
+                Get Featured In 1241 Publications
+              </p>
+              <div className="flex justify-center items-center gap-8 flex-wrap">
+                {featuredPublications.map((publication, index) => (
+                  <div key={`featured-${publication.name}-${index}`} className="h-12 flex items-center">
+                      <img 
+                        src={publication.logoUrl} 
+                        alt={publication.name}
+                        className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                     />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -193,29 +187,6 @@ export const Hero = () => {
             ))}
           </div>
 
-          {/* Premium Social Proof */}
-          <div className="text-center animate-fade-in" style={{ animationDelay: '0.8s' }}>
-            <p className="text-lg md:text-xl mb-6 uppercase tracking-wider font-bold text-white">
-              Get Seen In
-            </p>
-             <div className="flex justify-center items-center gap-8 flex-wrap">
-               {featuredPublications.map((publication, index) => (
-                 <div key={`bottom-${publication.name}-${index}`} className="h-12 flex items-center">
-                     <img 
-                       src={publication.logoUrl} 
-                       alt={publication.name}
-                       className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
-                       
-                       loading="lazy"
-                       onError={(e) => {
-                         const target = e.target as HTMLImageElement;
-                         target.style.display = 'none';
-                       }}
-                    />
-                 </div>
-               ))}
-             </div>
-          </div>
         </div>
       </div>
 
