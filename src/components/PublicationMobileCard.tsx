@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart, Star, ExternalLink, MapPin, Clock } from "lucide-react";
 import { Publication } from "@/types";
+import { useState, useEffect } from "react";
+import { BrandFetchService } from "@/utils/brandFetch";
 
 interface PublicationMobileCardProps {
   publication: Publication;
@@ -15,6 +17,32 @@ export const PublicationMobileCard = ({
   selected,
   onSelectionChange
 }: PublicationMobileCardProps) => {
+  const [logo, setLogo] = useState<string>(publication.logo_url || '');
+
+  // Fetch logo on component mount
+  useEffect(() => {
+    const fetchLogo = async () => {
+      // If we already have a logo_url from the database, use it
+      if (publication.logo_url) {
+        setLogo(publication.logo_url);
+        return;
+      }
+
+      // Otherwise fetch from BrandFetch if we have a website URL
+      if (publication.website_url) {
+        try {
+          const logoUrl = await BrandFetchService.getLogoWithFallback(publication.website_url);
+          setLogo(logoUrl);
+        } catch (error) {
+          console.log('Failed to fetch logo for:', publication.name);
+          setLogo('');
+        }
+      }
+    };
+
+    fetchLogo();
+  }, [publication.website_url, publication.logo_url]);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -38,18 +66,28 @@ export const PublicationMobileCard = ({
         {/* Header with Logo and Title */}
         <div className="flex items-start gap-3">
           <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-            {publication.logo_url ? (
+            {logo ? (
               <img 
-                src={publication.logo_url} 
+                src={logo} 
                 alt={`${publication.name} logo`}
                 className="w-8 h-8 object-contain rounded"
                 onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.nextElementSibling?.removeAttribute('style');
+                  const target = e.target as HTMLImageElement;
+                  const fallbacks = BrandFetchService.getMultipleFallbackLogos(publication.website_url);
+                  const currentSrc = target.src;
+                  const currentIndex = fallbacks.indexOf(currentSrc);
+                  
+                  if (currentIndex < fallbacks.length - 1) {
+                    target.src = fallbacks[currentIndex + 1];
+                  } else {
+                    target.style.display = 'none';
+                    const placeholder = target.nextElementSibling as HTMLElement;
+                    if (placeholder) placeholder.style.display = 'flex';
+                  }
                 }}
               />
             ) : null}
-            <div className="w-8 h-8 bg-gradient-primary rounded text-white text-xs font-bold flex items-center justify-center" style={publication.logo_url ? {display: 'none'} : {}}>
+            <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded text-primary text-xs font-bold flex items-center justify-center" style={logo ? {display: 'none'} : {}}>
               {publication.name.charAt(0)}
             </div>
           </div>
