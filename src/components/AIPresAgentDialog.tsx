@@ -232,8 +232,7 @@ export const AIPresAgentDialog = () => {
         </DialogHeader>
 
         <div className="space-y-6">
-          {workflowStep === 'strategy' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -404,17 +403,49 @@ export const AIPresAgentDialog = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
-                    <Bot className="h-12 w-12 mb-4 opacity-50" />
-                    <p className="text-lg font-medium mb-2">Ready to Analyze</p>
-                    <p className="text-sm">
-                      Fill out the form to get your personalized press release strategy.
-                    </p>
-                  </div>
+                  {isLoading && workflowStep === 'strategy' && (
+                    <div className="flex flex-col items-center justify-center h-64 text-center">
+                      <Loader2 className="h-6 w-6 mb-3 animate-spin" />
+                      <p className="text-base font-medium">Generating strategy...</p>
+                      <p className="text-sm text-muted-foreground">Analyzing budget and goals</p>
+                    </div>
+                  )}
+
+                  {isLoading && workflowStep === 'research' && (
+                    <div className="flex flex-col items-center justify-center h-64 text-center">
+                      <Loader2 className="h-6 w-6 mb-3 animate-spin" />
+                      <p className="text-base font-medium">Researching publications...</p>
+                      <p className="text-sm text-muted-foreground">Finding best-fit outlets with Perplexity</p>
+                    </div>
+                  )}
+
+                  {!isLoading && recommendation && (
+                    <div className="space-y-4">
+                      <div className="bg-gradient-card p-4 rounded-lg border max-h-96 overflow-y-auto">
+                        <div className="prose prose-sm max-w-none">
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                            {recommendation}
+                          </div>
+                        </div>
+                      </div>
+                      {workflowStep !== 'approval' && (
+                        <Button onClick={() => setWorkflowStep('approval')} className="w-full">
+                          Review & Approve to Draft
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
+                  {!isLoading && !recommendation && (
+                    <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
+                      <Bot className="h-12 w-12 mb-4 opacity-50" />
+                      <p className="text-lg font-medium mb-2">Ready to Analyze</p>
+                      <p className="text-sm">Fill out the form to get your personalized press release strategy.</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
-          )}
 
           {workflowStep === 'approval' && (
             <Card>
