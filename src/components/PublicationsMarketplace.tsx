@@ -11,34 +11,47 @@ export const PublicationsMarketplace = () => {
   const [logos, setLogos] = useState<Record<string, string>>({});
   const { publications, loading } = usePublicationsSync();
 
-  // Featured publications from uploaded logos
-  const featuredPublicationNames = [
-    'Forbes', 'Reuters', 'Bloomberg', 'TIME', 'Yahoo', 'Business Insider', 
-    'Fox News', 'Benzinga', 'Billboard', 'The Hollywood Reporter', 'Rolling Stone', 
-    'Hypebeast', 'Maxim'
+  // Featured publications strictly limited to DB-listed ones, in desired order
+  const featuredPublicationNames = ['Reuters','Bloomberg','Forbes','Time','Yahoo','Business Insider','Fox News','Benzinga','Billboard'];
+
+  const normalize = (s?: string) => (s || '').toLowerCase().trim();
+
+  const matchesTarget = (pubName: string, target: string) => {
+    const p = normalize(pubName);
+    const t = normalize(target);
+    return p === t || p.includes(t) ||
+      (t === 'yahoo' && p.includes('yahoo finance')) ||
+      (t === 'time' && (p.includes('time magazine') || p === 'time')) ||
+      (t === 'fox news' && p.includes('fox news channel'));
+  };
+
+  // Local logo overrides from uploaded assets
+  const localLogos: { match: string; src: string }[] = [
+    { match: 'forbes', src: '/assets/logos/forbes.png' },
+    { match: 'reuters', src: '/assets/logos/reuters.png' },
+    { match: 'bloomberg', src: '/assets/logos/bloomberg.png' },
+    { match: 'time', src: '/assets/logos/time.png' },
+    { match: 'yahoo', src: '/assets/logos/yahoo.png' },
+    { match: 'business insider', src: '/assets/logos/business-insider.png' },
+    { match: 'fox news', src: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Fox_News_Channel_logo.svg' },
+    { match: 'benzinga', src: '/assets/logos/benzinga.png' },
+    { match: 'billboard', src: '/assets/logos/billboard.png' },
   ];
 
-  // Get publications prioritizing the featured ones from uploaded logos
-  const popularPublications = (() => {
-    const featured = publications.filter(pub => 
-      pub.is_active && 
-      featuredPublicationNames.some(name => 
-        pub.name.toLowerCase().includes(name.toLowerCase()) || 
-        name.toLowerCase().includes(pub.name.toLowerCase())
-      )
-    );
-    
-    // If we have fewer than 8 featured publications, fill with other popular ones
-    const remaining = publications
-      .filter(pub => 
-        pub.is_active && 
-        pub.price > 0 && 
-        !featured.some(f => f.id === pub.id)
-      )
-      .sort((a, b) => b.popularity - a.popularity);
-    
-    return [...featured, ...remaining].slice(0, 8);
-  })();
+  const getLocalLogo = (name: string): string | undefined => {
+    const n = normalize(name);
+    const found = localLogos.find(l => n.includes(l.match));
+    return found?.src;
+  };
+
+  // Only show the specified publications that exist in the DB, in the specified order
+  const popularPublications = publications
+    .filter(pub => pub.is_active && pub.price > 0 && featuredPublicationNames.some(n => matchesTarget(pub.name, n)))
+    .sort((a, b) => {
+      const ai = featuredPublicationNames.findIndex(n => matchesTarget(a.name, n));
+      const bi = featuredPublicationNames.findIndex(n => matchesTarget(b.name, n));
+      return ai - bi;
+    });
 
   // Fetch logos on component mount
   useEffect(() => {
@@ -104,7 +117,7 @@ export const PublicationsMarketplace = () => {
                 {/* Logo Display */}
                 <div className="flex justify-center mb-3">
                   <img
-                    src={logos[publication.id] || BrandFetchService.getFallbackLogo(publication.website_url)}
+                    src={getLocalLogo(publication.name) || logos[publication.id] || BrandFetchService.getFallbackLogo(publication.website_url)}
                     alt={`${publication.name} logo`}
                     className="w-16 h-16 object-contain rounded-lg bg-white/10 p-2"
                     onError={(e) => {
