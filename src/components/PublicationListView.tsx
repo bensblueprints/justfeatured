@@ -232,9 +232,6 @@ export const PublicationListView = ({
                     <div className="truncate" title={publication.name}>
                       {publication.name}
                     </div>
-                    <div className="text-xs text-muted-foreground truncate">
-                      {publication.website_url ? new URL(publication.website_url).hostname : 'No website'}
-                    </div>
                     <div className="flex flex-col gap-1">
                       <Button
                         variant={selectedPublications.includes(publication.id) ? "secondary" : "default"}
