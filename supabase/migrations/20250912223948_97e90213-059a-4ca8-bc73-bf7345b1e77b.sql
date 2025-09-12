@@ -1,0 +1,43 @@
+-- Add Forbes USA publication to the database
+INSERT INTO public.publications (
+  name, 
+  category, 
+  price, 
+  tier, 
+  type, 
+  description, 
+  website_url, 
+  contact_info, 
+  tat_days, 
+  location, 
+  popularity, 
+  da_score, 
+  dr_score, 
+  dofollow_link, 
+  indexed, 
+  sponsored, 
+  is_active, 
+  status
+) VALUES (
+  'Forbes USA',
+  'Business & Finance',
+  7000.00,
+  'premium',
+  'premium',
+  'Leading business and financial news publication in the United States',
+  'https://forbes.com',
+  '[Contact Available After Purchase]',
+  '3-5 Days',
+  'USA',
+  95,
+  95,
+  92,
+  true,
+  true,
+  false,
+  true,
+  'active'::publication_status
+) ON CONFLICT (name) DO UPDATE SET
+  price = EXCLUDED.price,
+  tier = EXCLUDED.tier,
+  updated_at = now();
