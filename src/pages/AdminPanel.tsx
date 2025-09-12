@@ -36,6 +36,7 @@ import { SpreadsheetSync } from '@/components/SpreadsheetSync';
 import { useToast } from '@/hooks/use-toast';
 import { Dashboard as UserDashboard } from './Dashboard';
 import { PublicationLogoManager } from '@/components/admin/PublicationLogoManager';
+import { PublicationWebsiteManager } from '@/components/admin/PublicationWebsiteManager';
 
 type AdminSection = 
   | 'my-dashboard'
@@ -140,6 +141,7 @@ const AdminPanel = () => {
                   <PublicationManagement />
                 </div>
                 <div className="space-y-4">
+                  <PublicationWebsiteManager />
                   <SpreadsheetSync />
                 </div>
               </div>
