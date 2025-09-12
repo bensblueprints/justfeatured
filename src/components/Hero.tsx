@@ -52,6 +52,18 @@ export const Hero = () => {
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Fox_News_Channel_logo.svg',
       website_url: 'https://foxnews.com',
       tier: 'Premium'
+    },
+    {
+      name: 'Benzinga',
+      logoUrl: '/assets/logos/benzinga.png',
+      website_url: 'https://benzinga.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Billboard',
+      logoUrl: '/assets/logos/billboard.png',
+      website_url: 'https://billboard.com',
+      tier: 'Premium'
     }
   ];
 
@@ -151,16 +163,16 @@ export const Hero = () => {
                      {duplicatedPublications.map((publication, index) => (
                         <div key={`${publication.name}-${index}`} className="flex items-center space-x-8 mx-6">
                           <div className="flex items-center space-x-3">
-                             <img 
-                               src={publication.logoUrl} 
-                               alt={publication.name}
-                               className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-105"
-                               loading="lazy"
-                               onError={(e) => {
-                                 const target = e.target as HTMLImageElement;
-                                 target.style.display = 'none';
-                               }}
-                            />
+                              <img 
+                                src={publication.logoUrl} 
+                                alt={publication.name}
+                                className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-105"
+                                loading="lazy"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                }}
+                             />
                           </div>
                           
                         </div>
