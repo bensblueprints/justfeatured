@@ -4,12 +4,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthWrapper";
 import { User, LogOut, Menu, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { CartDrawer } from "@/components/CartDrawer";
+import { useCart } from "@/hooks/useCart";
+import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 import { useState } from "react";
 
 export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { selectedPublications, removeFromCart, clearCart } = useCart();
+  const { publications } = usePublicationsSync();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleNavigation = (path: string) => {
@@ -76,6 +81,14 @@ export const Header = () => {
         </nav>
 
         <div className="flex items-center space-x-4">
+          {/* Cart - Always visible */}
+          <CartDrawer
+            selectedPublications={selectedPublications}
+            publications={publications}
+            onRemoveFromCart={removeFromCart}
+            onClearCart={clearCart}
+          />
+          
           {/* Mobile menu button */}
           <button
             className="lg:hidden p-2 z-50 relative bg-white/80 backdrop-blur-sm rounded-lg border border-primary/20 hover:bg-white/90 transition-all duration-200"

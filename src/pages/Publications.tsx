@@ -17,12 +17,13 @@ import { Search, ShoppingCart, Filter, DollarSign, Building, Grid3X3, List } fro
 import { fetchPublications } from "@/lib/publications";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { useCart } from "@/hooks/useCart";
 import { Publication, CartItem } from "@/types";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 
 export const Publications = () => {
   const navigate = useNavigate();
-  const [selectedPublications, setSelectedPublications] = useState<string[]>([]);
+  const { selectedPublications, toggleCart } = useCart();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("price-low");
   const [activeTab, setActiveTab] = useState("all");
@@ -151,11 +152,7 @@ export const Publications = () => {
   }, [selectedPublications, publications]);
 
   const handleSelectionChange = (publicationId: string, selected: boolean) => {
-    setSelectedPublications(prev =>
-      selected
-        ? [...prev, publicationId]
-        : prev.filter(id => id !== publicationId)
-    );
+    toggleCart(publicationId);
   };
 
   const getTabCounts = useMemo(() => {
