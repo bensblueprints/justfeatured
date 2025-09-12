@@ -1,1 +1,13 @@
 project_id = "bxjjedeqnbsyqkahsjlc"
+
+[functions.ai-press-agent]
+verify_jwt = false
+
+[functions.create-payment]
+verify_jwt = false
+
+[functions.fetch-brand-logo]
+verify_jwt = false
+
+[functions.find-publication-websites]
+verify_jwt = false
