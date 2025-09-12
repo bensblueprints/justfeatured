@@ -32,8 +32,9 @@ export const CartDrawer = ({
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const cartItems = publications.filter(pub => selectedPublications.includes(pub.id));
-  const totalAmount = cartItems.reduce((sum, pub) => sum + pub.price, 0);
+  const cartItems = publications?.filter(pub => selectedPublications?.includes(pub.id)) || [];
+  const totalAmount = cartItems.reduce((sum, pub) => sum + (pub.price || 0), 0);
+  const cartCount = selectedPublications?.length || 0;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -58,12 +59,12 @@ export const CartDrawer = ({
           className="relative magnetic"
         >
           <ShoppingCart className="h-4 w-4" />
-          {selectedPublications.length > 0 && (
+          {cartCount > 0 && (
             <Badge 
               variant="destructive" 
               className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
             >
-              {selectedPublications.length}
+              {cartCount}
             </Badge>
           )}
         </Button>
@@ -72,17 +73,17 @@ export const CartDrawer = ({
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
-            Shopping Cart ({selectedPublications.length})
+            Shopping Cart ({cartCount})
           </SheetTitle>
           <SheetDescription>
-            {selectedPublications.length === 0 
+            {cartCount === 0 
               ? "Your cart is empty" 
-              : `${selectedPublications.length} publication${selectedPublications.length === 1 ? '' : 's'} selected`
+              : `${cartCount} publication${cartCount === 1 ? '' : 's'} selected`
             }
           </SheetDescription>
         </SheetHeader>
 
-        {selectedPublications.length === 0 ? (
+        {cartCount === 0 ? (
           <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
             <ShoppingCart className="h-12 w-12 text-muted-foreground" />
             <div className="text-center space-y-2">
@@ -117,6 +118,15 @@ export const CartDrawer = ({
                     </Button>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm pr-8">{publication.name}</CardTitle>
+                      <div className="text-xs text-muted-foreground mb-2">
+                        {publication.website_url ? (() => {
+                          try {
+                            return new URL(publication.website_url).hostname;
+                          } catch {
+                            return publication.website_url;
+                          }
+                        })() : 'No website available'}
+                      </div>
                       <div className="flex items-center justify-between">
                         <Badge variant="outline" className="text-xs">
                           {publication.category}

@@ -152,6 +152,7 @@ export const Publications = () => {
   }, [selectedPublications, publications]);
 
   const handleSelectionChange = (publicationId: string, selected: boolean) => {
+    console.log('handleSelectionChange called:', publicationId, selected);
     toggleCart(publicationId);
   };
 

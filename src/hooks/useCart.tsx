@@ -15,9 +15,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [selectedPublications, setSelectedPublications] = useState<string[]>([]);
 
   const addToCart = (publicationId: string) => {
-    setSelectedPublications(prev => 
-      prev.includes(publicationId) ? prev : [...prev, publicationId]
-    );
+    console.log('Adding to cart:', publicationId);
+    setSelectedPublications(prev => {
+      const newCart = prev.includes(publicationId) ? prev : [...prev, publicationId];
+      console.log('Cart updated:', newCart);
+      return newCart;
+    });
   };
 
   const removeFromCart = (publicationId: string) => {
@@ -35,9 +38,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const toggleCart = (publicationId: string) => {
+    console.log('Toggling cart for:', publicationId);
     if (isInCart(publicationId)) {
+      console.log('Removing from cart');
       removeFromCart(publicationId);
     } else {
+      console.log('Adding to cart');
       addToCart(publicationId);
     }
   };
@@ -59,7 +65,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    console.error('useCart must be used within a CartProvider');
+    // Return a fallback object to prevent crashes
+    return {
+      selectedPublications: [],
+      addToCart: () => {},
+      removeFromCart: () => {},
+      clearCart: () => {},
+      isInCart: () => false,
+      toggleCart: () => {}
+    };
   }
   return context;
 };

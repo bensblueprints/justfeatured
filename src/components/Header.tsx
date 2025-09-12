@@ -13,8 +13,32 @@ export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { selectedPublications, removeFromCart, clearCart } = useCart();
-  const { publications } = usePublicationsSync();
+  
+  // Safely get cart data with fallbacks
+  let cartData;
+  try {
+    cartData = useCart();
+  } catch (error) {
+    console.error('Cart context error:', error);
+    cartData = {
+      selectedPublications: [],
+      removeFromCart: () => {},
+      clearCart: () => {}
+    };
+  }
+  
+  const { selectedPublications, removeFromCart, clearCart } = cartData;
+  
+  // Safely get publications data
+  let publicationsData;
+  try {
+    publicationsData = usePublicationsSync();
+  } catch (error) {
+    console.error('Publications sync error:', error);
+    publicationsData = { publications: [] };
+  }
+  
+  const { publications } = publicationsData;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleNavigation = (path: string) => {
