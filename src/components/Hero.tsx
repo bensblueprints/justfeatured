@@ -116,10 +116,10 @@ export const Hero = () => {
                     {duplicatedPublications.map((publication, index) => (
                       <div key={`${publication.name}-${index}`} className="flex items-center space-x-8 mx-4">
                         <div className="flex items-center space-x-3">
-                          <img 
+                           <img 
                             src={publication.logoUrl} 
                             alt={publication.name}
-                            className="h-8 w-auto max-w-24 object-contain filter brightness-0 invert opacity-80 hover:opacity-100 transition-opacity"
+                            className="h-8 w-auto max-w-24 object-contain bg-white/10 rounded p-1 hover:bg-white/20 transition-all"
                             onError={(e) => {
                               // Fallback to publication name if logo fails to load
                               const target = e.target as HTMLImageElement;
@@ -162,10 +162,10 @@ export const Hero = () => {
             <div className="flex justify-center items-center gap-8 flex-wrap">
               {featuredPublications.slice(0, 6).map((publication, index) => (
                 <div key={`bottom-${publication.name}-${index}`} className="h-8 flex items-center">
-                  <img 
-                    src={publication.logoUrl} 
-                    alt={publication.name}
-                    className="h-8 w-auto max-w-20 object-contain filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+                   <img 
+                     src={publication.logoUrl} 
+                     alt={publication.name}
+                     className="h-8 w-auto max-w-20 object-contain bg-white/10 rounded p-1 hover:bg-white/20 transition-all cursor-pointer"
                     onError={(e) => {
                       // Fallback to publication name if logo fails to load
                       const target = e.target as HTMLImageElement;
