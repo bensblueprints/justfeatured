@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.find-publication-websites]
 verify_jwt = false
+
+[functions.extract-domains-from-contact]
+verify_jwt = false

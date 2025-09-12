@@ -1,137 +1,63 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, Search, CheckCircle, XCircle, AlertCircle, Play, Pause } from 'lucide-react';
+import { RefreshCw, Search, CheckCircle, XCircle, AlertCircle, Mail } from 'lucide-react';
 
 interface WebsiteResult {
   id: string;
   name: string;
-  status: 'success' | 'not_found' | 'error' | 'invalid_url' | 'update_error' | 'api_error';
+  status: 'success' | 'not_found' | 'error' | 'invalid_url' | 'update_error' | 'api_error' | 'no_email_found' | 'invalid_email';
   url?: string;
+  email?: string;
   error?: string;
   logoFetched?: boolean;
+  contact_info?: string;
 }
 
 export const PublicationWebsiteManager = () => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const [results, setResults] = useState<WebsiteResult[]>([]);
-  const [totalRemaining, setTotalRemaining] = useState(0);
-  const [processed, setProcessed] = useState(0);
-  const [currentItem, setCurrentItem] = useState('');
   const { toast } = useToast();
 
-  // Get initial count
-  useEffect(() => {
-    const getInitialCount = async () => {
-      try {
-        const { data } = await supabase.functions.invoke('find-publication-websites', {
-          body: { mode: 'count' }
-        });
-        if (data?.remaining) {
-          setTotalRemaining(data.remaining);
-        }
-      } catch (error) {
-        console.error('Error getting count:', error);
-      }
-    };
-    getInitialCount();
-  }, []);
-
-  const processNextPublication = async (): Promise<boolean> => {
-    if (isPaused) return false;
-
+  const extractDomainsFromContact = async () => {
+    setIsProcessing(true);
+    setResults([]);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('find-publication-websites', {
-        body: { mode: 'single' }
+      const { data, error } = await supabase.functions.invoke('extract-domains-from-contact', {
+        body: { batchSize: 100 }
       });
 
       if (error) {
-        console.error('Error processing publication:', error);
+        console.error('Error extracting domains:', error);
         toast({
           title: "Error",
-          description: "Failed to process publication. Stopping.",
+          description: "Failed to extract domains from contact info.",
           variant: "destructive",
         });
-        return false;
+        return;
       }
 
-      if (data.completed) {
-        toast({
-          title: "All Complete!",
-          description: "All publications have been processed successfully.",
-        });
-        return false;
-      }
-
-      if (data.result) {
-        setResults(prev => [data.result, ...prev.slice(0, 9)]); // Keep last 10 results
-        setCurrentItem(data.result.name);
-        setProcessed(prev => prev + 1);
-        setTotalRemaining(data.remaining || 0);
-      }
-
-      return data.hasMore;
+      setResults(data.results || []);
+      
+      toast({
+        title: "Domain Extraction Complete",
+        description: `Processed ${data.processed} publications. ${data.successful} websites extracted from contact emails.`,
+      });
+      
     } catch (error) {
       console.error('Error:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred. Stopping.",
+        description: "An unexpected error occurred.",
         variant: "destructive",
       });
-      return false;
+    } finally {
+      setIsProcessing(false);
     }
-  };
-
-  const startProcessing = async () => {
-    setIsProcessing(true);
-    setIsPaused(false);
-    setResults([]);
-    setProcessed(0);
-    
-    // Get fresh count
-    try {
-      const { data } = await supabase.functions.invoke('find-publication-websites', {
-        body: { mode: 'count' }
-      });
-      if (data?.remaining) {
-        setTotalRemaining(data.remaining);
-      }
-    } catch (error) {
-      console.error('Error getting count:', error);
-    }
-
-    let hasMore = true;
-    while (hasMore && !isPaused) {
-      hasMore = await processNextPublication();
-      if (hasMore) {
-        // Wait 3 seconds between each publication
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-    }
-    
-    setIsProcessing(false);
-    setCurrentItem('');
-    
-    if (!isPaused) {
-      toast({
-        title: "Processing Complete",
-        description: `Finished processing all publications. ${processed} total processed.`,
-      });
-    }
-  };
-
-  const pauseProcessing = () => {
-    setIsPaused(true);
-    setIsProcessing(false);
-    toast({
-      title: "Processing Paused",
-      description: "You can resume processing at any time.",
-    });
   };
 
   const getStatusIcon = (status: string) => {
@@ -139,11 +65,13 @@ export const PublicationWebsiteManager = () => {
       case 'success':
         return <CheckCircle className="h-4 w-4 text-green-600" />;
       case 'not_found':
+      case 'no_email_found':
         return <XCircle className="h-4 w-4 text-orange-600" />;
       case 'error':
       case 'update_error':
       case 'invalid_url':
       case 'api_error':
+      case 'invalid_email':
         return <AlertCircle className="h-4 w-4 text-red-600" />;
       default:
         return null;
@@ -156,12 +84,16 @@ export const PublicationWebsiteManager = () => {
         return <Badge variant="default" className="bg-green-100 text-green-800">Success</Badge>;
       case 'not_found':
         return <Badge variant="secondary">Not Found</Badge>;
+      case 'no_email_found':
+        return <Badge variant="secondary">No Email</Badge>;
       case 'error':
         return <Badge variant="destructive">Error</Badge>;
       case 'api_error':
         return <Badge variant="destructive">API Error</Badge>;
       case 'invalid_url':
         return <Badge variant="destructive">Invalid URL</Badge>;
+      case 'invalid_email':
+        return <Badge variant="destructive">Invalid Email</Badge>;
       case 'update_error':
         return <Badge variant="destructive">Update Failed</Badge>;
       default:
@@ -169,83 +101,39 @@ export const PublicationWebsiteManager = () => {
     }
   };
 
-  const progressPercentage = totalRemaining > 0 ? ((processed / (processed + totalRemaining)) * 100) : 0;
-
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Search className="h-5 w-5" />
-          AI Publication Website Finder
+          <Mail className="h-5 w-5" />
+          Publication Website Manager
         </CardTitle>
         <CardDescription>
-          Automatically find and populate website URLs for publications one by one, then fetch their logos.
+          Extract website URLs from contact email addresses and automatically fetch publication logos.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Status Display */}
-        {(totalRemaining > 0 || processed > 0) && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Progress: {processed} processed, {totalRemaining} remaining</span>
-              <span>{Math.round(progressPercentage)}%</span>
-            </div>
-            <Progress value={progressPercentage} className="w-full" />
-            {isProcessing && currentItem && (
-              <div className="text-sm text-muted-foreground">
-                Currently processing: <span className="font-medium">{currentItem}</span>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Control Buttons */}
         <div className="flex gap-2">
-          {!isProcessing ? (
-            <Button 
-              onClick={startProcessing} 
-              disabled={totalRemaining === 0}
-              className="flex items-center gap-2"
-            >
-              <Play className="h-4 w-4" />
-              {processed > 0 ? 'Resume Processing' : 'Start Processing All'}
-            </Button>
-          ) : (
-            <Button 
-              onClick={pauseProcessing}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Pause className="h-4 w-4" />
-              Pause Processing
-            </Button>
-          )}
-          
           <Button 
-            onClick={async () => {
-              const { data } = await supabase.functions.invoke('find-publication-websites', {
-                body: { mode: 'count' }
-              });
-              if (data?.remaining) {
-                setTotalRemaining(data.remaining);
-                toast({
-                  title: "Count Updated",
-                  description: `${data.remaining} publications still need websites.`,
-                });
-              }
-            }}
-            variant="ghost"
-            size="sm"
+            onClick={extractDomainsFromContact}
+            disabled={isProcessing}
+            className="flex items-center gap-2"
           >
-            <RefreshCw className="h-4 w-4" />
+            {isProcessing ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <Mail className="h-4 w-4" />
+            )}
+            {isProcessing ? 'Extracting...' : 'Extract from Contact Emails'}
           </Button>
         </div>
 
         {/* Recent Results */}
         {results.length > 0 && (
           <div className="space-y-3">
-            <h3 className="font-semibold">Recent Results:</h3>
-            <div className="max-h-80 overflow-y-auto space-y-2">
+            <h3 className="font-semibold">Results ({results.length}):</h3>
+            <div className="max-h-96 overflow-y-auto space-y-2">
               {results.map((result, index) => (
                 <div 
                   key={`${result.id}-${index}`} 
@@ -255,9 +143,14 @@ export const PublicationWebsiteManager = () => {
                     {getStatusIcon(result.status)}
                     <div className="flex-1">
                       <div className="font-medium">{result.name}</div>
+                      {result.email && (
+                        <div className="text-sm text-blue-600">
+                          📧 {result.email}
+                        </div>
+                      )}
                       {result.url && (
-                        <div className="text-sm text-muted-foreground truncate">
-                          {result.url}
+                        <div className="text-sm text-muted-foreground">
+                          🌐 {result.url}
                         </div>
                       )}
                       {result.logoFetched !== undefined && (
@@ -267,7 +160,12 @@ export const PublicationWebsiteManager = () => {
                       )}
                       {result.error && (
                         <div className="text-sm text-red-600">
-                          {result.error}
+                          ❌ {result.error}
+                        </div>
+                      )}
+                      {result.contact_info && result.status === 'no_email_found' && (
+                        <div className="text-xs text-muted-foreground truncate">
+                          Contact: {result.contact_info}
                         </div>
                       )}
                     </div>
@@ -276,12 +174,16 @@ export const PublicationWebsiteManager = () => {
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {totalRemaining === 0 && processed === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            All publications already have website URLs assigned.
+            
+            {/* Summary */}
+            <div className="mt-4 p-3 bg-muted/30 rounded-lg">
+              <div className="text-sm space-y-1">
+                <div>✅ Success: {results.filter(r => r.status === 'success').length}</div>
+                <div>📧 No Email: {results.filter(r => r.status === 'no_email_found').length}</div>
+                <div>❌ Errors: {results.filter(r => ['error', 'update_error', 'invalid_email'].includes(r.status)).length}</div>
+                <div>🖼️ Logos Fetched: {results.filter(r => r.logoFetched === true).length}</div>
+              </div>
+            </div>
           </div>
         )}
       </CardContent>
