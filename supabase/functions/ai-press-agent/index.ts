@@ -64,14 +64,58 @@ serve(async (req) => {
 async function handleStrategy(data: any) {
   const { budget, businessType, industry, goals, targetAudience } = data;
 
-  const systemPrompt = `You are an expert press release strategist. Your job is to analyze a client's budget and business needs to recommend the optimal mix of publications for maximum PR impact.
+  // Get actual publications from database to inform strategy
+  const { data: publications, error } = await supabase
+    .from('publications')
+    .select('name, price, tier, category, type')
+    .eq('status', 'active')
+    .order('price', { ascending: true });
 
-Consider these factors:
-1. Budget allocation across different tiers for maximum ROI
-2. Industry relevance and target audience reach
-3. Geographic coverage needs
-4. Timeline and frequency of releases
-5. Authority and credibility building
+  if (error) {
+    console.error('Error fetching publications:', error);
+  }
+
+  // Create intelligent budget distribution based on budget size
+  const budgetNum = parseInt(budget);
+  let budgetStrategy = '';
+  
+  if (budgetNum >= 10000) {
+    budgetStrategy = `
+**Smart Budget Distribution for $${budget}:**
+• 1 Premium Publication ($4,000-$6,000): Major national outlet for maximum credibility
+• 5-6 Mid-Tier Publications ($500-$1,000 each): Industry-specific and regional coverage  
+• 2-3 Niche Publications ($200-$500 each): Targeted audience reach
+• Reserve 10-15% for follow-up campaigns and content amplification
+    `;
+  } else if (budgetNum >= 5000) {
+    budgetStrategy = `
+**Smart Budget Distribution for $${budget}:**
+• 1 High-Impact Publication ($2,500-$3,500): Strong national or industry leader
+• 3-4 Mid-Tier Publications ($400-$800 each): Regional and industry coverage
+• 2-3 Targeted Publications ($200-$500 each): Niche audience focus
+    `;
+  } else if (budgetNum >= 2500) {
+    budgetStrategy = `
+**Smart Budget Distribution for $${budget}:**
+• 2-3 Mid-Tier Publications ($600-$1,000 each): Focus on industry relevance
+• 3-4 Smaller Publications ($200-$500 each): Regional and niche coverage
+    `;
+  } else {
+    budgetStrategy = `
+**Smart Budget Distribution for $${budget}:**
+• 4-6 Targeted Publications ($200-$600 each): Maximize coverage within budget
+• Focus on niche and regional outlets for cost-effective impact
+    `;
+  }
+
+  const systemPrompt = `You are an expert press release strategist who specializes in smart budget allocation across publication tiers. Your job is to create realistic, actionable strategies that maximize ROI by mixing high-impact and volume publications.
+
+Key principles:
+1. Always include at least one "anchor" publication for credibility
+2. Balance reach vs. authority based on budget constraints  
+3. Consider industry-specific publications for targeted impact
+4. Factor in geographic relevance for the business
+5. Provide realistic timelines and measurable outcomes
 
 Publication tiers available:
 - Exclusive ($50k-$200k): Bloomberg, WSJ, TechCrunch - Maximum authority, global reach
@@ -80,16 +124,9 @@ Publication tiers available:
 - Tier 2 ($1k-$4k): Targeted industry and local publications  
 - Starter ($400-$2.5k): Cost-effective reach and volume
 
-Provide specific recommendations with:
-1. Budget breakdown by tier
-2. Number of releases recommended
-3. Specific publication types to target
-4. Timeline strategy
-5. Expected outcomes
+Always provide specific budget breakdowns that add up to the total budget.`;
 
-Be concise but comprehensive in your recommendations.`;
-
-  const userPrompt = `Please analyze this client's needs and provide publication recommendations:
+  const userPrompt = `Create a strategic press release plan for this client:
 
 Budget: $${budget}
 Business Type: ${businessType}
@@ -97,7 +134,16 @@ Industry: ${industry}
 Goals: ${goals}
 Target Audience: ${targetAudience}
 
-Provide a strategic recommendation including specific budget allocation, number of releases, and expected timeline.`;
+${budgetStrategy}
+
+Based on this budget distribution, provide:
+1. **Specific Publication Recommendations** - actual tiers and estimated costs
+2. **Timeline Strategy** - when to publish each release for maximum impact
+3. **Key Messaging Strategy** - how to tailor content for different publication types
+4. **Success Metrics** - specific KPIs to track ROI
+5. **Expected Outcomes** - realistic projections for reach and engagement
+
+Make the strategy actionable with specific next steps.`;
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
