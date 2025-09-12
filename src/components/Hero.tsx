@@ -219,7 +219,7 @@ export const Hero = () => {
 
           {/* Premium Social Proof */}
           <div className="text-center animate-fade-in" style={{ animationDelay: '0.8s' }}>
-            <p className="text-sm mb-6 uppercase tracking-wider font-semibold opacity-80" style={{ color: '#FFB6C1' }}>
+            <p className="text-lg md:text-xl mb-6 uppercase tracking-wider font-bold text-white">
               Get Seen In
             </p>
              <div className="flex justify-center items-center gap-8 flex-wrap">
