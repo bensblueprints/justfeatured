@@ -159,7 +159,7 @@ export const Hero = () => {
               <div className="relative">
                 
                  <div className="overflow-hidden">
-                   <div className="flex animate-scroll whitespace-nowrap items-center h-12 md:h-16">
+                   <div className="flex animate-scroll whitespace-nowrap items-center h-60 md:h-80">
                      {duplicatedPublications.map((publication, index) => (
                         <div key={`${publication.name}-${index}`} className="flex items-center space-x-8 mx-6">
                           <div className="flex items-center space-x-3">
