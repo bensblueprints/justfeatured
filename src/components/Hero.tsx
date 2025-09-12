@@ -2,55 +2,24 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, Star, TrendingUp, Zap, Sparkles, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
-import { useState, useEffect } from "react";
-import { BrandFetchService } from "@/utils/brandFetch";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 
 export const Hero = () => {
   const navigate = useNavigate();
-  const [brandLogos, setBrandLogos] = useState<{ [key: string]: string }>({});
   const { publications } = usePublicationsSync();
 
-  // Define brands to fetch logos for
-  const featuredBrands = [
-    { name: "NBC News", website: "https://www.nbcnews.com" },
-    { name: "Forbes", website: "https://www.forbes.com" },
-    { name: "Associated Press", website: "https://www.ap.org" },
-    { name: "CNBC", website: "https://www.cnbc.com" }
-  ];
 
-  const featuredOutlets = [
-    "USA TODAY", "FORBES", "CNN", "REUTERS", "BLOOMBERG", 
-    "WALL STREET JOURNAL", "BUSINESS INSIDER", "CNBC", "TIME",
-    "NEWSWEEK", "WASHINGTON POST", "NEW YORK TIMES", "AP NEWS",
-    "NBC NEWS", "ABC NEWS", "CBS NEWS", "FOX NEWS", "YAHOO FINANCE"
-  ];
+  // Get featured publications with logos from database
+  const featuredPublications = publications
+    .filter(pub => pub.logo_url && pub.logo_url.includes('http')) // Only publications with valid logo URLs
+    .slice(0, 20) // Limit to 20 publications for marquee
+    .map(pub => ({
+      name: pub.name,
+      logoUrl: pub.logo_url
+    }));
 
-  const duplicatedOutlets = [...featuredOutlets, ...featuredOutlets];
-
-  // Fetch brand logos on component mount
-  useEffect(() => {
-    const fetchBrandLogos = async () => {
-      const logoPromises = featuredBrands.map(async (brand) => {
-        try {
-          const logoUrl = await BrandFetchService.getLogoWithFallback(brand.website);
-          return { name: brand.name, logo: logoUrl };
-        } catch (error) {
-          console.log('Failed to fetch logo for:', brand.name);
-          return { name: brand.name, logo: '' };
-        }
-      });
-
-      const logoResults = await Promise.all(logoPromises);
-      const logoMap: { [key: string]: string } = {};
-      logoResults.forEach(result => {
-        logoMap[result.name] = result.logo;
-      });
-      setBrandLogos(logoMap);
-    };
-
-    fetchBrandLogos();
-  }, []);
+  // Duplicate for seamless scrolling
+  const duplicatedPublications = [...featuredPublications, ...featuredPublications];
 
   return (
     <section className="hero-section purple-section relative min-h-screen overflow-hidden">
@@ -144,10 +113,23 @@ export const Hero = () => {
                 
                 <div className="overflow-hidden">
                   <div className="flex animate-scroll whitespace-nowrap">
-                    {duplicatedOutlets.map((outlet, index) => (
-                      <div key={index} className="flex items-center space-x-8 text-lg font-semibold">
-                        <span className="hover:text-white transition-colors cursor-pointer text-blue-200">{outlet}</span>
-                        <span className="text-blue-200">•</span>
+                    {duplicatedPublications.map((publication, index) => (
+                      <div key={`${publication.name}-${index}`} className="flex items-center space-x-8 mx-4">
+                        <div className="flex items-center space-x-3">
+                          <img 
+                            src={publication.logoUrl} 
+                            alt={publication.name}
+                            className="h-8 w-auto max-w-24 object-contain filter brightness-0 invert opacity-80 hover:opacity-100 transition-opacity"
+                            onError={(e) => {
+                              // Fallback to publication name if logo fails to load
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              target.nextElementSibling!.classList.remove('hidden');
+                            }}
+                          />
+                          <span className="hidden text-blue-200 font-semibold">{publication.name}</span>
+                        </div>
+                        <span className="text-blue-200 text-2xl">•</span>
                       </div>
                     ))}
                   </div>
@@ -177,28 +159,22 @@ export const Hero = () => {
             <p className="text-sm mb-6 uppercase tracking-wider font-semibold opacity-80" style={{ color: '#FFB6C1' }}>
               AS SEEN IN
             </p>
-            <div className="flex justify-center items-center gap-12 flex-wrap">
-              {featuredBrands.map((brand) => (
-                <div key={brand.name} className="h-8 flex items-center">
-                  {brandLogos[brand.name] ? (
-                    <img 
-                      src={brandLogos[brand.name]} 
-                      alt={brand.name} 
-                      className="h-8 hover:opacity-80 transition-opacity cursor-pointer magnetic object-contain"
-                      style={{ filter: 'brightness(0.8) contrast(1.2)' }}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const placeholder = target.nextElementSibling as HTMLElement;
-                        if (placeholder) placeholder.style.display = 'flex';
-                      }}
-                    />
-                  ) : null}
-                  <div 
-                    className="h-8 bg-white/20 rounded px-3 flex items-center justify-center text-white/80 text-sm font-semibold magnetic"
-                    style={{ display: brandLogos[brand.name] ? 'none' : 'flex' }}
-                  >
-                    {brand.name}
+            <div className="flex justify-center items-center gap-8 flex-wrap">
+              {featuredPublications.slice(0, 6).map((publication, index) => (
+                <div key={`bottom-${publication.name}-${index}`} className="h-8 flex items-center">
+                  <img 
+                    src={publication.logoUrl} 
+                    alt={publication.name}
+                    className="h-8 w-auto max-w-20 object-contain filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+                    onError={(e) => {
+                      // Fallback to publication name if logo fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.nextElementSibling!.classList.remove('hidden');
+                    }}
+                  />
+                  <div className="hidden h-8 bg-white/20 rounded px-3 flex items-center justify-center text-white/80 text-sm font-semibold">
+                    {publication.name}
                   </div>
                 </div>
               ))}
