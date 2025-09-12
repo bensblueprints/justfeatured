@@ -13,10 +13,12 @@ import {
   TrendingUp,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Image
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { PublicationLogoManager } from "./PublicationLogoManager";
 
 interface DashboardStats {
   totalClients: number;
@@ -147,6 +149,22 @@ export const AdminDashboard = () => {
             New Client Project
           </Button>
         </div>
+      </div>
+
+      {/* Logo Manager Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Image className="w-5 h-5 mr-2" />
+            Publication Logo Manager
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PublicationLogoManager />
+        </CardContent>
+      </Card>
+
+      <div className="space-y-6">
       </div>
 
       {/* Stats Overview */}
