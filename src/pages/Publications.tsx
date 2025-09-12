@@ -29,7 +29,7 @@ export const Publications = () => {
   const [visibleCount, setVisibleCount] = useState(18);
   const [priceRange, setPriceRange] = useState<string>("all");
   const [industryFilter, setIndustryFilter] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
+  const [viewMode, setViewMode] = useState<"cards" | "list">("list");
   
   const LOAD_MORE_COUNT = 18;
 
