@@ -14,30 +14,11 @@ export const Header = () => {
   const location = useLocation();
   const { user, signOut } = useAuth();
   
-  // Safely get cart data with fallbacks
-  let cartData;
-  try {
-    cartData = useCart();
-  } catch (error) {
-    console.error('Cart context error:', error);
-    cartData = {
-      selectedPublications: [],
-      removeFromCart: () => {},
-      clearCart: () => {}
-    };
-  }
+  // Always call hooks at the top level
+  const cartData = useCart();
+  const publicationsData = usePublicationsSync();
   
   const { selectedPublications, removeFromCart, clearCart } = cartData;
-  
-  // Safely get publications data
-  let publicationsData;
-  try {
-    publicationsData = usePublicationsSync();
-  } catch (error) {
-    console.error('Publications sync error:', error);
-    publicationsData = { publications: [] };
-  }
-  
   const { publications } = publicationsData;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
