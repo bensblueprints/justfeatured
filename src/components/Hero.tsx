@@ -127,9 +127,10 @@ export const Hero = () => {
                        <div key={`${publication.name}-${index}`} className="flex items-center space-x-8 mx-6">
                          <div className="flex items-center space-x-3">
                             <img 
-                             src={publication.logoUrl} 
-                             alt={publication.name}
-                             className="h-12 w-auto max-w-32 object-contain bg-white/20 backdrop-blur-sm rounded-lg p-2 hover:bg-white/30 hover:scale-105 transition-all duration-300 shadow-lg"
+                              src={publication.logoUrl} 
+                              alt={publication.name}
+                              className="h-8 w-auto object-contain filter brightness-0 invert opacity-90 hover:opacity-100 transition-all duration-300"
+                              style={{ maxHeight: '32px', maxWidth: '120px' }}
                              onError={(e) => {
                                // Enhanced fallback with premium styling
                                const target = e.target as HTMLImageElement;
