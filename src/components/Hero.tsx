@@ -9,60 +9,48 @@ export const Hero = () => {
   const { publications } = usePublicationsSync();
 
 
-  // Curated marquee logos provided by user (natural aspect ratio images)
+  // Curated marquee logos using uploaded logos
   const featuredPublications = [
     {
       name: 'Forbes',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/78/Forbes_logo.svg',
+      logoUrl: '/assets/logos/forbes.png',
       website_url: 'https://forbes.com',
       tier: 'Premium'
     },
     {
-      name: 'USA Today',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/80/USA_Today_%282020%29.svg',
-      website_url: 'https://usatoday.com',
+      name: 'Reuters',
+      logoUrl: '/assets/logos/reuters.png',
+      website_url: 'https://reuters.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Bloomberg',
+      logoUrl: '/assets/logos/bloomberg.png',
+      website_url: 'https://bloomberg.com',
       tier: 'Premium'
     },
     {
       name: 'TIME',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Time_Magazine_logo.svg',
+      logoUrl: '/assets/logos/time.png',
       website_url: 'https://time.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Yahoo',
+      logoUrl: '/assets/logos/yahoo.png',
+      website_url: 'https://yahoo.com',
+      tier: 'Premium'
+    },
+    {
+      name: 'Business Insider',
+      logoUrl: '/assets/logos/business-insider.png',
+      website_url: 'https://businessinsider.com',
       tier: 'Premium'
     },
     {
       name: 'Fox News',
       logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Fox_News_Channel_logo.svg',
       website_url: 'https://foxnews.com',
-      tier: 'Premium'
-    },
-    {
-      name: 'CBS News',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2b/CBS_News_logo_2020.svg',
-      website_url: 'https://cbsnews.com',
-      tier: 'Premium'
-    },
-    {
-      name: 'NBC',
-      logoUrl: '/lovable-uploads/nbc-logo.png',
-      website_url: 'https://nbc.com',
-      tier: 'Premium'
-    },
-    {
-      name: 'Associated Press',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/83/Associated_Press_logo_2012.svg',
-      website_url: 'https://apnews.com',
-      tier: 'Premium'
-    },
-    {
-      name: 'Reuters',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/59/Reuters_logo.svg',
-      website_url: 'https://reuters.com',
-      tier: 'Premium'
-    },
-    {
-      name: "Harper's Bazaar",
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Harper%27s_Bazaar_logo.svg',
-      website_url: 'https://harpersbazaar.com',
       tier: 'Premium'
     }
   ];
