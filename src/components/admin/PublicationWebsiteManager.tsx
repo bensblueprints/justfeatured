@@ -19,16 +19,21 @@ interface WebsiteResult {
 
 export const PublicationWebsiteManager = () => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessingAll, setIsProcessingAll] = useState(false);
+  const [processedTotal, setProcessedTotal] = useState(0);
+  const [successfulTotal, setSuccessfulTotal] = useState(0);
   const [results, setResults] = useState<WebsiteResult[]>([]);
   const { toast } = useToast();
 
-  const extractDomainsFromContact = async () => {
+  const extractDomainsFromContact = async (batchSize = 200) => {
     setIsProcessing(true);
     setResults([]);
+    setProcessedTotal(0);
+    setSuccessfulTotal(0);
     
     try {
       const { data, error } = await supabase.functions.invoke('extract-domains-from-contact', {
-        body: { batchSize: 100 }
+        body: { batchSize }
       });
 
       if (error) {
@@ -41,22 +46,76 @@ export const PublicationWebsiteManager = () => {
         return;
       }
 
-      setResults(data.results || []);
+      const batchResults: WebsiteResult[] = data?.results || [];
+      setResults(batchResults);
+      setProcessedTotal(data?.processed ?? batchResults.length);
+      setSuccessfulTotal(data?.successful ?? batchResults.filter(r => r.status === 'success').length);
       
       toast({
-        title: "Domain Extraction Complete",
-        description: `Processed ${data.processed} publications. ${data.successful} websites extracted from contact emails.`,
+        title: "Batch complete",
+        description: `Processed ${data?.processed ?? batchResults.length} publications. ${data?.successful ?? batchResults.filter(r => r.status==='success').length} websites extracted.`,
       });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred.",
+        description: error?.message || "An unexpected error occurred.",
         variant: "destructive",
       });
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const runFullExtraction = async () => {
+    setIsProcessingAll(true);
+    setProcessedTotal(0);
+    setSuccessfulTotal(0);
+    setResults([]);
+
+    const batchSize = 200;
+    let totalProcessed = 0;
+    let totalSuccess = 0;
+
+    try {
+      // Loop until no more results are returned (safeguard cap at 20 iterations ~ 4000 records)
+      for (let i = 0; i < 20; i++) {
+        const { data, error } = await supabase.functions.invoke('extract-domains-from-contact', {
+          body: { batchSize }
+        });
+
+        if (error) throw error;
+        const batchResults: WebsiteResult[] = data?.results || [];
+
+        // Append recent results for visibility (keep last 200 in UI)
+        setResults(prev => [...prev, ...batchResults].slice(-200));
+
+        totalProcessed += data?.processed ?? batchResults.length;
+        totalSuccess += data?.successful ?? batchResults.filter(r => r.status === 'success').length;
+        setProcessedTotal(totalProcessed);
+        setSuccessfulTotal(totalSuccess);
+
+        // Stop when nothing left to process
+        if (batchResults.length === 0) break;
+
+        // Gentle delay between batches
+        await new Promise(r => setTimeout(r, 400));
+      }
+
+      toast({
+        title: "Full extraction complete",
+        description: `Processed ${totalProcessed} publications. ${totalSuccess} websites extracted.`,
+      });
+    } catch (error: any) {
+      console.error('Full extraction error:', error);
+      toast({
+        title: "Error running full extraction",
+        description: error?.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsProcessingAll(false);
     }
   };
 
@@ -114,19 +173,41 @@ export const PublicationWebsiteManager = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Control Buttons */}
-        <div className="flex gap-2">
-          <Button 
-            onClick={extractDomainsFromContact}
-            disabled={isProcessing}
-            className="flex items-center gap-2"
-          >
-            {isProcessing ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
-            ) : (
-              <Mail className="h-4 w-4" />
-            )}
-            {isProcessing ? 'Extracting...' : 'Extract from Contact Emails'}
-          </Button>
+        <div className="flex flex-col gap-3">
+          <div className="flex gap-2 flex-wrap">
+            <Button 
+              onClick={() => extractDomainsFromContact(200)}
+              disabled={isProcessing || isProcessingAll}
+              className="flex items-center gap-2"
+            >
+              {isProcessing ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Mail className="h-4 w-4" />
+              )}
+              {isProcessing ? 'Extracting Batch...' : 'Extract from Contact Emails (200)'}
+            </Button>
+
+            <Button
+              onClick={runFullExtraction}
+              disabled={isProcessing || isProcessingAll}
+              variant="secondary"
+              className="flex items-center gap-2"
+            >
+              {isProcessingAll ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              {isProcessingAll ? 'Running Full Extraction...' : 'Run Full Extraction (All Missing)'}
+            </Button>
+          </div>
+
+          {(isProcessingAll || processedTotal > 0) && (
+            <div className="text-sm text-muted-foreground">
+              Processed: {processedTotal} • Success: {successfulTotal}
+            </div>
+          )}
         </div>
 
         {/* Recent Results */}
