@@ -263,35 +263,38 @@ export const PublicationListView = ({
                     onCheckedChange={(checked) => onSelectionChange(publication.id, !!checked)}
                   />
                 </TableCell>
-                <TableCell className="font-medium max-w-[200px]">
+                <TableCell className="font-medium min-w-[250px]">
                   <div className="space-y-2">
                     <div className="truncate" title={publication.name}>
                       {publication.name}
                     </div>
                     <div className="text-xs text-muted-foreground truncate">
-                      {publication.website_url && new URL(publication.website_url).hostname}
+                      {publication.website_url ? new URL(publication.website_url).hostname : 'No website'}
                     </div>
                     <div className="flex flex-col gap-1">
                       <Button
                         variant={selectedPublications.includes(publication.id) ? "secondary" : "default"}
                         size="sm"
                         onClick={() => onSelectionChange(publication.id, !selectedPublications.includes(publication.id))}
-                        className="h-6 px-3 text-xs w-full"
+                        className="h-7 px-3 text-xs w-full"
                       >
                         <ShoppingCart className="h-3 w-3 mr-1" />
                         {selectedPublications.includes(publication.id) ? "Remove" : "Add to Cart"}
                       </Button>
-                      {publication.website_url && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(publication.website_url, '_blank')}
-                          className="h-6 px-3 text-xs w-full"
-                        >
-                          <Globe className="h-3 w-3 mr-1" />
-                          View Sample
-                        </Button>
-                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (publication.website_url) {
+                            window.open(publication.website_url, '_blank');
+                          }
+                        }}
+                        disabled={!publication.website_url}
+                        className="h-7 px-3 text-xs w-full"
+                      >
+                        <Globe className="h-3 w-3 mr-1" />
+                        View Sample
+                      </Button>
                     </div>
                   </div>
                 </TableCell>
