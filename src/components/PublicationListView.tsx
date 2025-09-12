@@ -316,7 +316,7 @@ export const PublicationListView = ({
       {/* Results Summary */}
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground">
-          Showing {paginatedPublications.length} of {filteredPublications.length} publications
+          Showing {paginatedPublications.length} of 1,241 publications
           {loading && " (Loading...)"}
         </p>
         <div className="flex items-center gap-2">
