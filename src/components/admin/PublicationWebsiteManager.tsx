@@ -12,6 +12,7 @@ interface WebsiteResult {
   status: 'success' | 'not_found' | 'error' | 'invalid_url' | 'update_error';
   url?: string;
   error?: string;
+  logoFetched?: boolean;
 }
 
 export const PublicationWebsiteManager = () => {
@@ -40,9 +41,10 @@ export const PublicationWebsiteManager = () => {
 
       setResults(data.results || []);
       
+      const logoCount = data.results?.filter((r: any) => r.logoFetched).length || 0;
       toast({
         title: "Website Search Complete",
-        description: `Processed ${data.processed} publications. Found ${data.successful} websites.`,
+        description: `Processed ${data.processed} publications. Found ${data.successful} websites and ${logoCount} logos.`,
       });
       
     } catch (error) {
@@ -142,6 +144,11 @@ export const PublicationWebsiteManager = () => {
                       {result.url && (
                         <div className="text-sm text-muted-foreground truncate">
                           {result.url}
+                        </div>
+                      )}
+                      {result.logoFetched !== undefined && (
+                        <div className="text-xs text-muted-foreground">
+                          Logo: {result.logoFetched ? '✓ Fetched' : '✗ Failed/Fallback'}
                         </div>
                       )}
                       {result.error && (

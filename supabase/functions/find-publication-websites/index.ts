@@ -130,7 +130,41 @@ serve(async (req) => {
           results.push({ id: publication.id, name: publication.name, status: 'update_error', url: websiteUrl });
         } else {
           console.log(`Successfully updated ${publication.name} with ${websiteUrl}`);
-          results.push({ id: publication.id, name: publication.name, status: 'success', url: websiteUrl });
+          
+          // Now fetch the logo using the brand fetch API
+          try {
+            console.log(`Fetching logo for ${publication.name} using ${websiteUrl}`);
+            const logoResponse = await fetch(`${supabaseUrl}/functions/v1/fetch-brand-logo`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${supabaseServiceRoleKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                publicationId: publication.id,
+                websiteUrl: websiteUrl,
+                name: publication.name
+              }),
+            });
+
+            if (logoResponse.ok) {
+              const logoData = await logoResponse.json();
+              console.log(`Logo fetch completed for ${publication.name}:`, logoData.logoUrl ? 'success' : 'fallback');
+              results.push({ 
+                id: publication.id, 
+                name: publication.name, 
+                status: 'success', 
+                url: websiteUrl,
+                logoFetched: !!logoData.logoUrl 
+              });
+            } else {
+              console.log(`Logo fetch failed for ${publication.name}, but website was saved`);
+              results.push({ id: publication.id, name: publication.name, status: 'success', url: websiteUrl, logoFetched: false });
+            }
+          } catch (logoError) {
+            console.error(`Error fetching logo for ${publication.name}:`, logoError);
+            results.push({ id: publication.id, name: publication.name, status: 'success', url: websiteUrl, logoFetched: false });
+          }
         }
 
         // Small delay to avoid rate limits
