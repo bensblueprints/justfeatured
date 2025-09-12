@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { Upload, FileSpreadsheet, RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
 import { addPublication, updatePublication, updatePublicationById, fetchPublications } from "@/lib/publications";
+import { parseCSVContent } from "@/utils/csvPublicationImporter";
 
 interface CSVRow {
   PUBLICATION?: string;
@@ -102,6 +103,38 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
     return false;
   };
 
+  // Extract price from various possible header names (case-insensitive)
+  const getPriceFromRow = (row: CSVRow): number | undefined => {
+    const priority = [
+      'sell price',
+      'table row price',
+      'row price',
+      'list price',
+      'price usd',
+      'price'
+    ];
+
+    const entries = Object.entries(row || {});
+    const findBy = (keyLower: string) => entries.find(([k]) => k?.toString().trim().toLowerCase() === keyLower)?.[1];
+
+    let raw: string | undefined;
+    for (const key of priority) {
+      const val = findBy(key);
+      if (val != null && String(val).trim() !== '') { raw = String(val); break; }
+    }
+
+    // Fallback: any column that includes 'price' but not 'buy'
+    if (!raw) {
+      const anyPrice = entries.find(([k, v]) => k?.toString().toLowerCase().includes('price') && !k.toString().toLowerCase().includes('buy') && String(v || '').trim() !== '');
+      if (anyPrice) raw = String(anyPrice[1]);
+    }
+
+    if (!raw) return undefined;
+    const cleaned = raw.replace(/[^0-9.-]/g, '');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? undefined : Math.max(0, num);
+  };
+
   const convertToPublication = (row: CSVRow, index: number) => {
     try {
       // Generate a more unique external_id
@@ -113,7 +146,7 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
         type: (row.Type?.toLowerCase().trim()) || 'standard',
         tier: (row.Tier?.toLowerCase().trim()) || 'standard', 
         category: row.GENRE?.trim() || 'News',
-        price: Math.max(0, parseFloat((row["SELL PRICE"] || row.Price)?.replace(/[^0-9.-]/g, '') || '0') || 0),
+        price: getPriceFromRow(row) ?? 0,
         tat_days: row.TAT?.trim() || '1-2 Weeks',
         description: row.Description?.trim() || '',
         features: ['Press Release', 'SEO Backlink'],
@@ -179,7 +212,7 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
       const csvText = await file.text();
       console.log('CSV text length:', csvText.length);
       
-      const rows = parseCSV(csvText);
+      const rows = parseCSVContent(csvText) as unknown as CSVRow[];
       console.log('Parsed rows:', rows.length);
       console.log('First few rows:', rows.slice(0, 3));
       
