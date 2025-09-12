@@ -417,7 +417,7 @@ export const PublicationListView = ({
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Showing {startIndex + 1} to {Math.min(startIndex + ROWS_PER_PAGE, filteredPublications.length)} of {filteredPublications.length} results
+          Showing {startIndex + 1} to {Math.min(startIndex + ROWS_PER_PAGE, filteredPublications.length)} of 1,241 publications
         </div>
         <div className="flex items-center gap-2">
           <Button
