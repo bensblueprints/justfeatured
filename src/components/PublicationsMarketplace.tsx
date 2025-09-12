@@ -76,14 +76,14 @@ export const PublicationsMarketplace = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {popularPublications.map((publication) => (
-            <Card key={publication.id} className={`${getTierColor(publication.type)} transition-all duration-200 hover:shadow-lg hover:scale-105`}>
-              <CardHeader className="text-center">
+            <Card key={publication.id} className={`card-premium transition-all duration-200 hover:shadow-lg hover:scale-105`}>
+              <CardHeader className="p-4">
                 {/* Logo Display */}
-                <div className="flex justify-center mb-4">
+                <div className="flex justify-center mb-3">
                   <img
                     src={logos[publication.id] || BrandFetchService.getFallbackLogo(publication.website_url)}
                     alt={`${publication.name} logo`}
-                    className="w-24 h-24 object-contain rounded-lg bg-white/10 p-3"
+                    className="w-16 h-16 object-contain rounded-lg bg-white/10 p-2"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       const fallbacks = BrandFetchService.getMultipleFallbackLogos(publication.website_url);
@@ -101,33 +101,66 @@ export const PublicationsMarketplace = () => {
                     }}
                   />
                   <div 
-                    className="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg items-center justify-center text-xl font-bold text-primary hidden"
+                    className="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg items-center justify-center text-lg font-bold text-primary hidden"
                     style={{ display: 'none' }}
                   >
                     {publication.name.charAt(0).toUpperCase()}
                   </div>
                 </div>
                 
+                {/* Tier and Price Row */}
                 <div className="flex items-center justify-between mb-2">
-                  <Badge variant="secondary" className="text-xs">
-                    {publication.type.toUpperCase()}
+                  <Badge variant="secondary" className="text-xs px-2 py-1">
+                    {publication.tier?.toUpperCase() || publication.type?.toUpperCase() || 'STANDARD'}
                   </Badge>
-                  <div className="text-xs text-muted-foreground">
-                    ⭐ {publication.popularity}
+                  <div className="text-lg font-bold text-primary">
+                    {formatPrice(publication.price)}
                   </div>
                 </div>
-                <CardTitle className={`text-sm font-semibold ${publication.type === 'exclusive' ? 'text-white' : 'text-foreground'}`}>
+                
+                {/* Publication Name */}
+                <CardTitle className="text-sm font-semibold text-center mb-2 line-clamp-2">
                   {publication.name}
                 </CardTitle>
-                <div className={`text-lg font-bold ${publication.type === 'exclusive' ? 'text-white' : 'text-primary'}`}>
-                  {formatPrice(publication.price)}
+                
+                {/* DA/DR Scores */}
+                <div className="flex justify-center gap-4 mb-2">
+                  <div className="text-center">
+                    <div className="text-sm font-semibold text-primary">{publication.da_score || 0}</div>
+                    <div className="text-xs text-muted-foreground">DA</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm font-semibold text-primary">{publication.dr_score || 0}</div>
+                    <div className="text-xs text-muted-foreground">DR</div>
+                  </div>
                 </div>
-                <p className={`text-xs ${publication.type === 'exclusive' ? 'text-white/80' : 'text-muted-foreground'}`}>
-                  {publication.tat_days} days delivery
-                </p>
+                
+                {/* TAT and Location */}
+                <div className="text-center text-xs text-muted-foreground mb-2">
+                  {publication.tat_days} • {publication.location || 'Global'}
+                </div>
+                
+                {/* Feature Icons */}
+                <div className="flex justify-center gap-2 mb-2">
+                  {publication.dofollow_link && (
+                    <Badge variant="outline" className="text-xs px-1 py-0">
+                      ✓ DoFollow
+                    </Badge>
+                  )}
+                  {publication.indexed && (
+                    <Badge variant="outline" className="text-xs px-1 py-0">
+                      ✓ Indexed
+                    </Badge>
+                  )}
+                  {!publication.sponsored && (
+                    <Badge variant="outline" className="text-xs px-1 py-0">
+                      ✓ Editorial
+                    </Badge>
+                  )}
+                </div>
               </CardHeader>
-              <CardContent className="pt-0">
-                <p className={`text-xs leading-tight ${publication.type === 'exclusive' ? 'text-white/90' : 'text-muted-foreground'}`}>
+              <CardContent className="pt-0 px-4 pb-4">
+                <p className="text-xs leading-tight text-muted-foreground text-center line-clamp-2">
                   {publication.category}
                 </p>
               </CardContent>
