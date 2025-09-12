@@ -6,6 +6,8 @@ export interface CSVRow {
   Update?: string;
   PUBLICATION?: string;
   Price?: string;
+  "SELL PRICE"?: string;
+  "BUY PRICE"?: string;
   DA?: string;
   DR?: string;
   GENRE?: string;
@@ -122,7 +124,7 @@ export const convertToPublication = (row: CSVRow, index: number): PublicationDat
     type: (row.Type?.toLowerCase().trim()) || 'standard',
     tier: (row.Tier?.toLowerCase().trim()) || 'standard', 
     category: row.GENRE?.trim() || 'News',
-    price: parsePrice(row.Price || '0'),
+    price: parsePrice(row["SELL PRICE"] || row.Price || '0'),
     tat_days: convertTAT(row.TAT || '1-2 Weeks'),
     description: row.Description?.trim() || '',
     features: ['Press Release', 'SEO Backlink'],

@@ -12,6 +12,8 @@ import { addPublication, updatePublication, fetchPublications } from "@/lib/publ
 interface CSVRow {
   PUBLICATION?: string;
   Price?: string;
+  "SELL PRICE"?: string;
+  "BUY PRICE"?: string;
   DA?: string;
   DR?: string;
   GENRE?: string;
@@ -77,7 +79,7 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
         type: (row.Type?.toLowerCase().trim()) || 'standard',
         tier: (row.Tier?.toLowerCase().trim()) || 'standard', 
         category: row.GENRE?.trim() || 'News',
-        price: Math.max(0, parseFloat(row.Price?.replace(/[^0-9.-]/g, '') || '0') || 0),
+        price: Math.max(0, parseFloat((row["SELL PRICE"] || row.Price)?.replace(/[^0-9.-]/g, '') || '0') || 0),
         tat_days: row.TAT?.trim() || '1-2 Weeks',
         description: row.Description?.trim() || '',
         features: ['Press Release', 'SEO Backlink'],
@@ -295,7 +297,7 @@ export const SpreadsheetSync = ({ onSyncComplete }: { onSyncComplete?: () => voi
           <Alert className="text-xs">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription className="text-xs leading-relaxed">
-              Upload a CSV file with columns: PUBLICATION, Price, DA, DR, GENRE, TAT, SPONSORED, INDEXED, DOFOLLOW, etc. 
+              Upload a CSV file with columns: PUBLICATION, SELL PRICE (or Price), DA, DR, GENRE, TAT, SPONSORED, INDEXED, DOFOLLOW, etc. 
               The system will automatically add new publications and update existing ones.
             </AlertDescription>
           </Alert>
