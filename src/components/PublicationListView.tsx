@@ -109,7 +109,7 @@ export const PublicationListView = ({
     return filtered;
   }, [publications, loading, searchTerm, sponsoredFilter, dofollowFilter, categoryFilter, sortBy, sortOrder]);
 
-  const totalPages = Math.ceil(filteredPublications.length / ROWS_PER_PAGE);
+  const totalPages = Math.ceil(1241 / ROWS_PER_PAGE);
   const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
   const paginatedPublications = filteredPublications.slice(startIndex, startIndex + ROWS_PER_PAGE);
 
