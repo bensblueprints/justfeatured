@@ -35,6 +35,7 @@ import { PublicationManagement } from '@/components/admin/PublicationManagement'
 import { SpreadsheetSync } from '@/components/SpreadsheetSync';
 import { useToast } from '@/hooks/use-toast';
 import { Dashboard as UserDashboard } from './Dashboard';
+import { PublicationLogoManager } from '@/components/admin/PublicationLogoManager';
 
 type AdminSection = 
   | 'my-dashboard'

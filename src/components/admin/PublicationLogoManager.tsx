@@ -33,8 +33,7 @@ export const PublicationLogoManager = () => {
       const { data: publications, error } = await supabase
         .from('publications')
         .select('id, name, website_url, logo_url')
-        .eq('is_active', true)
-        .not('website_url', 'is', null);
+        .eq('is_active', true);
 
       if (error) throw error;
 
@@ -72,7 +71,7 @@ export const PublicationLogoManager = () => {
           try {
             // Call the edge function to fetch logo
             const { data: result, error: fetchError } = await supabase.functions.invoke('fetch-brand-logo', {
-              body: { websiteUrl: publication.website_url }
+              body: { publicationId: publication.id, websiteUrl: publication.website_url || undefined, name: publication.name }
             });
 
             if (fetchError) throw fetchError;

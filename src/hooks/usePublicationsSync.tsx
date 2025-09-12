@@ -14,10 +14,15 @@ export const usePublicationsSync = () => {
       try {
         const data = await fetchPublications();
         setPublications(data);
-        // Kick off background logo fetch for items missing logos (will also update DB in edge function)
-        const missing = data.filter(p => !p.logo_url && p.website_url).map(p => p.website_url!)
+        // Kick off background logo fetch for items missing logos (edge function updates DB)
+        const missing = data.filter(p => !p.logo_url);
         if (missing.length) {
-          BrandFetchService.prefetchLogos(missing).catch(() => {/* ignore */});
+          const promises = missing.slice(0, 100).map(p =>
+            supabase.functions.invoke('fetch-brand-logo', {
+              body: { publicationId: p.id, websiteUrl: p.website_url || undefined, name: p.name }
+            })
+          );
+          Promise.allSettled(promises).catch(() => {/* ignore */});
         }
       } catch (error) {
         console.error('Error loading publications:', error);

@@ -37,11 +37,11 @@ serve(async (req) => {
   }
 
   try {
-    const { websiteUrl } = await req.json();
+    const { websiteUrl, name, publicationId } = await req.json();
     
-    if (!websiteUrl) {
+    if (!websiteUrl && !name) {
       return new Response(
-        JSON.stringify({ error: 'Website URL is required' }),
+        JSON.stringify({ error: 'Website URL or name is required' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -49,11 +49,11 @@ serve(async (req) => {
       );
     }
 
-    const domain = extractDomain(websiteUrl);
-    const brandfetchApiKey = Deno.env.get('BRANDFETCH_API_KEY');
+    let domain = extractDomain(websiteUrl);
+    const clientId = Deno.env.get('BRANDFETCH_API_KEY'); // Using client ID per Brand Search API
     
-    if (!brandfetchApiKey) {
-      console.error('BRANDFETCH_API_KEY not configured');
+    if (!clientId) {
+      console.error('BRANDFETCH_API_KEY (client id) not configured');
       return new Response(
         JSON.stringify({ logoUrl: getFallbackLogo(websiteUrl) }),
         { 
@@ -62,13 +62,39 @@ serve(async (req) => {
       );
     }
 
+    // If no domain available, try Brand Search API by name
+    if (!domain && name) {
+      const searchRes = await fetch(`https://api.brandfetch.io/v2/search/${encodeURIComponent(name)}?c=${clientId}`);
+      if (searchRes.ok) {
+        const arr = await searchRes.json();
+        if (Array.isArray(arr) && arr.length > 0 && arr[0].domain) {
+          domain = arr[0].domain;
+          // If publicationId exists and websiteUrl is empty, update website_url
+          if (publicationId && !websiteUrl) {
+            try {
+              await supabase
+                .from('publications')
+                .update({ website_url: `https://${domain}` })
+                .eq('id', publicationId);
+            } catch (e) {
+              console.error('Failed to set website_url from search result:', e);
+            }
+          }
+        }
+      }
+    }
+
+    if (!domain) {
+      console.log('No domain could be resolved from input');
+      return new Response(
+        JSON.stringify({ logoUrl: getFallbackLogo(websiteUrl) }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     console.log(`Fetching brand logo for domain: ${domain}`);
 
-    const response = await fetch(`https://api.brandfetch.io/v2/brands/${domain}`, {
-      headers: {
-        'Authorization': `Bearer ${brandfetchApiKey}`,
-      },
-    });
+    const response = await fetch(`https://api.brandfetch.io/v2/brands/${domain}?c=${clientId}`);
 
     if (!response.ok) {
       console.log(`Brandfetch API failed with status: ${response.status}`);
@@ -83,10 +109,9 @@ serve(async (req) => {
     const data: BrandResponse = await response.json();
     const bestLogo = getBestLogo(data.logos);
 
-    // Attempt to persist logo to publications table (service role)
     if (bestLogo) {
       try {
-        await updatePublicationLogo(websiteUrl, domain, bestLogo);
+        await updatePublicationLogo({ publicationId, websiteUrl, domain, logoUrl: bestLogo });
       } catch (e) {
         console.error('Failed to update publication logo in DB:', e);
       }
@@ -176,16 +201,27 @@ function getFallbackLogo(websiteUrl: string | undefined): string {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
 }
 
-async function updatePublicationLogo(websiteUrl: string, domain: string, logoUrl: string) {
+async function updatePublicationLogo(params: { publicationId?: string; websiteUrl?: string; domain: string; logoUrl: string }) {
+  const { publicationId, websiteUrl, domain, logoUrl } = params;
   try {
-    // First try exact match on website_url
-    const { error: exactError } = await supabase
-      .from('publications')
-      .update({ logo_url: logoUrl })
-      .eq('website_url', websiteUrl);
+    if (publicationId) {
+      const { error } = await supabase
+        .from('publications')
+        .update({ logo_url: logoUrl })
+        .eq('id', publicationId);
+      if (error) console.error('Update by id error:', error);
+      return;
+    }
 
-    if (exactError) {
-      console.error('Exact match update error:', exactError);
+    if (websiteUrl) {
+      // First try exact match on website_url
+      const { error: exactError } = await supabase
+        .from('publications')
+        .update({ logo_url: logoUrl })
+        .eq('website_url', websiteUrl);
+      if (exactError) {
+        console.error('Exact match update error:', exactError);
+      }
     }
 
     // Also try domain match if exact didn't affect rows or URLs stored differ
@@ -193,7 +229,6 @@ async function updatePublicationLogo(websiteUrl: string, domain: string, logoUrl
       .from('publications')
       .update({ logo_url: logoUrl })
       .ilike('website_url', `%${domain}%`);
-
     if (domainError) {
       console.error('Domain match update error:', domainError);
     }
