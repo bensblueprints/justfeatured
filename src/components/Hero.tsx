@@ -115,11 +115,9 @@ export const Hero = () => {
 
           {/* Floating Publication Cards */}
           <div className="relative mb-16 animate-slide-up" style={{ animationDelay: '0.6s' }}>
-            <div className="glass-card rounded-2xl p-8 mb-8">
+            <div className="mb-8">
               <h3 className="text-xl font-bold mb-6 text-center text-white">Featured in 200+ Major News Outlets</h3>
               <div className="relative">
-                <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-current to-transparent z-10 pointer-events-none opacity-20" />
-                <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-current to-transparent z-10 pointer-events-none opacity-20" />
                 
                  <div className="overflow-hidden">
                    <div className="flex animate-scroll whitespace-nowrap">
@@ -130,7 +128,6 @@ export const Hero = () => {
                                src={publication.logoUrl} 
                                alt={publication.name}
                                className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-105"
-                               style={{ maxHeight: '48px', maxWidth: '120px' }}
                                loading="lazy"
                                onError={(e) => {
                                  const target = e.target as HTMLImageElement;
@@ -138,7 +135,7 @@ export const Hero = () => {
                                }}
                             />
                           </div>
-                          <span className="text-white/60 text-lg">•</span>
+                          
                         </div>
                      ))}
                    </div>
@@ -175,7 +172,7 @@ export const Hero = () => {
                       src={publication.logoUrl} 
                       alt={publication.name}
                       className="h-10 md:h-12 w-auto object-contain transition-all duration-300 hover:scale-110 cursor-pointer"
-                      style={{ maxHeight: '48px', maxWidth: '120px' }}
+                      
                       loading="lazy"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
