@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Search, Eye, ExternalLink, ShoppingCart } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Eye, ExternalLink, ShoppingCart, Globe } from "lucide-react";
 import { Publication } from "@/types";
 
 interface PublicationListViewProps {
@@ -268,15 +268,31 @@ export const PublicationListView = ({
                     <div className="truncate" title={publication.name}>
                       {publication.name}
                     </div>
-                    <Button
-                      variant={selectedPublications.includes(publication.id) ? "secondary" : "default"}
-                      size="sm"
-                      onClick={() => onSelectionChange(publication.id, !selectedPublications.includes(publication.id))}
-                      className="h-6 px-3 text-xs"
-                    >
-                      <ShoppingCart className="h-3 w-3 mr-1" />
-                      {selectedPublications.includes(publication.id) ? "Remove" : "Add to Cart"}
-                    </Button>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {publication.website_url && new URL(publication.website_url).hostname}
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <Button
+                        variant={selectedPublications.includes(publication.id) ? "secondary" : "default"}
+                        size="sm"
+                        onClick={() => onSelectionChange(publication.id, !selectedPublications.includes(publication.id))}
+                        className="h-6 px-3 text-xs w-full"
+                      >
+                        <ShoppingCart className="h-3 w-3 mr-1" />
+                        {selectedPublications.includes(publication.id) ? "Remove" : "Add to Cart"}
+                      </Button>
+                      {publication.website_url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(publication.website_url, '_blank')}
+                          className="h-6 px-3 text-xs w-full"
+                        >
+                          <Globe className="h-3 w-3 mr-1" />
+                          View Sample
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
