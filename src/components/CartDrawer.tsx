@@ -78,20 +78,31 @@ export const CartDrawer = ({
   };
 
   const handleCheckout = () => {
-    setIsOpen(false);
-    const checkoutItems = cartItems.map(pub => ({
-      id: pub.id,
-      name: pub.name,
-      price: Number(pub.price),
-      category: pub.category,
-      tat_days: parseInt(pub.tat_days) || 3
-    }));
-    navigate('/checkout', { 
-      state: { 
-        selectedPublications: checkoutItems,
-        packageType: 'custom'
-      } 
-    });
+    try {
+      const checkoutItems = cartItems.map(pub => ({
+        id: pub.id,
+        name: pub.name,
+        price: Number(pub.price),
+        category: pub.category,
+        tat_days: parseInt(String(pub.tat_days)) || 3,
+      }));
+      // Persist as fallback for navigation on mobile
+      sessionStorage.setItem('checkout_items', JSON.stringify(checkoutItems));
+      sessionStorage.setItem('checkout_package_type', 'custom');
+      setIsOpen(false);
+      // Navigate after closing animation to avoid sheet focus trap issues on mobile
+      setTimeout(() => {
+        navigate('/checkout', {
+          state: {
+            selectedPublications: checkoutItems,
+            packageType: 'custom',
+          },
+        });
+      }, 50);
+    } catch (e) {
+      console.error('Failed to proceed to checkout', e);
+      navigate('/checkout');
+    }
   };
 
   return (

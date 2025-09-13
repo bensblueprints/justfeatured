@@ -109,9 +109,9 @@ export const Checkout = () => {
   ];
 
   useEffect(() => {
-    // Get selected publications from navigation state
-    const selectedPublications = location.state?.selectedPublications || [];
-    const type = location.state?.packageType || 'custom';
+    // Get selected publications from navigation state (fallback to sessionStorage for mobile)
+    const stateItems = location.state?.selectedPublications || JSON.parse(sessionStorage.getItem('checkout_items') || '[]');
+    const type = (location.state?.packageType as 'starter' | 'custom') || (sessionStorage.getItem('checkout_package_type') as 'starter' | 'custom') || 'custom';
     const starterPubs = location.state?.selectedStarterPublications || [];
     
     setPackageType(type);
@@ -123,22 +123,27 @@ export const Checkout = () => {
         const starterItems = starterPubs.map((pub: any, index: number) => ({
           id: `starter-${pub.id}`,
           name: pub.name,
-          price: index === 0 ? 97 : 87, // First publication $97, additional $87 each (discounted from $97)
+          price: index === 0 ? 97 : 87,
           category: 'Starter Package',
-          tat_days: 3
+          tat_days: 3,
         }));
         setItems(starterItems);
       } else {
-        // Redirect to starter selection if no publications selected
         navigate('/starter-selection');
         return;
       }
     } else {
-      setItems(selectedPublications);
+      setItems(stateItems);
+    }
+
+    // Clean up persisted data once loaded
+    if (stateItems.length > 0) {
+      sessionStorage.removeItem('checkout_items');
+      sessionStorage.removeItem('checkout_package_type');
     }
 
     // If no items, redirect back to publications
-    if (selectedPublications.length === 0 && type !== 'starter') {
+    if (stateItems.length === 0 && type !== 'starter') {
       navigate('/publications');
     }
   }, [location.state, navigate]);
