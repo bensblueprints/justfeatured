@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -108,11 +108,22 @@ export const PublicationListView = ({
 
     return filtered;
   }, [publications, loading, searchTerm, sponsoredFilter, dofollowFilter, categoryFilter, sortBy, sortOrder]);
+const totalPages = Math.max(1, Math.ceil(filteredPublications.length / ROWS_PER_PAGE));
+const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
+const paginatedPublications = filteredPublications.slice(startIndex, startIndex + ROWS_PER_PAGE);
 
-  const totalPages = Math.ceil(1241 / ROWS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
-  const paginatedPublications = filteredPublications.slice(startIndex, startIndex + ROWS_PER_PAGE);
+// Reset to first page when filters/search or data change
+useEffect(() => {
+  setCurrentPage(1);
+}, [searchTerm, sponsoredFilter, dofollowFilter, categoryFilter, publications, ROWS_PER_PAGE]);
 
+// Ensure current page stays in bounds when result count changes
+useEffect(() => {
+  const pages = Math.max(1, Math.ceil(filteredPublications.length / ROWS_PER_PAGE));
+  if (currentPage > pages) {
+    setCurrentPage(1);
+  }
+}, [filteredPublications.length, ROWS_PER_PAGE]);
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -322,7 +333,7 @@ export const PublicationListView = ({
       {/* Results Summary */}
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground">
-          Showing {paginatedPublications.length} of 1,241 publications
+          Showing {paginatedPublications.length} of {filteredPublications.length} publications
           {loading && " (Loading...)"}
         </p>
         <div className="flex items-center gap-2">
@@ -431,7 +442,7 @@ export const PublicationListView = ({
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Showing {startIndex + 1} to {Math.min(startIndex + ROWS_PER_PAGE, filteredPublications.length)} of 1,241 publications
+          Showing {startIndex + 1} to {Math.min(startIndex + ROWS_PER_PAGE, filteredPublications.length)} of {filteredPublications.length} publications
         </div>
         <div className="flex items-center gap-2">
           <Button
