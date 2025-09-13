@@ -20,6 +20,7 @@ export const Hero = () => {
       logoUrl: '/assets/logos/forbes.png',
       website_url: 'https://forbes.com',
       tier: 'Premium',
+      price: 7000,
       dbId: '77e9cab4-0da1-4b79-8d3e-b816047be5c1'
     },
     {
@@ -27,12 +28,15 @@ export const Hero = () => {
       logoUrl: '/assets/logos/bloomberg.png',
       website_url: 'https://bloomberg.com',
       tier: 'Premium',
+      price: 200000,
+      dbId: '83a6bd7d-0ac9-4ac8-a531-ac3a9cc525e1'
     },
     {
       name: 'Reuters',
       logoUrl: '/assets/logos/reuters.png',
       website_url: 'https://reuters.com',
       tier: 'Premium',
+      price: 12000,
       dbId: null // Not found in database yet
     },
     {
@@ -40,6 +44,7 @@ export const Hero = () => {
       logoUrl: '/assets/logos/business-insider.png',
       website_url: 'https://businessinsiderafrica.com',
       tier: 'Premium',
+      price: 900,
       dbId: 'c0c0d909-fcf0-4e56-b9a9-6b8de1ed4c47'
     },
     {
@@ -47,6 +52,7 @@ export const Hero = () => {
       logoUrl: '/assets/logos/yahoo.png',
       website_url: 'https://yahoo.com',
       tier: 'Premium',
+      price: 8500,
       dbId: null // Not found in database yet
     },
     {
@@ -54,6 +60,7 @@ export const Hero = () => {
       logoUrl: '/assets/logos/time.png',
       website_url: 'https://time.com',
       tier: 'Premium',
+      price: 15000,
       dbId: null // Not found in database yet
     },
     {
@@ -61,6 +68,7 @@ export const Hero = () => {
       logoUrl: '/assets/logos/rolling-stone.png',
       website_url: 'https://rollingstone.com',
       tier: 'Premium',
+      price: 6500,
       dbId: null // Not found in database yet
     },
     {
@@ -68,6 +76,7 @@ export const Hero = () => {
       logoUrl: '/assets/logos/benzinga.png',
       website_url: 'https://benzinga.com',
       tier: 'Premium',
+      price: 800,
       dbId: '723edcb8-e551-4e1a-9d6e-34a9b376a046'
     }
   ];
@@ -191,9 +200,14 @@ export const Hero = () => {
                         }}
                       />
                     </div>
-                    <h3 className="text-white text-sm font-medium text-center mb-3 min-h-[2rem] flex items-center">
+                    <h3 className="text-white text-sm font-medium text-center mb-2 min-h-[2rem] flex items-center">
                       {publication.name}
                     </h3>
+                    <div className="text-center mb-3">
+                      <span className="text-green-400 text-lg font-bold">
+                        ${publication.price?.toLocaleString() || 'Contact for Price'}
+                      </span>
+                    </div>
                     <Button
                       onClick={() => handleAddToCart(publication)}
                       disabled={!publication.dbId || isInCart(publication.dbId)}
