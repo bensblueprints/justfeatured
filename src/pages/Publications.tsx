@@ -75,6 +75,9 @@ export const Publications = () => {
         case "socialpost":
           filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('social'));
           break;
+        case "starter":
+          filtered = filtered.filter(pub => pub.tier?.toLowerCase() === 'starter' || pub.price === 97);
+          break;
         default:
           filtered = filtered.filter(pub => pub.type === activeTab || pub.tier === activeTab);
       }
@@ -83,6 +86,7 @@ export const Publications = () => {
     // Filter by price range
     if (priceRange !== "all") {
       const ranges = {
+        "under-200": [0, 200], // Under $200
         "under-1000": [0, 1000], // Under $1,000
         "1000-5000": [1000, 5000], // $1,000 - $5,000
         "5000-15000": [5000, 15000], // $5,000 - $15,000
@@ -109,12 +113,17 @@ export const Publications = () => {
       );
     }
 
-    // Filter by search
+    // Enhanced search matching
     if (searchTerm) {
+      const normalizedSearch = searchTerm.toLowerCase().trim();
       filtered = filtered.filter(pub =>
-        pub.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.location?.toLowerCase().includes(searchTerm.toLowerCase())
+        pub.name.toLowerCase().includes(normalizedSearch) ||
+        pub.category.toLowerCase().includes(normalizedSearch) ||
+        pub.location?.toLowerCase().includes(normalizedSearch) ||
+        pub.type?.toLowerCase().includes(normalizedSearch) ||
+        pub.tier?.toLowerCase().includes(normalizedSearch) ||
+        (pub.features && pub.features.some(f => f.toLowerCase().includes(normalizedSearch))) ||
+        pub.price.toString().includes(normalizedSearch)
       );
     }
 
@@ -168,6 +177,7 @@ export const Publications = () => {
       digitaltv: publications.filter(p => p.category?.toLowerCase().includes('digital') || p.category?.toLowerCase().includes('tv')).length,
       broadcasttv: publications.filter(p => p.category?.toLowerCase().includes('broadcast')).length,
       socialpost: publications.filter(p => p.category?.toLowerCase().includes('social')).length,
+      starter: publications.filter(p => p.tier?.toLowerCase() === 'starter' || p.price === 97).length,
     };
   }, [publications]);
 
@@ -280,6 +290,7 @@ export const Publications = () => {
               <SelectContent className="bg-background border border-border shadow-lg z-50">
                 <SelectItem value="all">All Prices</SelectItem>
                 <SelectItem value="under-1000">Under $1,000</SelectItem>
+                <SelectItem value="under-200">Under $200</SelectItem>
                 <SelectItem value="1000-5000">$1,000 - $5,000</SelectItem>
                 <SelectItem value="5000-15000">$5,000 - $15,000</SelectItem>
                 <SelectItem value="15000-50000">$15,000 - $50,000</SelectItem>
@@ -332,6 +343,7 @@ export const Publications = () => {
               <SelectItem value="digitaltv">Digital TV ({tabCounts.digitaltv})</SelectItem>
               <SelectItem value="broadcasttv">Broadcast TV ({tabCounts.broadcasttv})</SelectItem>
               <SelectItem value="socialpost">Social Post ({tabCounts.socialpost})</SelectItem>
+              <SelectItem value="starter">Starter ($97) ({tabCounts.starter})</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -399,6 +411,28 @@ export const Publications = () => {
                   </div>
                 )}
               </>
+            )}
+
+            {/* No results found message */}
+            {filteredPublications.length === 0 && !loading && (
+              <div className="text-center py-12">
+                <p className="text-lg text-muted-foreground mb-4">
+                  No publications found matching your criteria
+                </p>
+                <Button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setActiveTab('all');
+                    setPriceRange('all');
+                    setIndustryFilter('all');
+                    setSortBy('popularity');
+                  }}
+                  variant="outline"
+                  className="min-w-[200px]"
+                >
+                  Reset Filters
+                </Button>
+              </div>
             )}
           </div>
 

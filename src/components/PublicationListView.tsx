@@ -205,14 +205,20 @@ export const PublicationListView = ({
 
         {/* Mobile Card Grid */}
         <div className="grid grid-cols-1 gap-4">
-          {paginatedPublications.map((publication) => (
-            <PublicationMobileCard
-              key={publication.id}
-              publication={publication}
-              selected={selectedPublications.includes(publication.id)}
-              onSelectionChange={(selected) => onSelectionChange(publication.id, selected)}
-            />
-          ))}
+          {paginatedPublications.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No publications found matching your criteria</p>
+            </div>
+          ) : (
+            paginatedPublications.map((publication) => (
+              <PublicationMobileCard
+                key={publication.id}
+                publication={publication}
+                selected={selectedPublications.includes(publication.id)}
+                onSelectionChange={(selected) => onSelectionChange(publication.id, selected)}
+              />
+            ))
+          )}
         </div>
 
         {/* Mobile Pagination */}
@@ -355,7 +361,14 @@ export const PublicationListView = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedPublications.map((publication) => (
+              {paginatedPublications.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    No publications found matching your criteria
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paginatedPublications.map((publication) => (
                 <TableRow key={publication.id} className="hover:bg-muted/30">
                   <TableCell className="font-medium">
                     <div className="space-y-2">
@@ -408,7 +421,8 @@ export const PublicationListView = ({
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
