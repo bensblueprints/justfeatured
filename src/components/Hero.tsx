@@ -13,63 +13,63 @@ export const Hero = () => {
   const { toast } = useToast();
 
 
-  // Match publications from database with static display data
+  // Featured premium tier publications from the newly added ones
   const featuredPublications = [
     {
-      name: 'Forbes USA',
-      logoUrl: '/assets/logos/forbes.png',
-      website_url: 'https://forbes.com',
+      name: 'Artist Recap',
+      logoUrl: 'https://ui-avatars.com/api/?name=Artist%20Recap&background=e2e8f0&color=475569&size=64',
+      website_url: 'https://artistrecap.com',
       tier: 'Premium',
-      dbId: '77e9cab4-0da1-4b79-8d3e-b816047be5c1'
+      dbId: '55c50f90-0b49-4d44-aefc-4f481ec3cab5'
     },
     {
-      name: 'Reuters',
-      logoUrl: '/assets/logos/reuters.png',
-      website_url: 'https://reuters.com',
+      name: 'AtoZ Times',
+      logoUrl: 'https://ui-avatars.com/api/?name=AtoZ%20Times&background=e2e8f0&color=475569&size=64',
+      website_url: 'https://atoztimes.com',
       tier: 'Premium',
-      dbId: '2555e631-6648-4027-ae1e-774c5b112679'
+      dbId: '741104c6-2518-4e79-9d42-a239d66581c2'
     },
     {
-      name: 'Bloomberg',
-      logoUrl: '/assets/logos/bloomberg.png',
-      website_url: 'https://bloomberg.com',
+      name: 'Artist Highlight',
+      logoUrl: 'https://ui-avatars.com/api/?name=Artist%20Highlight&background=e2e8f0&color=475569&size=64',
+      website_url: 'https://artisthighlight.com',
       tier: 'Premium',
-      dbId: '83a6bd7d-0ac9-4ac8-a531-ac3a9cc525e1'
+      dbId: '6434a354-de36-4c5e-96da-c5c8a729563d'
     },
     {
-      name: 'TIME',
-      logoUrl: '/assets/logos/time.png',
-      website_url: 'https://time.com',
+      name: 'Tech Daily',
+      logoUrl: 'https://ui-avatars.com/api/?name=Tech%20Daily&background=e2e8f0&color=475569&size=64',
+      website_url: 'https://techdaily.com',
       tier: 'Premium',
-      dbId: '52711bd4-884c-497f-8b30-f88d7c55a3c2'
+      dbId: null // Will be updated with correct ID once we find it
     },
     {
-      name: 'Yahoo',
-      logoUrl: '/assets/logos/yahoo.png',
-      website_url: 'https://yahoo.com',
+      name: 'Finance Focus',
+      logoUrl: 'https://ui-avatars.com/api/?name=Finance%20Focus&background=e2e8f0&color=475569&size=64',
+      website_url: 'https://financefocus.com',
       tier: 'Premium',
-      dbId: 'e0caea04-e8ce-4304-9dbf-ceeb7c0a9087'
+      dbId: null // Will be updated with correct ID once we find it
     },
     {
-      name: 'Business Insider',
-      logoUrl: '/assets/logos/business-insider.png',
-      website_url: 'https://businessinsider.com',
+      name: 'Biz Weekly',
+      logoUrl: 'https://ui-avatars.com/api/?name=Biz%20Weekly&background=e2e8f0&color=475569&size=64',
+      website_url: 'https://bizweekly.com',
       tier: 'Premium',
-      dbId: '24fc0876-3602-48e2-9e45-23bd69162a68'
+      dbId: null // Will be updated with correct ID once we find it
     },
     {
-      name: 'Benzinga',
-      logoUrl: '/assets/logos/benzinga.png',
-      website_url: 'https://benzinga.com',
+      name: 'Celeb Digest',
+      logoUrl: 'https://ui-avatars.com/api/?name=Celeb%20Digest&background=e2e8f0&color=475569&size=64',
+      website_url: 'https://celebdigest.com',
       tier: 'Premium',
-      dbId: '723edcb8-e551-4e1a-9d6e-34a9b376a046'
+      dbId: null // Will be updated with correct ID once we find it
     },
     {
-      name: 'Billboard',
-      logoUrl: '/assets/logos/billboard.png',
-      website_url: 'https://billboard.com',
+      name: 'Health Spotlight',
+      logoUrl: 'https://ui-avatars.com/api/?name=Health%20Spotlight&background=e2e8f0&color=475569&size=64',
+      website_url: 'https://healthspotlight.com',
       tier: 'Premium',
-      dbId: null
+      dbId: null // Will be updated with correct ID once we find it
     }
   ];
 

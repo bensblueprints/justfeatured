@@ -40,6 +40,7 @@ import { Dashboard as UserDashboard } from './Dashboard';
 import { PublicationLogoManager } from '@/components/admin/PublicationLogoManager';
 import { PublicationWebsiteManager } from '@/components/admin/PublicationWebsiteManager';
 import { EmailSubscribers } from '@/components/admin/EmailSubscribers';
+import { BulkLogoUpdater } from '@/components/admin/BulkLogoUpdater';
 import { ManualBillingPortal } from '@/components/admin/ManualBillingPortal';
 
 type AdminSection = 
@@ -153,6 +154,7 @@ const AdminPanel = () => {
                 </div>
                 <div className="space-y-4">
                   <PublicationWebsiteManager />
+                  <BulkLogoUpdater />
                   <SpreadsheetSync />
                 </div>
               </div>
