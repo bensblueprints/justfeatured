@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Star, TrendingUp, Zap, Sparkles, CheckCircle, ShoppingCart } from "lucide-react";
+import { ArrowRight, Star, TrendingUp, Zap, Sparkles, CheckCircle, ShoppingCart, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
@@ -211,7 +211,7 @@ export const Hero = () => {
                     <Button
                       onClick={() => handleAddToCart(publication)}
                       disabled={!publication.dbId || isInCart(publication.dbId)}
-                      className="w-full bg-primary hover:bg-primary/80 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-primary hover:bg-primary/80 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mb-2"
                       size="sm"
                     >
                       {publication.dbId ? (
@@ -229,6 +229,17 @@ export const Hero = () => {
                       ) : (
                         'Unavailable'
                       )}
+                    </Button>
+                    
+                    {/* Visit Website Button */}
+                    <Button
+                      onClick={() => window.open(publication.website_url, '_blank', 'noopener,noreferrer')}
+                      variant="outline"
+                      className="w-full border-white/30 text-white hover:bg-white/10 hover:border-white/50"
+                      size="sm"
+                    >
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      Visit Website
                     </Button>
                   </div>
                 ))}

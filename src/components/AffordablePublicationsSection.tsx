@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/useCart";
 import { toast } from "@/hooks/use-toast";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
+import { ExternalLink } from "lucide-react";
 
 export const AffordablePublicationsSection = () => {
   const { addToCart, isInCart } = useCart();
@@ -124,11 +125,24 @@ export const AffordablePublicationsSection = () => {
                 <Button
                   onClick={() => handleAddToCart(publication)}
                   disabled={isInCart(publication.id)}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white mb-2"
                   size="sm"
                 >
                   {isInCart(publication.id) ? 'In Cart ✓' : 'Add to Cart'}
                 </Button>
+                
+                {/* Visit Website Button */}
+                {publication.website_url && (
+                  <Button
+                    onClick={() => window.open(publication.website_url, '_blank', 'noopener,noreferrer')}
+                    variant="outline"
+                    className="w-full border-primary/20 text-primary hover:bg-primary/10"
+                    size="sm"
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    Visit Website
+                  </Button>
+                )}
               </CardHeader>
               
               <CardContent className="pt-0 px-4 pb-4">
