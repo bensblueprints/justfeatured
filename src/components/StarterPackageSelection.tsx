@@ -1,73 +1,75 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Star, ArrowRight } from 'lucide-react';
-import { fetchPublicationsByTier } from '@/lib/publications';
-import { PublicationCard } from '@/components/PublicationCard';
 import { Publication } from '@/types';
-import { BrandFetchService } from '@/utils/brandFetch';
+import { toast } from '@/hooks/use-toast';
 
 interface StarterPackageSelectionProps {
-  onSelectionComplete: (selectedPublication: Publication) => void;
+  onSelectionComplete: (selectedPublications: Publication[]) => void;
 }
 
 export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageSelectionProps) => {
-  const [selectedPublication, setSelectedPublication] = useState<Publication | null>(null);
-  const [publications, setPublications] = useState<Publication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [logos, setLogos] = useState<{ [key: string]: string }>({});
+  const [selectedPublications, setSelectedPublications] = useState<Publication[]>([]);
   const navigate = useNavigate();
 
-  // Fetch publications from database
-  useEffect(() => {
-    const loadPublications = async () => {
-      try {
-        const data = await fetchPublicationsByTier('starter');
-        setPublications(data); // Show all starter options
-        
-        // Fetch logos for each publication
-        const logoPromises = data.map(async (publication) => {
-          if (publication.logo_url) {
-            return { id: publication.id, logo: publication.logo_url };
-          } else if (publication.website_url) {
-            try {
-              const logoUrl = await BrandFetchService.getLogoWithFallback(publication.website_url);
-              return { id: publication.id, logo: logoUrl };
-            } catch (error) {
-              console.log('Failed to fetch logo for:', publication.name);
-              return { id: publication.id, logo: '' };
-            }
-          }
-          return { id: publication.id, logo: '' };
-        });
-        
-        const logoResults = await Promise.all(logoPromises);
-        const logoMap: { [key: string]: string } = {};
-        logoResults.forEach(result => {
-          logoMap[result.id] = result.logo;
-        });
-        setLogos(logoMap);
-      } catch (error) {
-        console.error('Error loading publications:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPublications();
-  }, []);
+  // All 27 $97 publications from AffordablePublicationsSection
+  const affordablePublications: Publication[] = [
+    { id: 'artist-recap', name: 'Artist Recap', price: 97, tier: 'premium', category: 'Entertainment', da_score: 45, dr_score: 42, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'atoz-times', name: 'AtoZ Times', price: 97, tier: 'premium', category: 'General News', da_score: 48, dr_score: 46, tat_days: '2-4 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'womens-reporter', name: 'Womens Reporter', price: 97, tier: 'premium', category: 'Lifestyle', da_score: 42, dr_score: 44, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'miami-highlight', name: 'Miami Highlight', price: 97, tier: 'premium', category: 'Local News', da_score: 40, dr_score: 38, tat_days: '1-2 Days', location: 'Miami', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'artist-highlight', name: 'Artist Highlight', price: 97, tier: 'premium', category: 'Entertainment', da_score: 46, dr_score: 43, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'texas-recap', name: 'Texas Recap', price: 97, tier: 'premium', category: 'Local News', da_score: 44, dr_score: 41, tat_days: '1-3 Days', location: 'Texas', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'leader-report', name: 'The Leader Report', price: 97, tier: 'premium', category: 'Business', da_score: 50, dr_score: 48, tat_days: '2-4 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'golden-state-review', name: 'Golden State Review', price: 97, tier: 'premium', category: 'Local News', da_score: 43, dr_score: 40, tat_days: '1-3 Days', location: 'California', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'mens-reporter', name: 'MensReporter', price: 97, tier: 'premium', category: 'Lifestyle', da_score: 41, dr_score: 39, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'best-in-houses', name: 'Best in Houses', price: 97, tier: 'premium', category: 'Real Estate', da_score: 44, dr_score: 42, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'juris-review', name: 'Juris Review', price: 97, tier: 'premium', category: 'Legal', da_score: 47, dr_score: 45, tat_days: '2-4 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'todays-read', name: 'Todays Read', price: 97, tier: 'premium', category: 'General News', da_score: 43, dr_score: 41, tat_days: '1-2 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'celeb-digest', name: 'Celeb Digest', price: 97, tier: 'premium', category: 'Entertainment', da_score: 49, dr_score: 47, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'primetime-press', name: 'Primetime Press', price: 97, tier: 'premium', category: 'Entertainment', da_score: 46, dr_score: 44, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'mens-newspaper', name: 'Mens Newspaper', price: 97, tier: 'premium', category: 'Lifestyle', da_score: 40, dr_score: 38, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'rent-magazine', name: 'Rent Magazine', price: 97, tier: 'premium', category: 'Real Estate', da_score: 42, dr_score: 40, tat_days: '2-4 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'empire-state-review', name: 'Empire State Review', price: 97, tier: 'premium', category: 'Local News', da_score: 45, dr_score: 43, tat_days: '1-3 Days', location: 'New York', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'top-listings', name: 'Top Listings', price: 97, tier: 'premium', category: 'Real Estate', da_score: 41, dr_score: 39, tat_days: '1-2 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'good-morning-us', name: 'Good Morning US', price: 97, tier: 'premium', category: 'General News', da_score: 48, dr_score: 46, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'biz-recap', name: 'Biz Recap', price: 97, tier: 'premium', category: 'Business', da_score: 47, dr_score: 45, tat_days: '1-3 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'womens-insider', name: 'Womens Insider', price: 97, tier: 'premium', category: 'Lifestyle', da_score: 44, dr_score: 42, tat_days: '2-4 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'ny-review', name: 'NY Review', price: 97, tier: 'premium', category: 'Local News', da_score: 46, dr_score: 44, tat_days: '1-3 Days', location: 'New York', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'biz-weekly', name: 'Biz Weekly', price: 97, tier: 'premium', category: 'Business', da_score: 45, dr_score: 43, tat_days: '2-3 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'tech-daily', name: 'Tech Daily', price: 97, tier: 'premium', category: 'Technology', da_score: 49, dr_score: 47, tat_days: '1-3 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'health-spotlight', name: 'Health Spotlight', price: 97, tier: 'premium', category: 'Health', da_score: 43, dr_score: 41, tat_days: '2-4 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'finance-focus', name: 'Finance Focus', price: 97, tier: 'premium', category: 'Finance', da_score: 48, dr_score: 46, tat_days: '1-3 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] },
+    { id: 'startup-stories', name: 'Startup Stories', price: 97, tier: 'premium', category: 'Business', da_score: 44, dr_score: 42, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false, type: 'standard', popularity: 50, is_active: true, features: ['DoFollow', 'Indexed', 'Editorial'] }
+  ];
 
   const handleSelect = (publication: Publication) => {
-    setSelectedPublication(publication);
+    const isSelected = selectedPublications.some(p => p.id === publication.id);
+    if (isSelected) {
+      setSelectedPublications(prev => prev.filter(p => p.id !== publication.id));
+      toast({
+        title: "Removed from selection",
+        description: `${publication.name} has been removed from your selection.`,
+      });
+    } else {
+      setSelectedPublications(prev => [...prev, publication]);
+      toast({
+        title: "Added to selection",
+        description: `${publication.name} has been added to your selection.`,
+      });
+    }
   };
 
   const handleContinue = () => {
-    if (selectedPublication) {
-      onSelectionComplete(selectedPublication);
+    if (selectedPublications.length > 0) {
+      onSelectionComplete(selectedPublications);
     }
   };
+
+  const totalPrice = selectedPublications.reduce((sum, pub) => sum + pub.price, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
@@ -75,120 +77,111 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <Badge className="bg-warning text-warning-foreground mb-4">
+            <Badge className="bg-green-100 text-green-800 mb-4">
               <Star className="h-3 w-3 mr-1" />
-              Starter Package - <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span>
+              $97 Publications • Select Multiple
             </Badge>
             <h1 className="text-4xl font-bold text-foreground mb-4">
-              Choose Your Publication
+              Choose Your Publications
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Select one publication from our starter collection. Perfect for first-time users to get professional media coverage.
+              Select one or more publications from our $97 collection. Each publication offers excellent value and professional coverage.
             </p>
+            {selectedPublications.length > 0 && (
+              <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-green-700">
+                  {selectedPublications.length} publication{selectedPublications.length > 1 ? 's' : ''} selected • Total: <span className="font-bold">${totalPrice}</span>
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Publication Selection Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {publications.map((publication) => {
-              // Determine target audience based on publication category
-              const getTargetAudience = (category: string, name: string) => {
-                const categoryLower = category.toLowerCase();
-                const nameLower = name.toLowerCase();
-                
-                if (categoryLower.includes('business') || nameLower.includes('ceo') || nameLower.includes('biz')) {
-                  return "Perfect for CEOs, entrepreneurs, and business leaders";
-                } else if (categoryLower.includes('news') || nameLower.includes('news')) {
-                  return "Ideal for newsworthy announcements and press releases";
-                } else if (categoryLower.includes('lifestyle') || nameLower.includes('men') || nameLower.includes('women')) {
-                  return "Great for lifestyle brands, personal brands, and consumer products";
-                } else if (categoryLower.includes('entertainment') || nameLower.includes('celeb')) {
-                  return "Best for entertainment industry and celebrity news";
-                } else if (categoryLower.includes('real estate') || nameLower.includes('rent') || nameLower.includes('houses')) {
-                  return "Perfect for real estate professionals and property announcements";
-                } else if (categoryLower.includes('legal') || nameLower.includes('juris')) {
-                  return "Ideal for law firms and legal professionals";
-                } else if (categoryLower.includes('arts') || categoryLower.includes('culture') || nameLower.includes('artist')) {
-                  return "Great for artists, galleries, and cultural organizations";
-                } else if (categoryLower.includes('regional') || nameLower.includes('state') || nameLower.includes('texas') || nameLower.includes('miami') || nameLower.includes('california')) {
-                  return "Perfect for local businesses and regional announcements";
-                } else {
-                  return "Suitable for general business announcements and brand awareness";
-                }
-              };
-
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {affordablePublications.map((publication) => {
+              const isSelected = selectedPublications.some(p => p.id === publication.id);
+              
               return (
                 <Card 
                   key={publication.id}
-                  className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                    selectedPublication?.id === publication.id 
-                      ? 'ring-2 ring-primary border-primary bg-primary/5' 
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 ${
+                    isSelected 
+                      ? 'ring-2 ring-green-500 border-green-500 bg-green-50' 
                       : 'hover:border-primary/50'
                   }`}
                   onClick={() => handleSelect(publication)}
                 >
-                  <CardHeader className="pb-3">
-                    {/* Logo */}
-                    <div className="flex justify-center mb-4">
-                      {logos[publication.id] ? (
-                        <img
-                          src={logos[publication.id]}
-                          alt={`${publication.name} logo`}
-                          className="w-20 h-20 object-contain rounded-lg bg-white/50 p-3"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const placeholder = target.nextElementSibling as HTMLElement;
-                            if (placeholder) placeholder.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
+                  <CardHeader className="p-4">
+                    {/* Logo Display */}
+                    <div className="flex justify-center mb-3">
                       <div 
-                        className="w-20 h-20 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center text-xl font-bold text-primary"
-                        style={{ display: logos[publication.id] ? 'none' : 'flex' }}
+                        className="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center text-lg font-bold text-primary"
                       >
                         {publication.name.charAt(0).toUpperCase()}
                       </div>
                     </div>
                     
+                    {/* Tier, Price and Selection */}
                     <div className="flex items-center justify-between mb-2">
-                      <Badge variant="secondary" className="text-xs">
-                        {publication.category}
+                      <Badge variant="secondary" className="text-xs px-2 py-1 bg-green-100 text-green-800">
+                        {publication.tier?.toUpperCase() || 'PREMIUM'}
                       </Badge>
-                      {selectedPublication?.id === publication.id && (
-                        <CheckCircle className="h-5 w-5 text-primary" />
+                      <div className="flex items-center gap-2">
+                        <div className="text-lg font-bold text-primary">
+                          $97
+                        </div>
+                        {isSelected && (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Publication Name */}
+                    <CardTitle className="text-sm font-semibold text-center mb-2 line-clamp-2">
+                      {publication.name}
+                    </CardTitle>
+                    
+                    {/* DA/DR Scores */}
+                    <div className="flex justify-center gap-4 mb-2">
+                      <div className="text-center">
+                        <div className="text-sm font-semibold text-primary">{publication.da_score || 0}</div>
+                        <div className="text-xs text-muted-foreground">DA</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-sm font-semibold text-primary">{publication.dr_score || 0}</div>
+                        <div className="text-xs text-muted-foreground">DR</div>
+                      </div>
+                    </div>
+                    
+                    {/* TAT and Location */}
+                    <div className="text-center text-xs text-muted-foreground mb-2">
+                      {publication.tat_days} • {publication.location || 'Global'}
+                    </div>
+                    
+                    {/* Feature Icons */}
+                    <div className="flex justify-center gap-2 mb-3">
+                      {publication.dofollow_link && (
+                        <Badge variant="outline" className="text-xs px-1 py-0">
+                          ✓ DoFollow
+                        </Badge>
+                      )}
+                      {publication.indexed && (
+                        <Badge variant="outline" className="text-xs px-1 py-0">
+                          ✓ Indexed
+                        </Badge>
+                      )}
+                      {!publication.sponsored && (
+                        <Badge variant="outline" className="text-xs px-1 py-0">
+                          ✓ Editorial
+                        </Badge>
                       )}
                     </div>
-                    <CardTitle className="text-lg text-center">{publication.name}</CardTitle>
-                    <CardDescription className="text-sm text-center">
-                      {getTargetAudience(publication.category, publication.name)}
-                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Price:</span>
-                        <span className="font-bold text-primary">$97</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Turnaround:</span>
-                        <span className="font-medium">{publication.tat_days}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Location:</span>
-                        <span className="font-medium text-xs">{publication.location}</span>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground mb-2">Features:</p>
-                        <div className="flex flex-wrap gap-1">
-                          <Badge variant="outline" className="text-xs px-2 py-0">
-                            {publication.indexed ? 'Indexed' : 'Not Indexed'}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs px-2 py-0">
-                            {publication.dofollow_link ? 'Dofollow' : 'Nofollow'}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
+                  
+                  <CardContent className="pt-0 px-4 pb-4">
+                    <p className="text-xs leading-tight text-muted-foreground text-center line-clamp-2">
+                      {publication.category}
+                    </p>
                   </CardContent>
                 </Card>
               );
@@ -206,11 +199,11 @@ export const StarterPackageSelection = ({ onSelectionComplete }: StarterPackageS
             </Button>
             <Button
               onClick={handleContinue}
-              disabled={!selectedPublication}
+              disabled={selectedPublications.length === 0}
               size="lg"
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
             >
-              Continue to Checkout
+              Continue to Checkout {selectedPublications.length > 0 && `(${selectedPublications.length} selected)`}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>

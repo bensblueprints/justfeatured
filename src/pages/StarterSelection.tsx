@@ -6,12 +6,12 @@ import { Publication } from '@/types';
 const StarterSelection = () => {
   const navigate = useNavigate();
 
-  const handleSelectionComplete = (selectedPublication: Publication) => {
-    // Navigate to checkout with the selected publication as an array
+  const handleSelectionComplete = (selectedPublications: Publication[]) => {
+    // Navigate to checkout with the selected publications
     navigate('/checkout', {
       state: {
         packageType: 'starter',
-        selectedStarterPublications: [selectedPublication], // Convert to array
+        selectedStarterPublications: selectedPublications,
         selectedPublications: []
       }
     });
