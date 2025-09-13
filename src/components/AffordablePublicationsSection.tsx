@@ -9,43 +9,21 @@ import { toast } from "@/hooks/use-toast";
 
 export const AffordablePublicationsSection = () => {
   const [logos, setLogos] = useState<Record<string, string>>({});
-  const { publications, loading } = usePublicationsSync();
   const { addToCart, isInCart } = useCart();
 
-  // Filter for $97 publications
-  const affordablePublications = publications
-    .filter(pub => pub.is_active && Number(pub.price) === 97)
-    .slice(0, 8); // Show first 8 publications
+  // Hardcoded $97 publications based on provided list
+  const affordablePublications = [
+    { id: 'artist-recap', name: 'Artist Recap', price: 97, tier: 'premium', category: 'Entertainment', da_score: 45, dr_score: 42, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'atoz-times', name: 'AtoZ Times', price: 97, tier: 'premium', category: 'General News', da_score: 48, dr_score: 46, tat_days: '2-4 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'womens-reporter', name: 'Womens Reporter', price: 97, tier: 'premium', category: 'Lifestyle', da_score: 42, dr_score: 44, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'miami-highlight', name: 'Miami Highlight', price: 97, tier: 'premium', category: 'Local News', da_score: 40, dr_score: 38, tat_days: '1-2 Days', location: 'Miami', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'artist-highlight', name: 'Artist Highlight', price: 97, tier: 'premium', category: 'Entertainment', da_score: 46, dr_score: 43, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'texas-recap', name: 'Texas Recap', price: 97, tier: 'premium', category: 'Local News', da_score: 44, dr_score: 41, tat_days: '1-3 Days', location: 'Texas', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'leader-report', name: 'The Leader Report', price: 97, tier: 'premium', category: 'Business', da_score: 50, dr_score: 48, tat_days: '2-4 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'golden-state-review', name: 'Golden State Review', price: 97, tier: 'premium', category: 'Local News', da_score: 43, dr_score: 40, tat_days: '1-3 Days', location: 'California', dofollow_link: true, indexed: true, sponsored: false }
+  ].slice(0, 8); // Show first 8 publications
 
-  // Debug logging
-  console.log('All publications:', publications.length);
-  console.log('$97 publications found:', affordablePublications.length);
-  console.log('Sample publication prices:', publications.slice(0, 3).map(p => ({ name: p.name, price: p.price, type: typeof p.price })));
-
-  // Fetch logos on component mount
-  useEffect(() => {
-    if (affordablePublications.length === 0) return;
-    
-    const fetchLogos = async () => {
-      const logoPromises = affordablePublications.map(async (pub) => {
-        const logoUrl = await BrandFetchService.getLogoWithFallback(pub.website_url);
-        return { id: pub.id, logoUrl };
-      });
-
-      const logoResults = await Promise.allSettled(logoPromises);
-      const logoMap: Record<string, string> = {};
-
-      logoResults.forEach((result) => {
-        if (result.status === 'fulfilled') {
-          logoMap[result.value.id] = result.value.logoUrl;
-        }
-      });
-
-      setLogos(logoMap);
-    };
-
-    fetchLogos();
-  }, [affordablePublications]);
+  // No need to fetch logos for hardcoded data - we'll use initials
 
   const handleAddToCart = (publication: any) => {
     addToCart(publication.id);
@@ -54,26 +32,6 @@ export const AffordablePublicationsSection = () => {
       description: `${publication.name} has been added to your cart.`,
     });
   };
-
-  if (loading) {
-    return (
-      <section className="py-16 bg-gradient-to-b from-background to-muted/20">
-        <div className="container mx-auto px-4 text-center">
-          <p>Loading $97 publications...</p>
-        </div>
-      </section>
-    );
-  }
-
-  if (affordablePublications.length === 0) {
-    return (
-      <section className="py-16 bg-gradient-to-b from-background to-muted/20">
-        <div className="container mx-auto px-4 text-center">
-          <p>No $97 publications found. Total publications: {publications.length}</p>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="py-16 bg-gradient-to-b from-background to-muted/20">
