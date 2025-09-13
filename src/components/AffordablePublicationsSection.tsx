@@ -11,7 +11,7 @@ export const AffordablePublicationsSection = () => {
   const [logos, setLogos] = useState<Record<string, string>>({});
   const { addToCart, isInCart } = useCart();
 
-  // Hardcoded $97 publications based on provided list
+  // All 27 $97 publications based on provided list
   const affordablePublications = [
     { id: 'artist-recap', name: 'Artist Recap', price: 97, tier: 'premium', category: 'Entertainment', da_score: 45, dr_score: 42, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
     { id: 'atoz-times', name: 'AtoZ Times', price: 97, tier: 'premium', category: 'General News', da_score: 48, dr_score: 46, tat_days: '2-4 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false },
@@ -20,8 +20,27 @@ export const AffordablePublicationsSection = () => {
     { id: 'artist-highlight', name: 'Artist Highlight', price: 97, tier: 'premium', category: 'Entertainment', da_score: 46, dr_score: 43, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
     { id: 'texas-recap', name: 'Texas Recap', price: 97, tier: 'premium', category: 'Local News', da_score: 44, dr_score: 41, tat_days: '1-3 Days', location: 'Texas', dofollow_link: true, indexed: true, sponsored: false },
     { id: 'leader-report', name: 'The Leader Report', price: 97, tier: 'premium', category: 'Business', da_score: 50, dr_score: 48, tat_days: '2-4 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false },
-    { id: 'golden-state-review', name: 'Golden State Review', price: 97, tier: 'premium', category: 'Local News', da_score: 43, dr_score: 40, tat_days: '1-3 Days', location: 'California', dofollow_link: true, indexed: true, sponsored: false }
-  ].slice(0, 8); // Show first 8 publications
+    { id: 'golden-state-review', name: 'Golden State Review', price: 97, tier: 'premium', category: 'Local News', da_score: 43, dr_score: 40, tat_days: '1-3 Days', location: 'California', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'mens-reporter', name: 'MensReporter', price: 97, tier: 'premium', category: 'Lifestyle', da_score: 41, dr_score: 39, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'best-in-houses', name: 'Best in Houses', price: 97, tier: 'premium', category: 'Real Estate', da_score: 44, dr_score: 42, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'juris-review', name: 'Juris Review', price: 97, tier: 'premium', category: 'Legal', da_score: 47, dr_score: 45, tat_days: '2-4 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'todays-read', name: 'Todays Read', price: 97, tier: 'premium', category: 'General News', da_score: 43, dr_score: 41, tat_days: '1-2 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'celeb-digest', name: 'Celeb Digest', price: 97, tier: 'premium', category: 'Entertainment', da_score: 49, dr_score: 47, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'primetime-press', name: 'Primetime Press', price: 97, tier: 'premium', category: 'Entertainment', da_score: 46, dr_score: 44, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'mens-newspaper', name: 'Mens Newspaper', price: 97, tier: 'premium', category: 'Lifestyle', da_score: 40, dr_score: 38, tat_days: '1-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'rent-magazine', name: 'Rent Magazine', price: 97, tier: 'premium', category: 'Real Estate', da_score: 42, dr_score: 40, tat_days: '2-4 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'empire-state-review', name: 'Empire State Review', price: 97, tier: 'premium', category: 'Local News', da_score: 45, dr_score: 43, tat_days: '1-3 Days', location: 'New York', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'top-listings', name: 'Top Listings', price: 97, tier: 'premium', category: 'Real Estate', da_score: 41, dr_score: 39, tat_days: '1-2 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'good-morning-us', name: 'Good Morning US', price: 97, tier: 'premium', category: 'General News', da_score: 48, dr_score: 46, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'biz-recap', name: 'Biz Recap', price: 97, tier: 'premium', category: 'Business', da_score: 47, dr_score: 45, tat_days: '1-3 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'womens-insider', name: 'Womens Insider', price: 97, tier: 'premium', category: 'Lifestyle', da_score: 44, dr_score: 42, tat_days: '2-4 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'ny-review', name: 'NY Review', price: 97, tier: 'premium', category: 'Local News', da_score: 46, dr_score: 44, tat_days: '1-3 Days', location: 'New York', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'biz-weekly', name: 'Biz Weekly', price: 97, tier: 'premium', category: 'Business', da_score: 45, dr_score: 43, tat_days: '2-3 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'tech-daily', name: 'Tech Daily', price: 97, tier: 'premium', category: 'Technology', da_score: 49, dr_score: 47, tat_days: '1-3 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'health-spotlight', name: 'Health Spotlight', price: 97, tier: 'premium', category: 'Health', da_score: 43, dr_score: 41, tat_days: '2-4 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'finance-focus', name: 'Finance Focus', price: 97, tier: 'premium', category: 'Finance', da_score: 48, dr_score: 46, tat_days: '1-3 Days', location: 'Global', dofollow_link: true, indexed: true, sponsored: false },
+    { id: 'startup-stories', name: 'Startup Stories', price: 97, tier: 'premium', category: 'Business', da_score: 44, dr_score: 42, tat_days: '2-3 Days', location: 'US', dofollow_link: true, indexed: true, sponsored: false }
+  ];
 
   // No need to fetch logos for hardcoded data - we'll use initials
 
