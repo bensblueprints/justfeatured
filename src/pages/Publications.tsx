@@ -123,7 +123,8 @@ export const Publications = () => {
         pub.type?.toLowerCase().includes(normalizedSearch) ||
         pub.tier?.toLowerCase().includes(normalizedSearch) ||
         (pub.features && pub.features.some(f => f.toLowerCase().includes(normalizedSearch))) ||
-        pub.price.toString().includes(normalizedSearch)
+        pub.price.toString().includes(normalizedSearch) ||
+        pub.website_url?.toLowerCase().includes(normalizedSearch)
       );
     }
 
@@ -150,8 +151,8 @@ export const Publications = () => {
     setVisibleCount(18);
   }, [searchTerm, sortBy, activeTab, priceRange, industryFilter]);
 
-  const visiblePublications = filteredPublications.slice(0, visibleCount);
-  const hasMorePublications = visibleCount < filteredPublications.length;
+  const visiblePublications = searchTerm ? filteredPublications : filteredPublications.slice(0, visibleCount);
+  const hasMorePublications = searchTerm ? false : visibleCount < filteredPublications.length;
 
   const selectedTotal = useMemo(() => {
     return selectedPublications.reduce((total, id) => {
