@@ -32,7 +32,7 @@ import { ClientManagement } from '@/components/admin/ClientManagement';
 import { UserManagement } from '@/components/admin/UserManagement';
 
 import { PressReleaseManagement } from '@/components/admin/PressReleaseManagement';
-import { PublicationBulkEditor } from '@/components/admin/PublicationBulkEditor';
+
 import { PublicationManagement } from '@/components/admin/PublicationManagement';
 import { SpreadsheetSync } from '@/components/SpreadsheetSync';
 import { useToast } from '@/hooks/use-toast';
@@ -48,7 +48,6 @@ type AdminSection =
   | 'clients' 
   | 'press-releases'
   | 'publications'
-  | 'bulk-editor'
   | 'users'
   | 'email-subscribers'
   | 'billing-portal';
@@ -109,12 +108,6 @@ const AdminPanel = () => {
       description: 'Manage publication database & sync'
     },
     { 
-      id: 'bulk-editor' as AdminSection, 
-      title: 'Bulk Editor', 
-      icon: Edit,
-      description: 'Bulk edit publications'
-    },
-    { 
       id: 'users' as AdminSection, 
       title: 'Users', 
       icon: Users,
@@ -165,8 +158,6 @@ const AdminPanel = () => {
               </div>
             </div>
           );
-      case 'bulk-editor':
-        return <PublicationBulkEditor />;
       case 'users':
         return <UserManagement />;
       case 'email-subscribers':
