@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const sendgridApiKey = Deno.env.get("SENDGRID_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -136,26 +135,54 @@ const handler = async (req: Request): Promise<Response> => {
 
     const htmlContent = generateInvoiceHTML(invoice);
 
-    const emailResponse = await resend.emails.send({
-      from: "Just Featured <billing@yourdomain.com>", // Update with your domain
-      to: [clientEmail],
-      subject: `Invoice ${invoice.invoice_number} - Just Featured`,
-      html: htmlContent,
-    });
+    const emailData = {
+      personalizations: [
+        {
+          to: [{ email: clientEmail }],
+          subject: `Invoice ${invoice.invoice_number} - Just Featured`
+        }
+      ],
+      from: { email: "billing@justfeatured.com", name: "Just Featured" },
+      content: [
+        {
+          type: "text/html",
+          value: htmlContent
+        }
+      ]
+    };
 
-    console.log("Invoice email sent successfully:", emailResponse);
-
-    return new Response(JSON.stringify({ 
-      success: true, 
-      message: "Invoice sent successfully",
-      emailId: emailResponse.data?.id 
-    }), {
-      status: 200,
+    const emailResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
+        "Authorization": `Bearer ${sendgridApiKey}`,
+        "Content-Type": "application/json"
       },
+      body: JSON.stringify(emailData)
     });
+
+    if (emailResponse.ok) {
+      console.log("Invoice email sent successfully:", emailResponse.status);
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: "Invoice sent successfully"
+      }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      });
+    } else {
+      const errorText = await emailResponse.text();
+      console.error("SendGrid error:", errorText);
+      return new Response(
+        JSON.stringify({ error: "Failed to send email" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
 
   } catch (error: any) {
     console.error("Error in send-invoice function:", error);
