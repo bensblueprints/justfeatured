@@ -41,9 +41,10 @@ export const usePublicationsSync = () => {
         async (payload) => {
           console.log('Publications table changed:', payload);
           
-          // Refresh the publications list when changes occur
+          // Force refresh the publications list when changes occur
           try {
             const data = await fetchPublications();
+            console.log('Refreshed publications count:', data.length);
             setPublications(data);
           } catch (error) {
             console.error('Error refreshing publications:', error);
@@ -51,6 +52,19 @@ export const usePublicationsSync = () => {
         }
       )
       .subscribe();
+
+    // Force an immediate refresh to ensure we have the latest data
+    const forceRefresh = async () => {
+      try {
+        const data = await fetchPublications();
+        console.log('Force refresh - publications count:', data.length);
+        setPublications(data);
+      } catch (error) {
+        console.error('Error in force refresh:', error);
+      }
+    };
+    
+    forceRefresh();
 
     return () => {
       supabase.removeChannel(channel);
