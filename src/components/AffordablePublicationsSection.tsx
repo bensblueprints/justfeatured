@@ -2,13 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { BrandFetchService } from "@/utils/brandFetch";
-import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 import { useCart } from "@/hooks/useCart";
 import { toast } from "@/hooks/use-toast";
 
 export const AffordablePublicationsSection = () => {
-  const [logos, setLogos] = useState<Record<string, string>>({});
   const { addToCart, isInCart } = useCart();
 
   // All 27 $97 publications based on provided list
@@ -45,6 +42,7 @@ export const AffordablePublicationsSection = () => {
   // No need to fetch logos for hardcoded data - we'll use initials
 
   const handleAddToCart = (publication: any) => {
+    console.log('Adding to cart:', publication);
     addToCart(publication.id);
     toast({
       title: "Added to Cart",
