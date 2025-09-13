@@ -87,10 +87,46 @@ export const PostCheckout = () => {
       }
       setUser(user);
       form.setValue("email", user.email || "");
+
+      // Check if we're continuing an existing setup
+      const continueId = searchParams.get('continue');
+      if (continueId) {
+        try {
+          const { data: existingData, error } = await supabase
+            .from('post_checkout_info')
+            .select('*')
+            .eq('id', continueId)
+            .eq('user_id', user.id)
+            .single();
+
+          if (error) throw error;
+
+          if (existingData) {
+            // Pre-fill form with existing data
+            form.setValue('company_name', existingData.company_name);
+            form.setValue('industry_sector', existingData.industry_sector || '');
+            form.setValue('contact_person_name', existingData.contact_person_name || '');
+            form.setValue('email', existingData.email || user.email || '');
+            form.setValue('phone_number', existingData.phone_number || '');
+            form.setValue('company_website', existingData.company_website || '');
+            form.setValue('business_description', existingData.business_description || '');
+            form.setValue('recent_achievements', existingData.recent_achievements || '');
+            form.setValue('key_products_services', existingData.key_products_services || '');
+            form.setValue('target_audience', existingData.target_audience || '');
+            form.setValue('preferred_tone', (existingData.preferred_tone || 'professional') as 'professional' | 'casual' | 'technical' | 'inspirational');
+            form.setValue('important_dates', existingData.important_dates || '');
+            form.setValue('additional_notes', existingData.additional_notes || '');
+            form.setValue('write_own_release', existingData.write_own_release || false);
+            form.setValue('custom_press_release', existingData.custom_press_release || '');
+          }
+        } catch (error) {
+          console.error('Error loading existing data:', error);
+        }
+      }
     };
 
     getCurrentUser();
-  }, [navigate, form]);
+  }, [navigate, form, searchParams]);
 
   useEffect(() => {
     // Calculate progress based on required fields
@@ -190,7 +226,7 @@ export const PostCheckout = () => {
     await Promise.all(uploads);
   };
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: FormData, saveAsDraft = false) => {
     if (!user) {
       toast({
         title: "Error",
@@ -200,10 +236,11 @@ export const PostCheckout = () => {
       return;
     }
 
-    if (!files.logo) {
+    // Only require logo for final submission, not for drafts
+    if (!saveAsDraft && !files.logo) {
       toast({
         title: "Logo Required",
-        description: "Please upload your company logo",
+        description: "Please upload your company logo to complete submission",
         variant: "destructive"
       });
       return;
@@ -231,25 +268,54 @@ export const PostCheckout = () => {
         additional_notes: data.additional_notes || undefined,
         write_own_release: data.write_own_release,
         custom_press_release: data.custom_press_release || undefined,
+        status: (saveAsDraft ? 'in_progress' : 'pending') as any,
       };
 
-      const { data: insertData, error } = await supabase
-        .from('post_checkout_info')
-        .insert(submitData)
-        .select()
-        .single();
+      const continueId = searchParams.get('continue');
+      let insertData;
+      
+      if (continueId) {
+        // Update existing record
+        const { data, error } = await supabase
+          .from('post_checkout_info')
+          .update(submitData)
+          .eq('id', continueId)
+          .eq('user_id', user.id)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        insertData = data;
+      } else {
+        // Create new record
+        const { data, error } = await supabase
+          .from('post_checkout_info')
+          .insert(submitData)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        insertData = data;
+      }
 
-      if (error) throw error;
+      // Upload files if any exist
+      if (files.logo || files.supportingImages.length > 0 || files.documents.length > 0) {
+        await uploadFiles(insertData.id);
+      }
 
-      // Upload files
-      await uploadFiles(insertData.id);
-
-      toast({
-        title: "Information Submitted Successfully!",
-        description: "We'll start working on your press release and notify you when it's ready for review."
-      });
-
-      navigate(`/review-board/${insertData.id}`);
+      if (saveAsDraft) {
+        toast({
+          title: "Draft Saved!",
+          description: "Your information has been saved. You can continue later from your dashboard."
+        });
+        navigate('/dashboard');
+      } else {
+        toast({
+          title: "Information Submitted Successfully!",
+          description: "We'll start working on your press release and notify you when it's ready for review."
+        });
+        navigate(`/review-board/${insertData.id}`);
+      }
     } catch (error: any) {
       console.error("Submission error:", error);
       toast({
@@ -296,7 +362,7 @@ export const PostCheckout = () => {
           </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit((data) => onSubmit(data, false))} className="space-y-8">
               {/* Company Information */}
               <Card>
                 <CardHeader>
@@ -704,7 +770,17 @@ export const PostCheckout = () => {
                 </CardContent>
               </Card>
 
-              <div className="flex justify-center">
+              <div className="flex justify-center gap-4">
+                <Button 
+                  type="button"
+                  variant="outline"
+                  size="lg" 
+                  disabled={loading}
+                  onClick={() => form.handleSubmit((data) => onSubmit(data, true))()}
+                  className="min-w-[200px]"
+                >
+                  {loading ? "Saving..." : "Save as Draft"}
+                </Button>
                 <Button 
                   type="submit" 
                   size="lg" 

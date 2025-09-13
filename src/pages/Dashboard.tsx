@@ -223,6 +223,16 @@ export const Dashboard = () => {
                     </div>
                     <div className="flex items-center space-x-3">
                       {getStatusBadge(item.pressRelease?.status)}
+                      {item.checkoutInfo.status === 'in_progress' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate(`/post-checkout?continue=${item.checkoutInfo.id}`)}
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          Continue Setup
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"
