@@ -125,7 +125,7 @@ export const Hero = () => {
             <div className="trust-badge rounded-full px-6 py-3 magnetic">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-success icon-on-purple" />
-                <span className="text-sm font-semibold">355+ Premium Outlets</span>
+                <span className="text-sm font-semibold">1200+ Premium Outlets</span>
               </div>
             </div>
           </div>
