@@ -23,7 +23,8 @@ import {
   Crown,
   ShieldCheck,
   Edit,
-  Mail
+  Mail,
+  CreditCard
 } from 'lucide-react';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
@@ -39,6 +40,7 @@ import { Dashboard as UserDashboard } from './Dashboard';
 import { PublicationLogoManager } from '@/components/admin/PublicationLogoManager';
 import { PublicationWebsiteManager } from '@/components/admin/PublicationWebsiteManager';
 import { EmailSubscribers } from '@/components/admin/EmailSubscribers';
+import { ManualBillingPortal } from '@/components/admin/ManualBillingPortal';
 
 type AdminSection = 
   | 'my-dashboard'
@@ -48,7 +50,8 @@ type AdminSection =
   | 'publications'
   | 'bulk-editor'
   | 'users'
-  | 'email-subscribers';
+  | 'email-subscribers'
+  | 'billing-portal';
 
 const AdminPanel = () => {
   const navigate = useNavigate();
@@ -122,6 +125,12 @@ const AdminPanel = () => {
       title: 'Email Subscribers', 
       icon: Mail,
       description: 'View and manage email subscribers'
+    },
+    { 
+      id: 'billing-portal' as AdminSection, 
+      title: 'Billing Portal', 
+      icon: CreditCard,
+      description: 'Create and send custom invoices'
     }
   ] : [
     { 
@@ -162,6 +171,8 @@ const AdminPanel = () => {
         return <UserManagement />;
       case 'email-subscribers':
         return <EmailSubscribers />;
+      case 'billing-portal':
+        return <ManualBillingPortal />;
       default:
         return <UserDashboard />;
     }
