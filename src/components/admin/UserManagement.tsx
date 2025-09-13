@@ -65,27 +65,19 @@ export const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      // Get all user roles with auth user data
-      const { data: userRolesData, error: userRolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role, created_at')
-        .order('created_at', { ascending: false });
+      // Use the new function to get users with their actual emails
+      const { data: usersData, error } = await supabase
+        .rpc('get_users_with_roles');
 
-      if (userRolesError) throw userRolesError;
+      if (error) throw error;
 
-      // Get auth users data (this will only work if we have proper permissions)
-      const usersWithRoles: UserWithRole[] = [];
-      
-      for (const userRole of userRolesData || []) {
-        // For now, we'll just use the user_id as email since we can't access auth.users
-        // In a real app, you'd need to either store email in user_roles or have a profiles table
-        usersWithRoles.push({
-          user_id: userRole.user_id,
-          email: userRole.user_id.slice(0, 8) + "@example.com", // Placeholder
-          role: userRole.role as UserRole,
-          created_at: userRole.created_at || new Date().toISOString()
-        });
-      }
+      // Transform the data to match our interface
+      const usersWithRoles: UserWithRole[] = (usersData || []).map(user => ({
+        user_id: user.user_id,
+        email: user.email,
+        role: user.role as UserRole,
+        created_at: user.created_at || new Date().toISOString()
+      }));
 
       setUsers(usersWithRoles);
     } catch (error) {
@@ -265,11 +257,16 @@ export const UserManagement = () => {
                       <div className="flex items-center space-x-3">
                         {getRoleIcon(user.role)}
                         <div>
-                          <div className="flex items-center text-sm">
+                          <div className="flex items-center text-sm font-medium">
                             <Mail className="w-3 h-3 mr-1" />
                             {user.email}
+                            {user.email === 'ben@rootaccess.design' && (
+                              <Badge variant="outline" className="ml-2 text-xs">
+                                Owner
+                              </Badge>
+                            )}
                           </div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-xs text-muted-foreground">
                             ID: {user.user_id.slice(0, 8)}...
                           </div>
                         </div>
