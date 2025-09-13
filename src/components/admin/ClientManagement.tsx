@@ -28,6 +28,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { type PostCheckoutInfo, type PressRelease } from "@/types/press-release";
 import { CreatePressReleaseDialog } from "@/components/CreatePressReleaseDialog";
 import { useAuth } from "@/components/AuthWrapper";
+import { ManualClientCreationDialog } from "./ManualClientCreationDialog";
 
 interface ClientWithPressRelease {
   client: PostCheckoutInfo;
@@ -167,6 +168,7 @@ export const ClientManagement = () => {
             Client Management
           </span>
           <div className="flex items-center space-x-2">
+            <ManualClientCreationDialog onClientCreated={fetchClients} />
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
