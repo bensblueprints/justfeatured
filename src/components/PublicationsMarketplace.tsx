@@ -15,7 +15,7 @@ export const PublicationsMarketplace = () => {
   const { addToCart, isInCart } = useCart();
 
   // Featured publications strictly limited to DB-listed ones, in desired order
-  const featuredPublicationNames = ['Reuters','Bloomberg','Forbes USA','Time.com','Yahoo','Business Insider','Fox News','Benzinga','Billboard'];
+  const featuredPublicationNames = ['Reuters','Bloomberg','Forbes USA','Time.com','Yahoo','Business Insider','Fox News','Benzinga','Billboard','Chiang Rai Times'];
 
   const normalize = (s?: string) => (s || '').toLowerCase().trim();
 
