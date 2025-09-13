@@ -80,6 +80,7 @@ export const ManualBillingPortal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [resendingInvoice, setResendingInvoice] = useState<string | null>(null);
   
   // Form states
   const [clientName, setClientName] = useState('');
@@ -366,6 +367,51 @@ export const ManualBillingPortal = () => {
       toast.error('Failed to create invoice');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendInvoice = async (invoiceId: string, invoiceNumber: string, clientEmail: string) => {
+    setResendingInvoice(invoiceId);
+    try {
+      // Get the full invoice data for re-sending
+      const invoice = invoices.find(inv => inv.id === invoiceId);
+      if (!invoice) {
+        throw new Error('Invoice not found');
+      }
+
+      const { error } = await supabase.functions.invoke('send-invoice', {
+        body: {
+          invoice,
+          clientEmail: invoice.client_email,
+          paymentToken: invoice.payment_token
+        }
+      });
+
+      if (error) {
+        console.error('Error sending invoice:', error);
+        toast.error('Failed to send invoice. Please try again.');
+      } else {
+        toast.success('Invoice sent successfully!');
+        
+        // Update invoice status to 'sent' if it was draft
+        if (invoice.status === 'draft') {
+          const { error: updateError } = await supabase
+            .from('invoices')
+            .update({ status: 'sent' })
+            .eq('id', invoiceId);
+
+          if (!updateError) {
+            setInvoices(prev => prev.map(inv => 
+              inv.id === invoiceId ? { ...inv, status: 'sent' as const } : inv
+            ));
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error sending invoice:', error);
+      toast.error('Failed to send invoice. Please try again.');
+    } finally {
+      setResendingInvoice(null);
     }
   };
 
@@ -795,6 +841,16 @@ export const ManualBillingPortal = () => {
                           Send Invoice
                         </Button>
                       )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleResendInvoice(invoice.id, invoice.invoice_number, invoice.client_email)}
+                        disabled={resendingInvoice === invoice.id}
+                        className="flex items-center gap-1"
+                      >
+                        <Send className="h-4 w-4" />
+                        {resendingInvoice === invoice.id ? "Sending..." : "Re-send"}
+                      </Button>
                     </div>
                   </div>
                   
