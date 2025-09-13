@@ -26,6 +26,7 @@ import BrandBundles from "./pages/BrandBundles";
 import AdminPanel from "./pages/AdminPanel";
 import AdminSetup from "./pages/AdminSetup";
 import AdminManualImport from "./pages/AdminManualImport";
+import InvoicePayment from "./pages/InvoicePayment";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => {
               <Route path="/brand-bundles" element={<BrandBundles />} />
               <Route path="/admin-setup" element={<AdminSetup />} />
               <Route path="/admin-manual-import" element={<AdminManualImport />} />
+              <Route path="/invoice-payment/:token" element={<InvoicePayment />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

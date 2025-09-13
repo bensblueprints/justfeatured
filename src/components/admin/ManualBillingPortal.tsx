@@ -61,6 +61,7 @@ interface Invoice {
   notes?: string;
   created_at: string;
   publications: SelectedPublication[];
+  payment_token?: string;
 }
 
 export const ManualBillingPortal = () => {
@@ -99,11 +100,45 @@ export const ManualBillingPortal = () => {
   };
 
   const fetchInvoices = async () => {
-    // For now, we'll store invoices in localStorage since we don't have invoice tables yet
-    // In a real implementation, this would fetch from a database
-    const storedInvoices = localStorage.getItem('manual_invoices');
-    if (storedInvoices) {
-      setInvoices(JSON.parse(storedInvoices));
+    try {
+      const { data: invoicesData, error } = await supabase
+        .from('invoices')
+        .select(`
+          *,
+          invoice_items (*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Transform data to match Invoice interface
+      const formattedInvoices: Invoice[] = invoicesData.map(inv => ({
+        id: inv.id,
+        invoice_number: inv.invoice_number,
+        client_name: inv.client_name,
+        client_email: inv.client_email,
+        client_company: inv.client_company,
+        total_amount: inv.total_amount,
+        status: inv.status as 'draft' | 'sent' | 'paid' | 'overdue',
+        due_date: inv.due_date,
+        notes: inv.notes,
+        created_at: inv.created_at,
+        payment_token: inv.payment_token,
+        publications: inv.invoice_items.map((item: any) => ({
+          id: item.publication_id,
+          name: item.publication_name,
+          quantity: item.quantity,
+          price: item.unit_price,
+          customPrice: item.custom_price,
+          category: item.category,
+          tier: item.tier
+        }))
+      }));
+
+      setInvoices(formattedInvoices);
+    } catch (error) {
+      console.error('Error fetching invoices:', error);
+      toast.error('Failed to load invoices');
     }
   };
 
@@ -173,26 +208,63 @@ export const ManualBillingPortal = () => {
     setIsLoading(true);
     
     try {
+      const invoiceNumber = generateInvoiceNumber();
+      const total = calculateTotal();
+
+      // Insert invoice into database
+      const { data: invoiceData, error: invoiceError } = await supabase
+        .from('invoices')
+        .insert({
+          invoice_number: invoiceNumber,
+          client_name: clientName,
+          client_email: clientEmail,
+          client_company: clientCompany || null,
+          total_amount: total,
+          status: 'draft',
+          due_date: dueDate || null,
+          notes: notes || null,
+          created_by: (await supabase.auth.getUser()).data.user?.id || 'system'
+        })
+        .select()
+        .single();
+
+      if (invoiceError) throw invoiceError;
+
+      // Insert invoice items
+      const invoiceItems = selectedPublications.map(pub => ({
+        invoice_id: invoiceData.id,
+        publication_id: pub.id || null,
+        publication_name: pub.name,
+        quantity: pub.quantity,
+        unit_price: pub.price,
+        custom_price: pub.customPrice || null,
+        category: pub.category || null,
+        tier: pub.tier || null
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('invoice_items')
+        .insert(invoiceItems);
+
+      if (itemsError) throw itemsError;
+
+      // Update local state with new invoice data
       const newInvoice: Invoice = {
-        id: crypto.randomUUID(),
-        client_name: clientName,
-        client_email: clientEmail,
-        client_company: clientCompany,
-        invoice_number: generateInvoiceNumber(),
-        total_amount: calculateTotal(),
-        status: 'draft',
-        due_date: dueDate,
-        notes,
-        created_at: new Date().toISOString(),
+        id: invoiceData.id,
+        invoice_number: invoiceData.invoice_number,
+        client_name: invoiceData.client_name,
+        client_email: invoiceData.client_email,
+        client_company: invoiceData.client_company,
+        total_amount: invoiceData.total_amount,
+        status: invoiceData.status as 'draft' | 'sent' | 'paid' | 'overdue',
+        due_date: invoiceData.due_date,
+        notes: invoiceData.notes,
+        created_at: invoiceData.created_at,
+        payment_token: invoiceData.payment_token,
         publications: selectedPublications
       };
 
-      // Store in localStorage for now
-      const existingInvoices = JSON.parse(localStorage.getItem('manual_invoices') || '[]');
-      const updatedInvoices = [...existingInvoices, newInvoice];
-      localStorage.setItem('manual_invoices', JSON.stringify(updatedInvoices));
-
-      setInvoices(updatedInvoices);
+      setInvoices(prev => [newInvoice, ...prev]);
       
       // Reset form
       setClientName('');
@@ -214,24 +286,32 @@ export const ManualBillingPortal = () => {
 
   const sendInvoice = async (invoice: Invoice) => {
     try {
-      // Call edge function to send invoice email
+      // Call edge function to send invoice email with payment token
       const { error } = await supabase.functions.invoke('send-invoice', {
         body: {
           invoice,
-          clientEmail: invoice.client_email
+          clientEmail: invoice.client_email,
+          paymentToken: invoice.payment_token
         }
       });
 
       if (error) throw error;
 
-      // Update invoice status
+      // Update invoice status in database
+      const { error: updateError } = await supabase
+        .from('invoices')
+        .update({ status: 'sent' })
+        .eq('id', invoice.id);
+
+      if (updateError) throw updateError;
+
+      // Update local state
       const updatedInvoices = invoices.map(inv => 
         inv.id === invoice.id ? { ...inv, status: 'sent' as const } : inv
       );
-      localStorage.setItem('manual_invoices', JSON.stringify(updatedInvoices));
       setInvoices(updatedInvoices);
       
-      toast.success('Invoice sent successfully!');
+      toast.success('Invoice sent successfully with payment link!');
     } catch (error) {
       console.error('Error sending invoice:', error);
       toast.error('Failed to send invoice');

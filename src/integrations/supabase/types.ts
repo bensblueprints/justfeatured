@@ -117,6 +117,108 @@ export type Database = {
           },
         ]
       }
+      invoice_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          custom_price: number | null
+          id: string
+          invoice_id: string
+          publication_id: string | null
+          publication_name: string
+          quantity: number
+          tier: string | null
+          unit_price: number
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          custom_price?: number | null
+          id?: string
+          invoice_id: string
+          publication_id?: string | null
+          publication_name: string
+          quantity?: number
+          tier?: string | null
+          unit_price?: number
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          custom_price?: number | null
+          id?: string
+          invoice_id?: string
+          publication_id?: string | null
+          publication_name?: string
+          quantity?: number
+          tier?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          client_company: string | null
+          client_email: string
+          client_name: string
+          created_at: string
+          created_by: string
+          due_date: string | null
+          id: string
+          invoice_number: string
+          notes: string | null
+          payment_token: string
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          client_company?: string | null
+          client_email: string
+          client_name: string
+          created_at?: string
+          created_by: string
+          due_date?: string | null
+          id?: string
+          invoice_number: string
+          notes?: string | null
+          payment_token?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          client_company?: string | null
+          client_email?: string
+          client_name?: string
+          created_at?: string
+          created_by?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          notes?: string | null
+          payment_token?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       popup_emails: {
         Row: {
           created_at: string

@@ -26,7 +26,7 @@ interface Invoice {
   }>;
 }
 
-const generateInvoiceHTML = (invoice: Invoice) => {
+const generateInvoiceHTML = (invoice: Invoice, paymentUrl?: string) => {
   const publicationsHTML = invoice.publications.map(pub => {
     const price = pub.customPrice || pub.price;
     const lineTotal = price * pub.quantity;
@@ -92,6 +92,19 @@ const generateInvoiceHTML = (invoice: Invoice) => {
           </tfoot>
         </table>
 
+        ${paymentUrl ? `
+          <div style="margin-top: 30px; padding: 25px; background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0 0 15px 0; color: #065f46;">Ready to Pay?</h3>
+            <p style="margin: 0 0 20px 0; color: #047857;">Click the button below to proceed with your payment securely.</p>
+            <a href="${paymentUrl}" style="display: inline-block; background-color: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1em;">
+              Pay Invoice - $${invoice.total_amount.toFixed(2)}
+            </a>
+            <p style="margin: 15px 0 0 0; font-size: 0.9em; color: #6b7280;">
+              This link will take you to our secure payment page where your cart will be pre-filled with the publications above.
+            </p>
+          </div>
+        ` : ''}
+
         ${invoice.notes ? `
           <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             <h4 style="margin: 0 0 10px 0; color: #667eea;">Notes:</h4>
@@ -101,7 +114,11 @@ const generateInvoiceHTML = (invoice: Invoice) => {
 
         <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
           <h4 style="margin: 0 0 15px 0; color: #667eea;">Payment Information</h4>
-          <p style="margin: 5px 0;">Please contact us for payment instructions and methods.</p>
+          ${paymentUrl ? `
+            <p style="margin: 5px 0;">Click the payment button above to complete your payment securely online.</p>
+          ` : `
+            <p style="margin: 5px 0;">Please contact us for payment instructions and methods.</p>
+          `}
           <p style="margin: 5px 0;">If you have any questions about this invoice, please contact our billing department.</p>
         </div>
 
@@ -122,7 +139,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { invoice, clientEmail } = await req.json();
+    const { invoice, clientEmail, paymentToken } = await req.json();
 
     if (!invoice || !clientEmail) {
       return new Response(
@@ -133,7 +150,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Sending invoice ${invoice.invoice_number} to ${clientEmail}`);
 
-    const htmlContent = generateInvoiceHTML(invoice);
+    // Generate payment URL if token is provided
+    const baseUrl = req.headers.get('origin') || 'https://app.lovable.ai';
+    const paymentUrl = paymentToken 
+      ? `${baseUrl}/invoice-payment/${paymentToken}`
+      : undefined;
+
+    const htmlContent = generateInvoiceHTML(invoice, paymentUrl);
 
     const emailData = {
       personalizations: [
