@@ -16,53 +16,46 @@ export const Hero = () => {
   // Match publications from database with static display data
   const featuredPublications = [
     {
-      name: 'Daily Scanner',
-      logoUrl: null,
-      website_url: 'https://dailyscanner.com',
+      name: 'Forbes USA',
+      logoUrl: '/assets/logos/forbes.png',
+      website_url: 'https://forbes.com',
       tier: 'Premium',
-      dbId: null
+      dbId: '77e9cab4-0da1-4b79-8d3e-b816047be5c1'
     },
     {
-      name: 'The Influential',
-      logoUrl: null,
-      website_url: 'https://theinfluential.com',
+      name: 'Reuters',
+      logoUrl: '/assets/logos/reuters.png',
+      website_url: 'https://reuters.com',
       tier: 'Premium',
-      dbId: null
+      dbId: '2555e631-6648-4027-ae1e-774c5b112679'
     },
     {
-      name: 'MSN',
-      logoUrl: null,
-      website_url: 'https://msn.com',
+      name: 'Bloomberg',
+      logoUrl: '/assets/logos/bloomberg.png',
+      website_url: 'https://bloomberg.com',
       tier: 'Premium',
-      dbId: null
+      dbId: '83a6bd7d-0ac9-4ac8-a531-ac3a9cc525e1'
     },
     {
-      name: 'California Business Journal',
-      logoUrl: null,
-      website_url: 'https://calbizjournal.com',
+      name: 'TIME',
+      logoUrl: '/assets/logos/time.png',
+      website_url: 'https://time.com',
       tier: 'Premium',
-      dbId: null
+      dbId: '52711bd4-884c-497f-8b30-f88d7c55a3c2'
     },
     {
-      name: 'Global Banking & Finance',
-      logoUrl: null,
-      website_url: 'https://globalbankingandfinance.com',
+      name: 'Yahoo',
+      logoUrl: '/assets/logos/yahoo.png',
+      website_url: 'https://yahoo.com',
       tier: 'Premium',
-      dbId: null
+      dbId: 'e0caea04-e8ce-4304-9dbf-ceeb7c0a9087'
     },
     {
-      name: 'Fashion Week Daily',
-      logoUrl: null,
-      website_url: 'https://fashionweekdaily.com',
+      name: 'Business Insider',
+      logoUrl: '/assets/logos/business-insider.png',
+      website_url: 'https://businessinsider.com',
       tier: 'Premium',
-      dbId: null
-    },
-    {
-      name: 'Digital Journal',
-      logoUrl: null,
-      website_url: 'https://digitaljournal.com',
-      tier: 'Premium',
-      dbId: null
+      dbId: '24fc0876-3602-48e2-9e45-23bd69162a68'
     },
     {
       name: 'Benzinga',
@@ -70,6 +63,13 @@ export const Hero = () => {
       website_url: 'https://benzinga.com',
       tier: 'Premium',
       dbId: '723edcb8-e551-4e1a-9d6e-34a9b376a046'
+    },
+    {
+      name: 'Billboard',
+      logoUrl: '/assets/logos/billboard.png',
+      website_url: 'https://billboard.com',
+      tier: 'Premium',
+      dbId: null
     }
   ];
 
