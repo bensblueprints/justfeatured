@@ -49,6 +49,14 @@ interface SelectedPublication extends Publication {
   customPrice?: number;
 }
 
+interface ManualLineItem {
+  id: string;
+  name: string;
+  description?: string;
+  quantity: number;
+  price: number;
+}
+
 interface Invoice {
   id: string;
   client_name: string;
@@ -61,12 +69,14 @@ interface Invoice {
   notes?: string;
   created_at: string;
   publications: SelectedPublication[];
+  manualItems: ManualLineItem[];
   payment_token?: string;
 }
 
 export const ManualBillingPortal = () => {
   const [publications, setPublications] = useState<Publication[]>([]);
   const [selectedPublications, setSelectedPublications] = useState<SelectedPublication[]>([]);
+  const [manualLineItems, setManualLineItems] = useState<ManualLineItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -77,6 +87,12 @@ export const ManualBillingPortal = () => {
   const [clientCompany, setClientCompany] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
+  
+  // Manual line item form states
+  const [manualItemName, setManualItemName] = useState('');
+  const [manualItemDescription, setManualItemDescription] = useState('');
+  const [manualItemQuantity, setManualItemQuantity] = useState(1);
+  const [manualItemPrice, setManualItemPrice] = useState(0);
 
   useEffect(() => {
     fetchPublications();
@@ -124,15 +140,26 @@ export const ManualBillingPortal = () => {
         notes: inv.notes,
         created_at: inv.created_at,
         payment_token: inv.payment_token,
-        publications: inv.invoice_items.map((item: any) => ({
-          id: item.publication_id,
-          name: item.publication_name,
-          quantity: item.quantity,
-          price: item.unit_price,
-          customPrice: item.custom_price,
-          category: item.category,
-          tier: item.tier
-        }))
+        publications: inv.invoice_items
+          .filter((item: any) => item.publication_id)
+          .map((item: any) => ({
+            id: item.publication_id,
+            name: item.publication_name,
+            quantity: item.quantity,
+            price: item.unit_price,
+            customPrice: item.custom_price,
+            category: item.category,
+            tier: item.tier
+          })),
+        manualItems: inv.invoice_items
+          .filter((item: any) => !item.publication_id)
+          .map((item: any) => ({
+            id: item.id,
+            name: item.publication_name,
+            description: item.category || '',
+            quantity: item.quantity,
+            price: item.unit_price
+          }))
       }));
 
       setInvoices(formattedInvoices);
@@ -184,11 +211,52 @@ export const ManualBillingPortal = () => {
     );
   };
 
+  const addManualLineItem = () => {
+    if (!manualItemName.trim() || manualItemPrice <= 0) {
+      toast.error('Please enter a valid item name and price');
+      return;
+    }
+
+    const newItem: ManualLineItem = {
+      id: `manual-${Date.now()}`,
+      name: manualItemName.trim(),
+      description: manualItemDescription.trim(),
+      quantity: manualItemQuantity,
+      price: manualItemPrice
+    };
+
+    setManualLineItems(prev => [...prev, newItem]);
+    
+    // Reset form
+    setManualItemName('');
+    setManualItemDescription('');
+    setManualItemQuantity(1);
+    setManualItemPrice(0);
+  };
+
+  const removeManualLineItem = (id: string) => {
+    setManualLineItems(prev => prev.filter(item => item.id !== id));
+  };
+
+  const updateManualLineItem = (id: string, updates: Partial<ManualLineItem>) => {
+    setManualLineItems(prev => 
+      prev.map(item => 
+        item.id === id ? { ...item, ...updates } : item
+      )
+    );
+  };
+
   const calculateTotal = () => {
-    return selectedPublications.reduce((total, pub) => {
+    const publicationsTotal = selectedPublications.reduce((total, pub) => {
       const price = pub.customPrice || pub.price;
       return total + (price * pub.quantity);
     }, 0);
+    
+    const manualItemsTotal = manualLineItems.reduce((total, item) => {
+      return total + (item.price * item.quantity);
+    }, 0);
+    
+    return publicationsTotal + manualItemsTotal;
   };
 
   const generateInvoiceNumber = () => {
@@ -200,8 +268,8 @@ export const ManualBillingPortal = () => {
   };
 
   const createInvoice = async () => {
-    if (!clientName || !clientEmail || selectedPublications.length === 0) {
-      toast.error('Please fill in all required fields and select at least one publication');
+    if (!clientName || !clientEmail || (selectedPublications.length === 0 && manualLineItems.length === 0)) {
+      toast.error('Please fill in all required fields and select at least one publication or add a manual item');
       return;
     }
 
@@ -230,8 +298,8 @@ export const ManualBillingPortal = () => {
 
       if (invoiceError) throw invoiceError;
 
-      // Insert invoice items
-      const invoiceItems = selectedPublications.map(pub => ({
+      // Insert invoice items (publications and manual items)
+      const publicationItems = selectedPublications.map(pub => ({
         invoice_id: invoiceData.id,
         publication_id: pub.id || null,
         publication_name: pub.name,
@@ -242,11 +310,26 @@ export const ManualBillingPortal = () => {
         tier: pub.tier || null
       }));
 
-      const { error: itemsError } = await supabase
-        .from('invoice_items')
-        .insert(invoiceItems);
+      const manualItems = manualLineItems.map(item => ({
+        invoice_id: invoiceData.id,
+        publication_id: null,
+        publication_name: item.name,
+        quantity: item.quantity,
+        unit_price: item.price,
+        custom_price: null,
+        category: item.description || null,
+        tier: null
+      }));
 
-      if (itemsError) throw itemsError;
+      const allInvoiceItems = [...publicationItems, ...manualItems];
+
+      if (allInvoiceItems.length > 0) {
+        const { error: itemsError } = await supabase
+          .from('invoice_items')
+          .insert(allInvoiceItems);
+
+        if (itemsError) throw itemsError;
+      }
 
       // Update local state with new invoice data
       const newInvoice: Invoice = {
@@ -261,7 +344,8 @@ export const ManualBillingPortal = () => {
         notes: invoiceData.notes,
         created_at: invoiceData.created_at,
         payment_token: invoiceData.payment_token,
-        publications: selectedPublications
+        publications: selectedPublications,
+        manualItems: manualLineItems
       };
 
       setInvoices(prev => [newInvoice, ...prev]);
@@ -273,6 +357,7 @@ export const ManualBillingPortal = () => {
       setDueDate('');
       setNotes('');
       setSelectedPublications([]);
+      setManualLineItems([]);
       setShowCreateDialog(false);
       
       toast.success('Invoice created successfully!');
@@ -443,6 +528,138 @@ export const ManualBillingPortal = () => {
                       </div>
                     </div>
 
+                    {/* Manual Line Items Section */}
+                    <Separator className="my-4" />
+                    
+                    <div>
+                      <Label>Manual Line Items</Label>
+                      <div className="border rounded-md p-3 space-y-3 mt-2">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-xs">Item Name *</Label>
+                            <Input
+                              placeholder="Custom service..."
+                              value={manualItemName}
+                              onChange={(e) => setManualItemName(e.target.value)}
+                              className="h-8"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Description</Label>
+                            <Input
+                              placeholder="Optional description..."
+                              value={manualItemDescription}
+                              onChange={(e) => setManualItemDescription(e.target.value)}
+                              className="h-8"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <Label className="text-xs">Quantity</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={manualItemQuantity}
+                              onChange={(e) => setManualItemQuantity(parseInt(e.target.value) || 1)}
+                              className="h-8"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Price ($)</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={manualItemPrice}
+                              onChange={(e) => setManualItemPrice(parseFloat(e.target.value) || 0)}
+                              className="h-8"
+                            />
+                          </div>
+                          <div className="flex items-end">
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={addManualLineItem}
+                              className="h-8 w-full"
+                            >
+                              <Plus className="h-3 w-3 mr-1" />
+                              Add Item
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Display Added Manual Items */}
+                    {manualLineItems.length > 0 && (
+                      <div>
+                        <Label>Added Manual Items</Label>
+                        <div className="space-y-2 mt-2">
+                          {manualLineItems.map((item) => (
+                            <div key={item.id} className="border rounded-md p-3 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium text-sm">{item.name}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeManualLineItem(item.id)}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              
+                              {item.description && (
+                                <p className="text-xs text-muted-foreground">{item.description}</p>
+                              )}
+                              
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <Label className="text-xs">Quantity</Label>
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    value={item.quantity}
+                                    onChange={(e) => updateManualLineItem(item.id, { quantity: parseInt(e.target.value) || 1 })}
+                                    className="h-8"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Price ($)</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={item.price}
+                                    onChange={(e) => updateManualLineItem(item.id, { price: parseFloat(e.target.value) || 0 })}
+                                    className="h-8"
+                                  />
+                                </div>
+                              </div>
+                              
+                              <div className="text-right">
+                                <span className="text-sm font-semibold">
+                                  Total: ${(item.price * item.quantity).toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Display total for both publications and manual items */}
+                    {(selectedPublications.length > 0 || manualLineItems.length > 0) && (
+                      <div>
+                        <Separator className="my-4" />
+                        
+                        <div className="flex items-center justify-between text-lg font-bold">
+                          <span>Total Amount:</span>
+                          <span>${calculateTotal().toFixed(2)}</span>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Selected Publications */}
                     {selectedPublications.length > 0 && (
                       <div>
@@ -491,13 +708,6 @@ export const ManualBillingPortal = () => {
                               </div>
                             </div>
                           ))}
-                        </div>
-                        
-                        <Separator className="my-4" />
-                        
-                        <div className="flex items-center justify-between text-lg font-bold">
-                          <span>Total Amount:</span>
-                          <span>${calculateTotal().toFixed(2)}</span>
                         </div>
                       </div>
                     )}
@@ -588,17 +798,38 @@ export const ManualBillingPortal = () => {
                     </div>
                   </div>
                   
-                  {invoice.publications.length > 0 && (
-                    <div className="mt-4 pt-4 border-t">
-                      <div className="text-sm font-medium mb-2">Publications:</div>
-                      <div className="space-y-1">
-                        {invoice.publications.map((pub, index) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span>{pub.name} × {pub.quantity}</span>
-                            <span>${((pub.customPrice || pub.price) * pub.quantity).toFixed(2)}</span>
+                  {(invoice.publications.length > 0 || invoice.manualItems.length > 0) && (
+                    <div className="mt-4 pt-4 border-t space-y-3">
+                      {invoice.publications.length > 0 && (
+                        <div>
+                          <div className="text-sm font-medium mb-2">Publications:</div>
+                          <div className="space-y-1">
+                            {invoice.publications.map((pub, index) => (
+                              <div key={index} className="flex justify-between text-sm">
+                                <span>{pub.name} × {pub.quantity}</span>
+                                <span>${((pub.customPrice || pub.price) * pub.quantity).toFixed(2)}</span>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      )}
+                      
+                      {invoice.manualItems.length > 0 && (
+                        <div>
+                          <div className="text-sm font-medium mb-2">Manual Items:</div>
+                          <div className="space-y-1">
+                            {invoice.manualItems.map((item, index) => (
+                              <div key={index} className="flex justify-between text-sm">
+                                <span>
+                                  {item.name} × {item.quantity}
+                                  {item.description && <span className="text-muted-foreground ml-1">({item.description})</span>}
+                                </span>
+                                <span>${(item.price * item.quantity).toFixed(2)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </CardContent>
