@@ -55,10 +55,10 @@ export const AffordablePublicationsSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <Badge className="mb-4 bg-gradient-to-r from-green-600/10 to-emerald-600/10 text-green-700 border-green-200">
-            $97 Featured Publications
+            Budget Publications · $97
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Premium Publications at $97
+            Budget Publications at $97
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             High-quality publications perfect for building credibility without breaking the bank. Each publication offers excellent value and professional coverage.

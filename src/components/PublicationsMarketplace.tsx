@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { BrandFetchService } from "@/utils/brandFetch";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 import { useCart } from "@/hooks/useCart";
@@ -50,38 +50,47 @@ export const PublicationsMarketplace = () => {
   };
 
   // Only show the specified publications that exist in the DB, in the specified order
-  const popularPublications = publications
-    .filter(pub => pub.is_active && pub.price > 0 && featuredPublicationNames.some(n => matchesTarget(pub.name, n)))
-    .sort((a, b) => {
-      const ai = featuredPublicationNames.findIndex(n => matchesTarget(a.name, n));
-      const bi = featuredPublicationNames.findIndex(n => matchesTarget(b.name, n));
-      return ai - bi;
-    });
+  const popularPublications = useMemo(() => {
+    return publications
+      .filter(pub => pub.is_active && pub.price > 0 && featuredPublicationNames.some(n => matchesTarget(pub.name, n)))
+      .sort((a, b) => {
+        const ai = featuredPublicationNames.findIndex(n => matchesTarget(a.name, n));
+        const bi = featuredPublicationNames.findIndex(n => matchesTarget(b.name, n));
+        return ai - bi;
+      });
+  }, [publications]);
 
-  // Fetch logos on component mount
+  // Fetch logos only for missing publications; prevent infinite loops
   useEffect(() => {
-    if (publications.length === 0) return;
-    
-    const fetchLogos = async () => {
-      const logoPromises = popularPublications.map(async (pub) => {
+    if (popularPublications.length === 0) return;
+
+    const missing = popularPublications
+      .map(p => p.id)
+      .filter(id => !logos[id]);
+    if (missing.length === 0) return;
+
+    const pubsToFetch = popularPublications.filter(p => missing.includes(p.id));
+
+    (async () => {
+      const logoPromises = pubsToFetch.map(async (pub) => {
         const logoUrl = await BrandFetchService.getLogoWithFallback(pub.website_url);
-        return { id: pub.id, logoUrl };
+        return { id: pub.id, logoUrl } as const;
       });
 
       const logoResults = await Promise.allSettled(logoPromises);
-      const logoMap: Record<string, string> = {};
+      const updates: Record<string, string> = {};
 
       logoResults.forEach((result) => {
         if (result.status === 'fulfilled') {
-          logoMap[result.value.id] = result.value.logoUrl;
+          updates[result.value.id] = result.value.logoUrl;
         }
       });
 
-      setLogos(logoMap);
-    };
-
-    fetchLogos();
-  }, [publications, popularPublications]);
+      if (Object.keys(updates).length > 0) {
+        setLogos(prev => ({ ...prev, ...updates }));
+      }
+    })();
+  }, [popularPublications, logos]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
