@@ -151,7 +151,9 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending invoice ${invoice.invoice_number} to ${clientEmail}`);
 
     // Generate payment URL if token is provided
-    const baseUrl = req.headers.get('origin') || 'https://app.lovable.ai';
+    const origin = req.headers.get("origin");
+    const isLocalDev = origin?.includes("localhost") || origin?.includes("127.0.0.1");
+    const baseUrl = isLocalDev ? origin : "https://justfeatured.com";
     const paymentUrl = paymentToken 
       ? `${baseUrl}/invoice-payment/${paymentToken}`
       : undefined;
