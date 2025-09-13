@@ -150,13 +150,6 @@ export const CreatePressReleaseDialog = ({ checkoutInfoId, onSuccess, userRole, 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
-          size="sm" 
-          className="bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          {standalone ? "Add New Press Release" : "Create Press Release"}
-        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
