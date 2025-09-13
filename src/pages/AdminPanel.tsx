@@ -22,7 +22,8 @@ import {
   Database,
   Crown,
   ShieldCheck,
-  Edit
+  Edit,
+  Mail
 } from 'lucide-react';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
@@ -37,6 +38,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Dashboard as UserDashboard } from './Dashboard';
 import { PublicationLogoManager } from '@/components/admin/PublicationLogoManager';
 import { PublicationWebsiteManager } from '@/components/admin/PublicationWebsiteManager';
+import { EmailSubscribers } from '@/components/admin/EmailSubscribers';
 
 type AdminSection = 
   | 'my-dashboard'
@@ -45,7 +47,8 @@ type AdminSection =
   | 'press-releases'
   | 'publications'
   | 'bulk-editor'
-  | 'users';
+  | 'users'
+  | 'email-subscribers';
 
 const AdminPanel = () => {
   const navigate = useNavigate();
@@ -113,6 +116,12 @@ const AdminPanel = () => {
       title: 'Users', 
       icon: Users,
       description: 'Manage user accounts and roles'
+    },
+    { 
+      id: 'email-subscribers' as AdminSection, 
+      title: 'Email Subscribers', 
+      icon: Mail,
+      description: 'View and manage email subscribers'
     }
   ] : [
     { 
@@ -151,6 +160,8 @@ const AdminPanel = () => {
         return <PublicationBulkEditor />;
       case 'users':
         return <UserManagement />;
+      case 'email-subscribers':
+        return <EmailSubscribers />;
       default:
         return <UserDashboard />;
     }
