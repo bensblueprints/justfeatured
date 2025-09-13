@@ -1,0 +1,27 @@
+-- Update logo URLs to use proper public paths (assuming they will be moved there)
+UPDATE publications SET logo_url = '/assets/publications/artisthighlight.png' WHERE name ILIKE '%artist highlight%';
+UPDATE publications SET logo_url = '/assets/publications/artistrecap.png' WHERE name ILIKE '%artist recap%';
+UPDATE publications SET logo_url = '/assets/publications/AtoZTimes.png' WHERE name ILIKE '%atoz times%';
+UPDATE publications SET logo_url = '/assets/publications/Best-Houses.jpg' WHERE name ILIKE '%best%houses%' OR name ILIKE '%best in houses%';
+UPDATE publications SET logo_url = '/assets/publications/BizRecap-logo.png' WHERE name ILIKE '%biz recap%';
+UPDATE publications SET logo_url = '/assets/publications/bizweekly.png' WHERE name ILIKE '%biz weekly%';
+UPDATE publications SET logo_url = '/assets/publications/CelebDigest.png' WHERE name ILIKE '%celeb%digest%';
+UPDATE publications SET logo_url = '/assets/publications/ceotimes.png' WHERE name ILIKE '%ceo%times%';
+UPDATE publications SET logo_url = '/assets/publications/Digital-Journal-Logo.webp' WHERE name ILIKE '%digital%journal%';
+UPDATE publications SET logo_url = '/assets/publications/EmpireStateReview.png' WHERE name ILIKE '%empire%state%review%';
+UPDATE publications SET logo_url = '/assets/publications/GoldenStateReview.png' WHERE name ILIKE '%golden%state%review%';
+UPDATE publications SET logo_url = '/assets/publications/goodmorninguslogo.png' WHERE name ILIKE '%good%morning%us%';
+UPDATE publications SET logo_url = '/assets/publications/Juris-Review.png' WHERE name ILIKE '%juris%review%';
+UPDATE publications SET logo_url = '/assets/publications/MENS_INSIDER.png' WHERE name ILIKE '%mens%insider%' OR name ILIKE '%women%insider%';
+UPDATE publications SET logo_url = '/assets/publications/Mensnewspaper.png' WHERE name ILIKE '%mens%newspaper%';
+UPDATE publications SET logo_url = '/assets/publications/Mensreporter.png' WHERE name ILIKE '%mens%reporter%' OR name ILIKE '%women%reporter%';
+UPDATE publications SET logo_url = '/assets/publications/miami-highlight.png' WHERE name ILIKE '%miami%highlight%';
+UPDATE publications SET logo_url = '/assets/publications/NYReview.png' WHERE name ILIKE '%ny%review%' OR name ILIKE '%new%york%review%';
+UPDATE publications SET logo_url = '/assets/publications/primetimepress.jpg' WHERE name ILIKE '%primetime%press%';
+UPDATE publications SET logo_url = '/assets/publications/RentMagazine.png' WHERE name ILIKE '%rent%magazine%';
+UPDATE publications SET logo_url = '/assets/publications/TexasRecap.png' WHERE name ILIKE '%texas%recap%';
+UPDATE publications SET logo_url = '/assets/publications/theleaderreport.png' WHERE name ILIKE '%leader%report%';
+UPDATE publications SET logo_url = '/assets/publications/todays-Reed-logo.png' WHERE name ILIKE '%todays%read%' OR name ILIKE '%today%read%';
+UPDATE publications SET logo_url = '/assets/publications/todayus.png' WHERE name ILIKE '%today%us%';
+UPDATE publications SET logo_url = '/assets/publications/TopListings.png' WHERE name ILIKE '%top%listings%';
+UPDATE publications SET logo_url = '/assets/publications/usanews.png' WHERE name ILIKE '%usa%news%';
