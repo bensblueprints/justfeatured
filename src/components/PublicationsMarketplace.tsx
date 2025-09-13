@@ -15,7 +15,16 @@ export const PublicationsMarketplace = () => {
   const { addToCart, isInCart } = useCart();
 
   // Featured publications strictly limited to DB-listed ones, in desired order
-  const featuredPublicationNames = ['Reuters','Bloomberg','Forbes USA','Time.com','Yahoo','Business Insider','Fox News','Benzinga','Billboard'];
+  const featuredPublicationNames = [
+    'Daily Scanner', 'The Influential', 'MSN', 'California Business Journal', 
+    'Global Banking & Finance', 'Fashion Week Daily', 'Digital Journal', 'Benzinga',
+    'Vegas News', 'Apple News', 'CEO World Biz', 'San Diego Reader', 'SF Weekly',
+    'Galore Magazine', 'SF Examiner', 'Market Realist', 'LA Weekly', 'Daily Caller',
+    'Tech Times', 'The Street', 'Flaunt Magazine', 'Radar Online', 'Hollywood Life',
+    'Mashable', 'Hollywood Unlocked', 'LA Mag', 'Reuters', 'OK! Magazine',
+    'AV Club', 'Entrepreneur', 'Elite Daily', 'Rolling Stone', 'Success.com',
+    'Bustle', 'The Zoe Report', 'Nylon', 'Time.com', 'Yahoo News'
+  ];
 
   const normalize = (s?: string) => (s || '').toLowerCase().trim();
 
