@@ -45,17 +45,35 @@ const ALL_FIELDS = [
  * Contact information is automatically masked for non-admin users
  */
 export const fetchPublications = async (): Promise<Publication[]> => {
-  const { data, error } = await supabase
-    .rpc('get_publications_for_user');
+  const PAGE_SIZE = 1000;
+  let allData: any[] = [];
+  let from = 0;
+  let hasMore = true;
 
-  if (error) {
-    console.error('Error fetching publications:', error);
-    return [];
+  while (hasMore) {
+    const { data, error } = await supabase
+      .rpc('get_publications_for_user')
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error) {
+      console.error('Error fetching publications:', error);
+      return [];
+    }
+
+    if (data && data.length > 0) {
+      allData = allData.concat(data);
+      hasMore = data.length === PAGE_SIZE;
+      from += PAGE_SIZE;
+    } else {
+      hasMore = false;
+    }
   }
+
+  console.log('Loaded publications total:', allData.length);
 
   // Transform database records to match the Publication type
   // Contact info is already masked by the database function for non-admins
-  return data?.map((record: any) => ({
+  return allData.map((record: any) => ({
     id: record.id,
     external_id: record.external_id,
     name: record.name,
@@ -83,99 +101,29 @@ export const fetchPublications = async (): Promise<Publication[]> => {
     gambling: record.gambling,
     created_at: record.created_at,
     updated_at: record.updated_at,
-  })) || [];
+  }));
 };
 
 /**
  * Fetch publications by tier (secured)
  */
 export const fetchPublicationsByTier = async (tier: string): Promise<Publication[]> => {
-  const { data, error } = await supabase
-    .rpc('get_publications_for_user');
-
-  if (error) {
-    console.error('Error fetching publications by tier:', error);
-    return [];
-  }
-
-  return (data || [])
-    .filter(record => record.tier === tier)
-    .sort((a, b) => (b.price || 0) - (a.price || 0))
-    .map(record => ({
-      id: record.id,
-      external_id: record.external_id,
-      name: record.name,
-      type: record.type,
-      category: record.category,
-      price: record.price,
-      tat_days: record.tat_days,
-      description: record.description,
-      features: record.features || [],
-      logo_url: record.logo_url,
-      website_url: record.website_url,
-      tier: record.tier,
-      popularity: record.popularity || 0,
-      is_active: record.is_active,
-      da_score: record.da_score,
-      dr_score: record.dr_score,
-      location: record.location,
-      dofollow_link: record.dofollow_link,
-      sponsored: record.sponsored,
-      indexed: record.indexed,
-      erotic: record.erotic,
-      health: record.health,
-      cbd: record.cbd,
-      crypto: record.crypto,
-      gambling: record.gambling,
-      created_at: record.created_at,
-      updated_at: record.updated_at,
-    }));
+  const allPublications = await fetchPublications();
+  
+  return allPublications
+    .filter(pub => pub.tier === tier)
+    .sort((a, b) => (b.price || 0) - (a.price || 0));
 };
 
 /**
  * Fetch publications by category (secured)
  */
 export const fetchPublicationsByCategory = async (category: string): Promise<Publication[]> => {
-  const { data, error } = await supabase
-    .rpc('get_publications_for_user');
-
-  if (error) {
-    console.error('Error fetching publications by category:', error);
-    return [];
-  }
-
-  return (data || [])
-    .filter(record => record.category === category)
-    .sort((a, b) => (b.price || 0) - (a.price || 0))
-    .map(record => ({
-      id: record.id,
-      external_id: record.external_id,
-      name: record.name,
-      type: record.type,
-      category: record.category,
-      price: record.price,
-      tat_days: record.tat_days,
-      description: record.description,
-      features: record.features || [],
-      logo_url: record.logo_url,
-      website_url: record.website_url,
-      tier: record.tier,
-      popularity: record.popularity || 0,
-      is_active: record.is_active,
-      da_score: record.da_score,
-      dr_score: record.dr_score,
-      location: record.location,
-      dofollow_link: record.dofollow_link,
-      sponsored: record.sponsored,
-      indexed: record.indexed,
-      erotic: record.erotic,
-      health: record.health,
-      cbd: record.cbd,
-      crypto: record.crypto,
-      gambling: record.gambling,
-      created_at: record.created_at,
-      updated_at: record.updated_at,
-    }));
+  const allPublications = await fetchPublications();
+  
+  return allPublications
+    .filter(pub => pub.category === category)
+    .sort((a, b) => (b.price || 0) - (a.price || 0));
 };
 
 /**
