@@ -34,6 +34,21 @@ export const EmailCollectionPopup = ({
     setIsSubmitting(true);
     
     try {
+      // Sync with MailChimp first
+      const mailchimpResponse = await supabase.functions.invoke('sync-mailchimp', {
+        body: {
+          email: email.trim().toLowerCase(),
+          source,
+          listId: 'your-mailchimp-list-id' // Replace with your actual MailChimp list ID
+        }
+      });
+
+      if (mailchimpResponse.error) {
+        console.error('MailChimp sync error:', mailchimpResponse.error);
+        // Continue with local storage even if MailChimp fails
+      }
+
+      // Insert email into Supabase (backup storage)
       const { error } = await supabase
         .from('email_subscribers')
         .insert({
@@ -42,7 +57,8 @@ export const EmailCollectionPopup = ({
           metadata: {
             timestamp: new Date().toISOString(),
             user_agent: navigator.userAgent,
-            page_url: window.location.href
+            page_url: window.location.href,
+            mailchimp_synced: !mailchimpResponse.error
           }
         });
 
