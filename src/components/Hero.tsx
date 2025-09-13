@@ -16,60 +16,59 @@ export const Hero = () => {
   // Featured established publications
   const featuredPublications = [
     {
-      name: 'Forbes',
+      name: 'Forbes USA',
       logoUrl: '/assets/logos/forbes.png',
       website_url: 'https://forbes.com',
       tier: 'Premium',
-      dbId: null
+      dbId: '77e9cab4-0da1-4b79-8d3e-b816047be5c1'
     },
     {
       name: 'Bloomberg',
       logoUrl: '/assets/logos/bloomberg.png',
       website_url: 'https://bloomberg.com',
       tier: 'Premium',
-      dbId: null
     },
     {
       name: 'Reuters',
       logoUrl: '/assets/logos/reuters.png',
       website_url: 'https://reuters.com',
       tier: 'Premium',
-      dbId: null
+      dbId: null // Not found in database yet
     },
     {
-      name: 'Business Insider',
+      name: 'Business Insider Africa',
       logoUrl: '/assets/logos/business-insider.png',
-      website_url: 'https://businessinsider.com',
+      website_url: 'https://businessinsiderafrica.com',
       tier: 'Premium',
-      dbId: null
+      dbId: 'c0c0d909-fcf0-4e56-b9a9-6b8de1ed4c47'
     },
     {
       name: 'Yahoo',
       logoUrl: '/assets/logos/yahoo.png',
       website_url: 'https://yahoo.com',
       tier: 'Premium',
-      dbId: null
+      dbId: null // Not found in database yet
     },
     {
       name: 'Time',
       logoUrl: '/assets/logos/time.png',
       website_url: 'https://time.com',
       tier: 'Premium',
-      dbId: null
+      dbId: null // Not found in database yet
     },
     {
       name: 'Rolling Stone',
       logoUrl: '/assets/logos/rolling-stone.png',
       website_url: 'https://rollingstone.com',
       tier: 'Premium',
-      dbId: null
+      dbId: null // Not found in database yet
     },
     {
       name: 'Benzinga',
       logoUrl: '/assets/logos/benzinga.png',
       website_url: 'https://benzinga.com',
       tier: 'Premium',
-      dbId: null
+      dbId: '723edcb8-e551-4e1a-9d6e-34a9b376a046'
     }
   ];
 
