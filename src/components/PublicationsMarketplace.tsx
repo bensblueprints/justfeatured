@@ -5,11 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { BrandFetchService } from "@/utils/brandFetch";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
+import { useCart } from "@/hooks/useCart";
+import { toast } from "@/hooks/use-toast";
 
 export const PublicationsMarketplace = () => {
   const navigate = useNavigate();
   const [logos, setLogos] = useState<Record<string, string>>({});
   const { publications, loading } = usePublicationsSync();
+  const { addToCart, isInCart } = useCart();
 
   // Featured publications strictly limited to DB-listed ones, in desired order
   const featuredPublicationNames = ['Reuters','Bloomberg','Forbes USA','Time.com','Yahoo','Business Insider','Fox News','Benzinga','Billboard'];
@@ -87,6 +90,14 @@ export const PublicationsMarketplace = () => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(price);
+  };
+
+  const handleAddToCart = (publication: any) => {
+    addToCart(publication.id);
+    toast({
+      title: "Added to Cart",
+      description: `${publication.name} has been added to your cart.`,
+    });
   };
 
   const getTierColor = (type: string) => {
@@ -179,7 +190,7 @@ export const PublicationsMarketplace = () => {
                 </div>
                 
                 {/* Feature Icons */}
-                <div className="flex justify-center gap-2 mb-2">
+                <div className="flex justify-center gap-2 mb-3">
                   {publication.dofollow_link && (
                     <Badge variant="outline" className="text-xs px-1 py-0">
                       ✓ DoFollow
@@ -196,6 +207,16 @@ export const PublicationsMarketplace = () => {
                     </Badge>
                   )}
                 </div>
+
+                {/* Add to Cart Button */}
+                <Button
+                  onClick={() => handleAddToCart(publication)}
+                  disabled={isInCart(publication.id)}
+                  className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white mb-2"
+                  size="sm"
+                >
+                  {isInCart(publication.id) ? 'In Cart ✓' : 'Add to Cart'}
+                </Button>
               </CardHeader>
               <CardContent className="pt-0 px-4 pb-4">
                 <p className="text-xs leading-tight text-muted-foreground text-center line-clamp-2">
