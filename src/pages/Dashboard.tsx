@@ -167,6 +167,13 @@ export const Dashboard = () => {
               </p>
             </div>
             <div className="flex gap-2">
+              {['admin', 'super_admin', 'editor'].includes(userRole) && (
+                <CreatePressReleaseDialog 
+                  onSuccess={() => window.location.reload()}
+                  userRole={userRole}
+                  standalone={true}
+                />
+              )}
               <Button 
                 onClick={() => navigate('/post-checkout')}
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -285,6 +292,7 @@ export const Dashboard = () => {
                             <CreatePressReleaseDialog 
                               checkoutInfoId={item.checkoutInfo.id}
                               onSuccess={() => window.location.reload()}
+                              userRole={userRole}
                             />
                           )}
                         </div>
