@@ -66,13 +66,18 @@ serve(async (req) => {
       });
     }
 
+    // Get the proper domain for redirects
+    const origin = req.headers.get("origin");
+    const isLocalDev = origin?.includes("localhost") || origin?.includes("127.0.0.1");
+    const baseUrl = isLocalDev ? origin : "https://justfeatured.com";
+
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer_email: customerInfo.email,
       line_items: lineItems,
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/checkout`,
+      success_url: `${baseUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/checkout`,
       metadata: {
         customer_name: customerInfo.fullName,
         business_name: customerInfo.businessName || '',
