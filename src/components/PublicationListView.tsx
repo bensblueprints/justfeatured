@@ -396,6 +396,17 @@ useEffect(() => {
                           <ShoppingCart className="h-3 w-3 mr-1" />
                           {selectedPublications.includes(publication.id) ? "Remove" : "Add to Cart"}
                         </Button>
+                        {publication.website_url && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(publication.website_url, '_blank', 'noopener,noreferrer')}
+                            className="h-7 px-3 text-xs w-full"
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            Visit Website
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </TableCell>

@@ -7,6 +7,7 @@ import { BrandFetchService } from "@/utils/brandFetch";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 import { useCart } from "@/hooks/useCart";
 import { toast } from "@/hooks/use-toast";
+import { ExternalLink } from "lucide-react";
 
 export const PublicationsMarketplace = () => {
   const navigate = useNavigate();
@@ -235,6 +236,19 @@ export const PublicationsMarketplace = () => {
                 >
                   {isInCart(publication.id) ? 'In Cart ✓' : 'Add to Cart'}
                 </Button>
+
+                {/* Visit Website Button */}
+                {publication.website_url && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open(publication.website_url, '_blank', 'noopener,noreferrer')}
+                    className="w-full"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Visit Website
+                  </Button>
+                )}
               </CardHeader>
               <CardContent className="pt-0 px-4 pb-4">
                 <p className="text-xs leading-tight text-muted-foreground text-center line-clamp-2">

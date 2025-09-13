@@ -159,15 +159,28 @@ export const PublicationMobileCard = ({
             {formatPrice(publication.price)}
           </div>
           
-          <Button
-            size="sm"
-            variant={selected ? "secondary" : "default"}
-            onClick={() => onSelectionChange(!selected)}
-            className="h-8 px-3 text-xs"
-          >
-            <ShoppingCart className="w-3 h-3 mr-1" />
-            {selected ? "Remove" : "Add"}
-          </Button>
+          <div className="flex flex-col gap-1">
+            <Button
+              size="sm"
+              variant={selected ? "secondary" : "default"}
+              onClick={() => onSelectionChange(!selected)}
+              className="h-8 px-3 text-xs w-full"
+            >
+              <ShoppingCart className="w-3 h-3 mr-1" />
+              {selected ? "Remove" : "Add"}
+            </Button>
+            {publication.website_url && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(publication.website_url, '_blank', 'noopener,noreferrer')}
+                className="h-8 px-3 text-xs w-full"
+              >
+                <ExternalLink className="w-3 h-3 mr-1" />
+                Visit Website
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
