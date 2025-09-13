@@ -14,8 +14,13 @@ export const AffordablePublicationsSection = () => {
 
   // Filter for $97 publications
   const affordablePublications = publications
-    .filter(pub => pub.is_active && pub.price === 97)
+    .filter(pub => pub.is_active && Number(pub.price) === 97)
     .slice(0, 8); // Show first 8 publications
+
+  // Debug logging
+  console.log('All publications:', publications.length);
+  console.log('$97 publications found:', affordablePublications.length);
+  console.log('Sample publication prices:', publications.slice(0, 3).map(p => ({ name: p.name, price: p.price, type: typeof p.price })));
 
   // Fetch logos on component mount
   useEffect(() => {
@@ -50,8 +55,24 @@ export const AffordablePublicationsSection = () => {
     });
   };
 
-  if (loading || affordablePublications.length === 0) {
-    return null;
+  if (loading) {
+    return (
+      <section className="py-16 bg-gradient-to-b from-background to-muted/20">
+        <div className="container mx-auto px-4 text-center">
+          <p>Loading $97 publications...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (affordablePublications.length === 0) {
+    return (
+      <section className="py-16 bg-gradient-to-b from-background to-muted/20">
+        <div className="container mx-auto px-4 text-center">
+          <p>No $97 publications found. Total publications: {publications.length}</p>
+        </div>
+      </section>
+    );
   }
 
   return (
