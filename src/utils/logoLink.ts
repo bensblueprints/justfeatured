@@ -13,7 +13,7 @@ interface LogoLinkOptions {
 
 export class LogoLinkService {
   private static readonly CDN_BASE = 'https://cdn.brandfetch.io';
-  private static readonly CLIENT_ID = 'brandfetch.com'; // Default client ID for free usage
+  private static readonly CLIENT_ID = '1idElq-c5ECzI_p2pRG'; // Your Brandfetch client ID
   private static logoCache = new Map<string, string>();
 
   /**
@@ -237,18 +237,13 @@ export class LogoLinkService {
     websiteUrl: string | undefined,
     options: LogoLinkOptions = {}
   ): string {
-    // First try Logo Link URL if available
-    if (logoLinkUrl) {
-      return logoLinkUrl;
+    // Prioritize Logo Link - generate new URL if needed
+    const logoLink = logoLinkUrl || this.getLogoLinkUrl(websiteUrl, options);
+    if (logoLink) {
+      return logoLink;
     }
     
-    // Then try to generate a new Logo Link URL
-    const generatedLogoLink = this.getLogoLinkUrl(websiteUrl, options);
-    if (generatedLogoLink) {
-      return generatedLogoLink;
-    }
-    
-    // Fall back to API-fetched logo
+    // Fall back to API-fetched logo only if Logo Link fails
     if (logoUrl) {
       return logoUrl;
     }

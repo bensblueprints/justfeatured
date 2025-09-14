@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   FileText, 
   Clock, 
@@ -13,13 +14,15 @@ import {
   Eye,
   Upload,
   Building,
-  Calendar
+  Calendar,
+  Image
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeText } from "@/lib/security";
 import { type PostCheckoutInfo, type PressRelease } from "@/types/press-release";
 import { CreatePressReleaseDialog } from "@/components/CreatePressReleaseDialog";
+import { LogoPackGenerator } from "@/components/LogoPackGenerator";
 
 interface DashboardItem {
   checkoutInfo: PostCheckoutInfo;
@@ -161,9 +164,9 @@ export const Dashboard = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">My Press Releases</h1>
+              <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
               <p className="text-muted-foreground mt-1">
-                Track the progress of your press releases
+                Manage your press releases and access client tools
               </p>
             </div>
             <div className="flex gap-2">
@@ -187,123 +190,142 @@ export const Dashboard = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {dashboardItems.length === 0 ? (
-          <Card className="text-center py-12">
-            <CardContent>
-              <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-foreground mb-2">No Press Releases Yet</h3>
-              <p className="text-muted-foreground mb-6">
-                Get started by creating your first press release
-              </p>
-              <Button 
-                onClick={() => navigate('/starter-selection')}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Press Release
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-6">
-            {dashboardItems.map((item) => (
-              <Card key={item.checkoutInfo.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-3">
-                      {getStatusIcon(item.pressRelease?.status)}
-                      <div>
-                        <CardTitle className="text-foreground">
-                          {item.checkoutInfo.company_name}
-                        </CardTitle>
-                        <CardDescription className="flex items-center space-x-4 mt-1">
-                          <span className="flex items-center">
-                            <Building className="w-4 h-4 mr-1" />
-                            {item.checkoutInfo.industry_sector}
-                          </span>
-                          <span className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            {new Date(item.checkoutInfo.created_at).toLocaleDateString()}
-                          </span>
-                        </CardDescription>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      {getStatusBadge(item.pressRelease?.status)}
-                      {item.checkoutInfo.status === 'in_progress' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => navigate(`/post-checkout?continue=${item.checkoutInfo.id}`)}
-                        >
-                          <Upload className="w-4 h-4 mr-2" />
-                          Continue Setup
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigate(`/review-board/${item.checkoutInfo.id}`)}
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        View Details
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                
+        <Tabs defaultValue="press-releases" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="press-releases" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Press Releases
+            </TabsTrigger>
+            <TabsTrigger value="logo-generator" className="flex items-center gap-2">
+              <Image className="w-4 h-4" />
+              Logo Pack Generator
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="press-releases" className="space-y-6">
+            {dashboardItems.length === 0 ? (
+              <Card className="text-center py-12">
                 <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium text-foreground mb-2">Business Description</h4>
-                      <p className="text-muted-foreground text-sm">
-                        {sanitizeText(item.checkoutInfo.business_description)}
-                      </p>
-                    </div>
-                    
-                    {item.pressRelease && (
-                      <>
-                        <Separator />
-                        <div>
-                          <h4 className="font-medium text-foreground mb-2">Press Release</h4>
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-sm text-foreground font-medium">
-                                {item.pressRelease.title}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                Version {item.pressRelease.version_number} • 
-                                {item.pressRelease.word_count ? ` ${item.pressRelease.word_count} words` : ' Draft'}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    
-                    {!item.pressRelease && (
-                      <>
-                        <Separator />
-                        <div className="text-center py-4">
-                          <p className="text-muted-foreground text-sm mb-4">
-                            Press release not yet created. Our team will start working on it soon.
-                          </p>
-                          {['admin', 'super_admin', 'editor'].includes(userRole) && (
-                            <CreatePressReleaseDialog 
-                              checkoutInfoId={item.checkoutInfo.id}
-                              onSuccess={() => window.location.reload()}
-                              userRole={userRole}
-                            />
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
+                  <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground mb-2">No Press Releases Yet</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Get started by creating your first press release
+                  </p>
+                  <Button 
+                    onClick={() => navigate('/starter-selection')}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Press Release
+                  </Button>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        )}
+            ) : (
+              <div className="grid gap-6">
+                {dashboardItems.map((item) => (
+                  <Card key={item.checkoutInfo.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center space-x-3">
+                          {getStatusIcon(item.pressRelease?.status)}
+                          <div>
+                            <CardTitle className="text-foreground">
+                              {item.checkoutInfo.company_name}
+                            </CardTitle>
+                            <CardDescription className="flex items-center space-x-4 mt-1">
+                              <span className="flex items-center">
+                                <Building className="w-4 h-4 mr-1" />
+                                {item.checkoutInfo.industry_sector}
+                              </span>
+                              <span className="flex items-center">
+                                <Calendar className="w-4 h-4 mr-1" />
+                                {new Date(item.checkoutInfo.created_at).toLocaleDateString()}
+                              </span>
+                            </CardDescription>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          {getStatusBadge(item.pressRelease?.status)}
+                          {item.checkoutInfo.status === 'in_progress' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => navigate(`/post-checkout?continue=${item.checkoutInfo.id}`)}
+                            >
+                              <Upload className="w-4 h-4 mr-2" />
+                              Continue Setup
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(`/review-board/${item.checkoutInfo.id}`)}
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-medium text-foreground mb-2">Business Description</h4>
+                          <p className="text-muted-foreground text-sm">
+                            {sanitizeText(item.checkoutInfo.business_description)}
+                          </p>
+                        </div>
+                        
+                        {item.pressRelease && (
+                          <>
+                            <Separator />
+                            <div>
+                              <h4 className="font-medium text-foreground mb-2">Press Release</h4>
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm text-foreground font-medium">
+                                    {item.pressRelease.title}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Version {item.pressRelease.version_number} • 
+                                    {item.pressRelease.word_count ? ` ${item.pressRelease.word_count} words` : ' Draft'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        
+                        {!item.pressRelease && (
+                          <>
+                            <Separator />
+                            <div className="text-center py-4">
+                              <p className="text-muted-foreground text-sm mb-4">
+                                Press release not yet created. Our team will start working on it soon.
+                              </p>
+                              {['admin', 'super_admin', 'editor'].includes(userRole) && (
+                                <CreatePressReleaseDialog 
+                                  checkoutInfoId={item.checkoutInfo.id}
+                                  onSuccess={() => window.location.reload()}
+                                  userRole={userRole}
+                                />
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="logo-generator">
+            <LogoPackGenerator />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
