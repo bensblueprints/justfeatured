@@ -391,6 +391,7 @@ export type Database = {
           indexed: boolean | null
           is_active: boolean | null
           location: string | null
+          logo_link_url: string | null
           logo_url: string | null
           monthly_readers: number
           name: string
@@ -423,6 +424,7 @@ export type Database = {
           indexed?: boolean | null
           is_active?: boolean | null
           location?: string | null
+          logo_link_url?: string | null
           logo_url?: string | null
           monthly_readers?: number
           name: string
@@ -455,6 +457,7 @@ export type Database = {
           indexed?: boolean | null
           is_active?: boolean | null
           location?: string | null
+          logo_link_url?: string | null
           logo_url?: string | null
           monthly_readers?: number
           name?: string

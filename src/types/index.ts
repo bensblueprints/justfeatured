@@ -8,6 +8,7 @@ export interface Publication {
   description?: string;
   features: string[];
   logo_url?: string;
+  logo_link_url?: string;
   website_url?: string;
   tier: string;
   popularity: number;

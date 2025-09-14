@@ -5,6 +5,7 @@ import { ShoppingCart, Star, ExternalLink, MapPin, Clock } from "lucide-react";
 import { Publication } from "@/types";
 import { useState, useEffect } from "react";
 import { BrandFetchService } from "@/utils/brandFetch";
+import { LogoLinkService } from "@/utils/logoLink";
 
 interface PublicationMobileCardProps {
   publication: Publication;
@@ -17,31 +18,25 @@ export const PublicationMobileCard = ({
   selected,
   onSelectionChange
 }: PublicationMobileCardProps) => {
-  const [logo, setLogo] = useState<string>(publication.logo_url || '');
+  const [logo, setLogo] = useState<string>(() => 
+    LogoLinkService.getBestLogoUrl(
+      publication.logo_link_url,
+      publication.logo_url,
+      publication.website_url,
+      { type: 'icon', theme: 'light', fallback: true }
+    )
+  );
 
-  // Fetch logo on component mount
   useEffect(() => {
-    const fetchLogo = async () => {
-      // If we already have a logo_url from the database, use it
-      if (publication.logo_url) {
-        setLogo(publication.logo_url);
-        return;
-      }
-
-      // Otherwise fetch from BrandFetch if we have a website URL
-      if (publication.website_url) {
-        try {
-          const logoUrl = await BrandFetchService.getLogoWithFallback(publication.website_url);
-          setLogo(logoUrl);
-        } catch (error) {
-          console.log('Failed to fetch logo for:', publication.name);
-          setLogo('');
-        }
-      }
-    };
-
-    fetchLogo();
-  }, [publication.website_url, publication.logo_url]);
+    // Update logo URL when publication changes
+    const bestLogo = LogoLinkService.getBestLogoUrl(
+      publication.logo_link_url,
+      publication.logo_url,
+      publication.website_url,
+      { type: 'icon', theme: 'light', fallback: true }
+    );
+    setLogo(bestLogo);
+  }, [publication.logo_link_url, publication.logo_url, publication.website_url]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
