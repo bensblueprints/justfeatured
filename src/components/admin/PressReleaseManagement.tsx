@@ -28,7 +28,8 @@ import {
   Edit,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  Plus
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -177,6 +178,14 @@ export const PressReleaseManagement = () => {
               Press Release Management
             </span>
             <div className="flex items-center space-x-2 flex-wrap gap-2">
+              <Button 
+                onClick={() => navigate('/admin-upload')}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Press Release
+              </Button>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Filter by status" />
