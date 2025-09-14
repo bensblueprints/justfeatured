@@ -30,8 +30,10 @@ import {
   Calculator,
   User,
   Building2,
-  Mail
+  Mail,
+  Home
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -74,6 +76,7 @@ interface Invoice {
 }
 
 export const ManualBillingPortal = () => {
+  const navigate = useNavigate();
   const [publications, setPublications] = useState<Publication[]>([]);
   const [selectedPublications, setSelectedPublications] = useState<SelectedPublication[]>([]);
   const [manualLineItems, setManualLineItems] = useState<ManualLineItem[]>([]);
@@ -457,15 +460,22 @@ export const ManualBillingPortal = () => {
           <p className="text-muted-foreground">Create and send custom invoices to clients</p>
         </div>
         
-        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Create Invoice
-            </Button>
-          </DialogTrigger>
-          
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => navigate('/')}
+            variant="outline"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Back to Website
+          </Button>
+          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Create Invoice
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Invoice</DialogTitle>
             </DialogHeader>
@@ -772,6 +782,7 @@ export const ManualBillingPortal = () => {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Invoice List */}

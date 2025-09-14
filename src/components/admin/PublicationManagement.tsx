@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Plus } from 'lucide-react';
+import { Pencil, Trash2, Plus, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -50,6 +51,7 @@ interface Publication {
 }
 
 export function PublicationManagement() {
+  const navigate = useNavigate();
   const [publications, setPublications] = useState<Publication[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingPublication, setEditingPublication] = useState<Publication | null>(null);
@@ -221,14 +223,22 @@ export function PublicationManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Publications Management</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Publication
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => navigate('/')}
+            variant="outline"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Back to Website
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={resetForm}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Publication
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingPublication ? 'Edit Publication' : 'Add New Publication'}
@@ -529,6 +539,7 @@ export function PublicationManagement() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="grid gap-4">

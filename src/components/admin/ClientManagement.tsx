@@ -21,7 +21,8 @@ import {
   Calendar,
   FileText,
   Plus,
-  Upload
+  Upload,
+  Home
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -168,6 +169,13 @@ export const ClientManagement = () => {
             Client Management
           </span>
           <div className="flex items-center space-x-2">
+            <Button 
+              onClick={() => navigate('/')}
+              variant="outline"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Back to Website
+            </Button>
             <ManualClientCreationDialog onClientCreated={fetchClients} />
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />

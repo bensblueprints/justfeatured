@@ -14,7 +14,8 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Image
+  Image,
+  Home
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -135,6 +136,13 @@ export const AdminDashboard = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button 
+            onClick={() => navigate('/')}
+            variant="outline"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Back to Website
+          </Button>
           <Button 
             onClick={() => navigate('/post-checkout')}
             variant="outline"

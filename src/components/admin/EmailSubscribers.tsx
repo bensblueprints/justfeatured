@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Search, Download, Users, Calendar } from 'lucide-react';
+import { Mail, Search, Download, Users, Calendar, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
 interface EmailSubscriber {
@@ -18,6 +19,7 @@ interface EmailSubscriber {
 }
 
 export const EmailSubscribers = () => {
+  const navigate = useNavigate();
   const [subscribers, setSubscribers] = useState<EmailSubscriber[]>([]);
   const [filteredSubscribers, setFilteredSubscribers] = useState<EmailSubscriber[]>([]);
   const [loading, setLoading] = useState(true);
@@ -140,10 +142,19 @@ export const EmailSubscribers = () => {
             Manage users who signed up through popup forms and email capture
           </p>
         </div>
-        <Button onClick={exportToCSV} disabled={filteredSubscribers.length === 0}>
-          <Download className="mr-2 h-4 w-4" />
-          Export CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => navigate('/')}
+            variant="outline"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Back to Website
+          </Button>
+          <Button onClick={exportToCSV} disabled={filteredSubscribers.length === 0}>
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
