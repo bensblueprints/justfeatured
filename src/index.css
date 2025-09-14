@@ -457,6 +457,15 @@ All colors MUST be HSL.
     -webkit-line-clamp: 3;
   }
 
+  /* LiveChat widget positioning override */
+  #chat-widget-container,
+  [data-testid="chat-widget-container"],
+  .lc-chat-widget,
+  .livechat-widget {
+    left: 20px !important;
+    right: auto !important;
+  }
+
   /* Mobile Responsive */
   @media (max-width: 768px) {
     .hero-title { font-size: 48px; }
