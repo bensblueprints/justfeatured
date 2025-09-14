@@ -136,13 +136,6 @@ export const AdminDashboard = () => {
         </div>
         <div className="flex gap-2">
           <Button 
-            onClick={() => navigate('/admin-upload')}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            Upload Press Release
-          </Button>
-          <Button 
             onClick={() => navigate('/post-checkout')}
             variant="outline"
           >
@@ -227,10 +220,20 @@ export const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <TrendingUp className="w-5 h-5 mr-2" />
-              Press Release Pipeline
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2" />
+                Press Release Pipeline
+              </CardTitle>
+              <Button 
+                onClick={() => navigate('/admin-upload')}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                size="sm"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Press Release
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
