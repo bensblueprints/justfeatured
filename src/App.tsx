@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthWrapper } from "@/components/AuthWrapper";
+import { PRChatbot } from "@/components/PRChatbot";
 import { CartProvider } from "@/hooks/useCart";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { Home } from "./pages/Home";
@@ -65,6 +66,7 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
             <AuthGuardComponent />
+            <PRChatbot />
           </AuthWrapper>
         </BrowserRouter>
         </CartProvider>
