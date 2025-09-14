@@ -31,8 +31,7 @@ export const Home = () => {
         </div>
       </ProtectedInteraction>
       
-      {/* PR Chatbot */}
-      <PRChatbot />
+      {/* PR Chatbot removed */}
       
       {/* Footer */}
       <footer className="py-8 bg-background border-t border-border">
