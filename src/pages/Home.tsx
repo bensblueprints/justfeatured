@@ -10,6 +10,7 @@ import { WhyJustFeatured } from "@/components/WhyJustFeatured";
 import { EmailCapture } from "@/components/EmailCapture";
 import { BlogCarousel } from "@/components/BlogCarousel";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
+import { PRChatbot } from "@/components/PRChatbot";
 
 export const Home = () => {
   return (
@@ -29,6 +30,9 @@ export const Home = () => {
           <EmailCapture />
         </div>
       </ProtectedInteraction>
+      
+      {/* PR Chatbot */}
+      <PRChatbot />
       
       {/* Footer */}
       <footer className="py-8 bg-background border-t border-border">

@@ -5,7 +5,7 @@ import { PublicationCard } from "@/components/PublicationCard";
 import { PublicationListView } from "@/components/PublicationListView";
 import { SpreadsheetSync } from "@/components/SpreadsheetSync";
 
-import { AIPresAgentDialog } from "@/components/AIPresAgentDialog";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -222,11 +222,6 @@ export const Publications = () => {
               </Button>
             </div>
             
-            <ProtectedInteraction>
-              <div>
-                <AIPresAgentDialog />
-              </div>
-            </ProtectedInteraction>
           </div>
         </div>
 
