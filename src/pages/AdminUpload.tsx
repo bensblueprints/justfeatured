@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, FileText, ArrowLeft } from "lucide-react";
+import { Upload, FileText, ArrowLeft, Plus } from "lucide-react";
+import { CreateClientDialog } from "@/components/admin/CreateClientDialog";
 
 interface ClientInfo {
   id: string;
@@ -92,6 +93,35 @@ export const AdminUpload = () => {
 
     fetchClients();
   }, [user, userRole, toast]);
+
+  const handleClientCreated = async (clientId: string) => {
+    // Refresh the clients list and auto-select the new client
+    try {
+      const { data, error } = await supabase
+        .from('post_checkout_info')
+        .select('id, company_name, contact_email, email, industry, industry_sector')
+        .order('company_name');
+
+      if (error) throw error;
+      
+      const clientsData = (data || []).map(client => ({
+        id: client.id,
+        company_name: client.company_name,
+        email: client.email || client.contact_email || 'N/A',
+        industry_sector: client.industry_sector || client.industry || 'other'
+      }));
+      
+      setClients(clientsData);
+      setSelectedClient(clientId); // Auto-select the newly created client
+      
+      toast({
+        title: "Client Selected",
+        description: "New client has been created and selected for this press release"
+      });
+    } catch (error: any) {
+      console.error('Error refreshing clients:', error);
+    }
+  };
 
   const uploadPressRelease = async () => {
     if (!selectedClient || !title.trim() || !content.trim()) {
@@ -214,7 +244,15 @@ export const AdminUpload = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="client">Select Client</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="client">Select Client</Label>
+                  <CreateClientDialog onClientCreated={handleClientCreated}>
+                    <Button variant="outline" size="sm">
+                      <Plus className="w-4 h-4 mr-2" />
+                      New Client
+                    </Button>
+                  </CreateClientDialog>
+                </div>
                 <Select value={selectedClient} onValueChange={setSelectedClient}>
                   <SelectTrigger>
                     <SelectValue placeholder="Choose a client..." />
