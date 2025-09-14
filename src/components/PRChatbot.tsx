@@ -7,6 +7,7 @@ import { MessageCircle, X, Send, Bot, User, Loader2, ShoppingCart, ExternalLink 
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useCart } from '@/hooks/useCart';
+import { useChatbot } from '@/contexts/ChatbotContext';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -24,7 +25,7 @@ interface Publication {
 }
 
 export const PRChatbot = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, closeChatbot } = useChatbot();
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -152,19 +153,7 @@ export const PRChatbot = () => {
   ];
 
   if (!isOpen) {
-    return (
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-          onClick={() => setIsOpen(true)}
-          data-chatbot-trigger
-          className="bg-gradient-hero text-white hover:bg-gradient-hero/90 rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300"
-          size="lg"
-        >
-          <MessageCircle className="h-6 w-6 mr-2" />
-          Get Featured in Press
-        </Button>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -178,7 +167,7 @@ export const PRChatbot = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsOpen(false)}
+            onClick={closeChatbot}
             className="text-white hover:bg-white/20 p-1"
           >
             <X className="h-4 w-4" />

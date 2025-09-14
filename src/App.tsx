@@ -8,6 +8,7 @@ import { AuthWrapper } from "@/components/AuthWrapper";
 import { PRChatbot } from "@/components/PRChatbot";
 import { CartProvider } from "@/hooks/useCart";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { ChatbotProvider } from "@/contexts/ChatbotContext";
 import { Home } from "./pages/Home";
 
 
@@ -38,37 +39,38 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <CartProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AuthWrapper>
-            
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/blog/trust-factor" element={<BlogPost />} />
-              <Route path="/blog/social-proof" element={<SocialProofBlogPost />} />
-              <Route path="/dashboard" element={<AdminPanel />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/media-upload/:id" element={<MediaUpload />} />
-              <Route path="/post-checkout" element={<PostCheckout />} />
-              <Route path="/review-board/:id" element={<ReviewBoard />} />
-              <Route path="/publications" element={<Publications />} />
-              <Route path="/starter-selection" element={<StarterSelection />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/payment-success" element={<PaymentSuccess />} />
-              <Route path="/admin-upload" element={<AdminUpload />} />
-              <Route path="/brand-bundles" element={<BrandBundles />} />
-              <Route path="/admin-setup" element={<AdminSetup />} />
-              <Route path="/admin-manual-import" element={<AdminManualImport />} />
-              <Route path="/invoice-payment/:token" element={<InvoicePayment />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <AuthGuardComponent />
-            <PRChatbot />
-          </AuthWrapper>
-        </BrowserRouter>
+          <ChatbotProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AuthWrapper>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/blog/trust-factor" element={<BlogPost />} />
+                  <Route path="/blog/social-proof" element={<SocialProofBlogPost />} />
+                  <Route path="/dashboard" element={<AdminPanel />} />
+                  <Route path="/admin" element={<AdminPanel />} />
+                  <Route path="/media-upload/:id" element={<MediaUpload />} />
+                  <Route path="/post-checkout" element={<PostCheckout />} />
+                  <Route path="/review-board/:id" element={<ReviewBoard />} />
+                  <Route path="/publications" element={<Publications />} />
+                  <Route path="/starter-selection" element={<StarterSelection />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/payment-success" element={<PaymentSuccess />} />
+                  <Route path="/admin-upload" element={<AdminUpload />} />
+                  <Route path="/brand-bundles" element={<BrandBundles />} />
+                  <Route path="/admin-setup" element={<AdminSetup />} />
+                  <Route path="/admin-manual-import" element={<AdminManualImport />} />
+                  <Route path="/invoice-payment/:token" element={<InvoicePayment />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <AuthGuardComponent />
+                <PRChatbot />
+              </AuthWrapper>
+            </BrowserRouter>
+          </ChatbotProvider>
         </CartProvider>
       </TooltipProvider>
     </QueryClientProvider>

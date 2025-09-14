@@ -8,6 +8,7 @@ import { CartDrawer } from "@/components/CartDrawer";
 import { useCart } from "@/hooks/useCart";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 import { useState } from "react";
+import { useChatbot } from "@/contexts/ChatbotContext";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export const Header = () => {
   // Always call hooks at the top level
   const cartData = useCart();
   const publicationsData = usePublicationsSync();
+  const { openChatbot } = useChatbot();
   
   const { selectedPublications, removeFromCart, clearCart } = cartData;
   const { publications } = publicationsData;
@@ -151,12 +153,7 @@ export const Header = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => {
-                  const chatbot = document.querySelector('[data-chatbot-trigger]');
-                  if (chatbot) {
-                    (chatbot as HTMLElement).click();
-                  }
-                }}
+                onClick={openChatbot}
                 className="magnetic text-xs"
               >
                 PR Assistant
@@ -281,10 +278,7 @@ export const Header = () => {
                   variant="outline" 
                   size="sm"
                   onClick={() => {
-                    const chatbot = document.querySelector('[data-chatbot-trigger]');
-                    if (chatbot) {
-                      (chatbot as HTMLElement).click();
-                    }
+                    openChatbot();
                     setIsMobileMenuOpen(false);
                   }}
                   className="w-full text-xs"
