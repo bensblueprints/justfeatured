@@ -156,6 +156,7 @@ export const PRChatbot = () => {
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={() => setIsOpen(true)}
+          data-chatbot-trigger
           className="bg-gradient-hero text-white hover:bg-gradient-hero/90 rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300"
           size="lg"
         >

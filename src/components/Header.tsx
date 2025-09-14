@@ -141,12 +141,27 @@ export const Header = () => {
                 Login
               </Button>
             )}
-            <button 
-              className="cta-primary magnetic"
-              onClick={() => handleNavigation('/starter-selection')}
-            >
-              Get Featured ✨
-            </button>
+            <div className="flex flex-col space-y-2">
+              <button 
+                className="cta-primary magnetic text-sm py-2 px-4"
+                onClick={() => handleNavigation('/starter-selection')}
+              >
+                $97 Features ✨
+              </button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  const chatbot = document.querySelector('[data-chatbot-trigger]');
+                  if (chatbot) {
+                    (chatbot as HTMLElement).click();
+                  }
+                }}
+                className="magnetic text-xs"
+              >
+                PR Assistant
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -252,15 +267,31 @@ export const Header = () => {
                   Login
                 </button>
               )}
-              <button 
-                className="cta-primary w-full text-center"
-                onClick={() => {
-                  handleNavigation('/starter-selection');
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                Get Featured ✨
-              </button>
+              <div className="space-y-2">
+                <button 
+                  className="cta-primary w-full text-center text-sm py-2"
+                  onClick={() => {
+                    handleNavigation('/starter-selection');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  $97 Features ✨
+                </button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    const chatbot = document.querySelector('[data-chatbot-trigger]');
+                    if (chatbot) {
+                      (chatbot as HTMLElement).click();
+                    }
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-xs"
+                >
+                  PR Assistant
+                </Button>
+              </div>
             </div>
           </div>
         </div>
