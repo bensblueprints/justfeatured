@@ -29,6 +29,12 @@ import AdminPanel from "./pages/AdminPanel";
 import AdminSetup from "./pages/AdminSetup";
 import AdminManualImport from "./pages/AdminManualImport";
 import InvoicePayment from "./pages/InvoicePayment";
+import DigitalBillboardAdvertising from "./pages/services/DigitalBillboardAdvertising";
+import InStoreDigitalAdvertising from "./pages/services/InStoreDigitalAdvertising";
+import FacebookMarketing from "./pages/services/FacebookMarketing";
+import FacebookAds from "./pages/services/FacebookAds";
+import WebsiteDevelopment from "./pages/services/WebsiteDevelopment";
+import SEO from "./pages/services/SEO";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +69,12 @@ const App = () => {
                   <Route path="/admin-setup" element={<AdminSetup />} />
                   <Route path="/admin-manual-import" element={<AdminManualImport />} />
                   <Route path="/invoice-payment/:token" element={<InvoicePayment />} />
+                  <Route path="/services/digital-billboard-advertising" element={<DigitalBillboardAdvertising />} />
+                  <Route path="/services/in-store-digital-advertising" element={<InStoreDigitalAdvertising />} />
+                  <Route path="/services/facebook-marketing" element={<FacebookMarketing />} />
+                  <Route path="/services/facebook-ads" element={<FacebookAds />} />
+                  <Route path="/services/website-development" element={<WebsiteDevelopment />} />
+                  <Route path="/services/seo" element={<SEO />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

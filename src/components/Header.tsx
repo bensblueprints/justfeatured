@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthWrapper";
-import { User, LogOut, Menu, X } from "lucide-react";
+import { User, LogOut, Menu, X, ChevronDown } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CartDrawer } from "@/components/CartDrawer";
 import { useCart } from "@/hooks/useCart";
@@ -57,6 +57,37 @@ export const Header = () => {
           >
             Publications
           </button>
+          
+          {/* Services Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center space-x-1 transition-all duration-300 font-medium magnetic" style={{ color: '#475569' }}>
+                <span>Services</span>
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="w-64 bg-white/95 backdrop-blur-lg border border-primary/20">
+              <DropdownMenuItem onClick={() => handleNavigation('/services/digital-billboard-advertising')}>
+                Digital Billboard Advertising
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleNavigation('/services/in-store-digital-advertising')}>
+                In-Store Digital Advertising
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleNavigation('/services/facebook-marketing')}>
+                Facebook Marketing
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleNavigation('/services/facebook-ads')}>
+                Facebook Ads
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleNavigation('/services/website-development')}>
+                Website Development
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleNavigation('/services/seo')}>
+                SEO Services
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
           <button 
             onClick={() => handleNavigation('/starter-selection')}
             className="transition-all duration-300 font-medium magnetic"
@@ -178,6 +209,17 @@ export const Header = () => {
               >
                 Publications
               </button>
+              
+              {/* Mobile Services Menu */}
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-gray-700 px-4">Services</div>
+                <button onClick={() => { handleNavigation('/services/digital-billboard-advertising'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-6 text-sm hover:bg-primary/5 transition-colors" style={{ color: '#475569' }}>Digital Billboard Advertising</button>
+                <button onClick={() => { handleNavigation('/services/in-store-digital-advertising'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-6 text-sm hover:bg-primary/5 transition-colors" style={{ color: '#475569' }}>In-Store Digital Advertising</button>
+                <button onClick={() => { handleNavigation('/services/facebook-marketing'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-6 text-sm hover:bg-primary/5 transition-colors" style={{ color: '#475569' }}>Facebook Marketing</button>
+                <button onClick={() => { handleNavigation('/services/facebook-ads'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-6 text-sm hover:bg-primary/5 transition-colors" style={{ color: '#475569' }}>Facebook Ads</button>
+                <button onClick={() => { handleNavigation('/services/website-development'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-6 text-sm hover:bg-primary/5 transition-colors" style={{ color: '#475569' }}>Website Development</button>
+                <button onClick={() => { handleNavigation('/services/seo'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-6 text-sm hover:bg-primary/5 transition-colors" style={{ color: '#475569' }}>SEO Services</button>
+              </div>
               <button 
                 onClick={() => {
                   handleNavigation('/starter-selection');
