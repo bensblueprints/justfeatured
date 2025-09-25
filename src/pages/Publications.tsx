@@ -24,7 +24,7 @@ export const Publications = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("price-asc");
   const [activeTab, setActiveTab] = useState("publications");
-  const [priceRange, setPriceRange] = useState<number[]>([85000]);
+  const [priceRange, setPriceRange] = useState<number[]>([0, 85000]);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [typeFilters, setTypeFilters] = useState<string[]>([]);
@@ -71,8 +71,11 @@ export const Publications = () => {
     }
 
     // Filter by price range
-    const maxPrice = priceRange[0];
-    filtered = filtered.filter(pub => Number(pub.price) <= maxPrice);
+    const [minPrice, maxPrice] = priceRange;
+    filtered = filtered.filter(pub => {
+      const price = Number(pub.price);
+      return price >= minPrice && price <= maxPrice;
+    });
 
     // Filter by genres
     if (selectedGenres.length > 0) {
@@ -141,7 +144,7 @@ export const Publications = () => {
   }, [searchTerm, sortBy, activeTab, priceRange, selectedGenres, selectedRegions, sponsoredFilter, dofollowFilter, indexedFilter, publications, loading]);
 
   const genres = ["Music", "News", "Lifestyle", "Entertainment", "Business", "Tech", "Web 3", "Luxury", "Fashion", "Real Estate", "Sports", "Gaming", "Political", "Legal", "Alcohol"];
-  const regions = ["United States", "California", "New York", "Global", "UK", "Canada", "Australia"];
+  const regions = ["GLOBAL", "UNITED STATES", "CALIFORNIA", "NEW YORK", "TEXAS", "FLORIDA", "ILLINOIS", "PENNSYLVANIA", "OHIO", "GEORGIA", "NORTH CAROLINA", "MICHIGAN", "NEW JERSEY", "VIRGINIA", "WASHINGTON", "ARIZONA", "MASSACHUSETTS", "TENNESSEE", "INDIANA", "MISSOURI", "MARYLAND", "WISCONSIN", "COLORADO", "MINNESOTA", "SOUTH CAROLINA", "ALABAMA", "LOUISIANA", "KENTUCKY", "OREGON", "OKLAHOMA", "CONNECTICUT", "UTAH", "IOWA", "NEVADA", "ARKANSAS", "MISSISSIPPI", "KANSAS", "NEW MEXICO", "NEBRASKA", "WEST VIRGINIA", "IDAHO", "HAWAII", "NEW HAMPSHIRE", "MAINE", "MONTANA", "RHODE ISLAND", "DELAWARE", "SOUTH DAKOTA", "NORTH DAKOTA", "ALASKA", "VERMONT", "WYOMING", "WASHINGTON D.C.", "CANADA", "UNITED KINGDOM", "AUSTRALIA", "EUROPE", "ASIA PACIFIC", "MIDDLE EAST", "AFRICA", "CHINA", "INDIA", "JAPAN", "UAE", "ISRAEL", "ITALY", "NETHERLANDS", "NORDIC", "MEXICO", "LATIN AMERICA", "SOUTH AFRICA", "NIGERIA", "GHANA", "KENYA", "UGANDA", "SENEGAL", "PHILIPPINES", "TURKEY", "UKRAINE"];
   const typeOptions = ["Staff", "New", "Press Release", "Contributor", "On Hold", "6 Month Lifespan", "Raised"];
 
   const toggleGenre = (genre: string) => {
@@ -167,6 +170,18 @@ export const Publications = () => {
     toggleCart(publicationId);
   };
 
+  const resetFilters = () => {
+    setSearchTerm("");
+    setPriceRange([0, 85000]);
+    setSelectedRegions([]);
+    setSelectedGenres([]);
+    setTypeFilters([]);
+    setSponsoredFilter("all");
+    setDofollowFilter("all");
+    setIndexedFilter("all");
+    setSortBy("price-asc");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -176,10 +191,10 @@ export const Publications = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold mb-2">PRICING (ASCEND PR)</h1>
+              <h1 className="text-2xl font-bold mb-2">FEATURED PR</h1>
               <p className="text-sm text-muted-foreground">
                 Once we have published the article on any further edits may include an extra charge.<br/>
-                Ascend Agency will use reasonable good faith efforts to ensure that such article will remain publicly available in the applicable publication for at least 12 months.
+                We will use reasonable good faith efforts to ensure that such article will remain publicly available in the applicable publication for at least 12 months.
               </p>
             </div>
             <div className="flex gap-2">
@@ -258,9 +273,8 @@ export const Publications = () => {
                   className="w-full"
                 />
                 <div className="flex justify-between text-sm text-muted-foreground mt-2">
-                  <span>$0</span>
                   <span>${priceRange[0].toLocaleString()}</span>
-                  <span>$85,000</span>
+                  <span>${priceRange[1].toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -284,18 +298,18 @@ export const Publications = () => {
             {/* Select Regions */}
             <div>
               <h3 className="font-medium mb-2">Select regions</h3>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select regions" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border border-border shadow-lg z-50">
-                  {regions.map(region => (
-                    <SelectItem key={region} value={region.toLowerCase()}>
-                      {region}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+                {regions.map(region => (
+                  <Badge
+                    key={region}
+                    variant={selectedRegions.includes(region) ? "default" : "secondary"}
+                    className="cursor-pointer"
+                    onClick={() => toggleRegion(region)}
+                  >
+                    {region}
+                  </Badge>
+                ))}
+              </div>
             </div>
 
             {/* Select Genres */}
@@ -385,9 +399,19 @@ export const Publications = () => {
 
           {/* Main Content */}
           <div className="flex-1">
-            {/* Results Count */}
-            <div className="mb-4">
+            {/* Results Count and Reset */}
+            <div className="mb-4 flex justify-between items-center">
               <p className="font-medium">SHOWING {filteredPublications.length} OF {publications.length} PUBLICATIONS</p>
+              <div className="flex items-center gap-4">
+                {selectedPublications.length > 0 && (
+                  <div className="text-sm font-medium">
+                    {selectedPublications.length} selected - ${selectedTotal.toLocaleString()}
+                  </div>
+                )}
+                <Button variant="outline" size="sm" onClick={resetFilters}>
+                  Reset Filters
+                </Button>
+              </div>
             </div>
 
             {/* Publications Table */}
@@ -395,6 +419,7 @@ export const Publications = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50">
+                    <TableHead className="text-red-500 font-medium">SELECT</TableHead>
                     <TableHead className="text-red-500 font-medium">PUBLICATION</TableHead>
                     <TableHead className="text-red-500 font-medium">GENRES</TableHead>
                     <TableHead className="text-red-500 font-medium">PRICE</TableHead>
@@ -410,20 +435,37 @@ export const Publications = () => {
                     <TableHead className="text-red-500 font-medium">NICHES</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
-                  {filteredPublications.map((publication) => (
-                    <TableRow key={publication.id} className="hover:bg-muted/50">
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-white text-sm font-bold">
-                            {publication.name.charAt(0)}
-                          </div>
-                          <div>
-                            <div className="font-medium">{publication.name}</div>
-                          </div>
-                          <Star className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      </TableCell>
+                 <TableBody>
+                   {filteredPublications.map((publication) => (
+                     <TableRow key={publication.id} className="hover:bg-muted/50">
+                       <TableCell>
+                         <Button
+                           variant={selectedPublications.includes(publication.id) ? "default" : "outline"}
+                           size="sm"
+                           onClick={() => handleSelectionChange(publication.id, !selectedPublications.includes(publication.id))}
+                           className="w-full"
+                         >
+                           {selectedPublications.includes(publication.id) ? (
+                             <>
+                               <ShoppingCart className="h-4 w-4 mr-2" />
+                               Selected
+                             </>
+                           ) : (
+                             "Select"
+                           )}
+                         </Button>
+                       </TableCell>
+                       <TableCell>
+                         <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-white text-sm font-bold">
+                             {publication.name.charAt(0)}
+                           </div>
+                           <div>
+                             <div className="font-medium">{publication.name}</div>
+                           </div>
+                           <Star className="h-4 w-4 text-muted-foreground" />
+                         </div>
+                       </TableCell>
                       <TableCell>
                         <div className="space-y-1">
                           <Badge variant="outline" className="text-xs">
