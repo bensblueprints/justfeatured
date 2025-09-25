@@ -156,21 +156,18 @@ All colors MUST be HSL.
     font-size: 72px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: hsl(var(--foreground));
     text-shadow: none;
     position: relative;
   }
 
   .hero-subtitle {
     font-family: 'Inter', sans-serif;
-    color: rgba(255, 255, 255, 0.96);
+    color: hsl(var(--muted-foreground));
     font-size: 24px;
     font-weight: 400;
     line-height: 1.6;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    text-shadow: none;
   }
 
   /* Blue Section Text Styling */
