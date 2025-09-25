@@ -257,6 +257,58 @@ const FacebookAds = () => {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section className="section-padding">
+        <div className="container">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="section-title mb-12">
+              Facebook Ads Management Pricing
+            </h2>
+            <div className="card-standard p-12 border-2 border-primary">
+              <h3 className="text-3xl font-semibold mb-6">Professional Facebook Ads Management</h3>
+              <div className="text-6xl font-bold text-primary mb-4">$1,500<span className="text-2xl text-gray-600">/month</span></div>
+              <p className="text-gray-600 mb-6 text-lg">
+                Expert Facebook advertising management to maximize your ROI and drive qualified leads.
+              </p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+                <p className="text-sm text-yellow-800">
+                  <strong>Note:</strong> $100 minimum daily ad spend required (not included in management fee)
+                </p>
+              </div>
+              <ul className="text-left space-y-3 mb-10 max-w-md mx-auto">
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>Campaign strategy & setup</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>Advanced audience targeting</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>Creative testing & optimization</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>Daily monitoring & optimization</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>Comprehensive monthly reporting</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>ROI tracking & analysis</span>
+                </li>
+              </ul>
+              <button className="cta-primary text-xl px-12 py-4">
+                Start Campaign
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Form Section */}
       <section id="contact" className="section-padding bg-gray-50">
         <div className="container">

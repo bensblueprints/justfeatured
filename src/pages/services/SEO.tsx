@@ -329,8 +329,56 @@ const SEO = () => {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section className="section-padding">
+        <div className="container">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="section-title mb-12">
+              SEO Services Pricing
+            </h2>
+            <div className="card-standard p-12 border-2 border-primary">
+              <h3 className="text-3xl font-semibold mb-6">Monthly SEO Services</h3>
+              <div className="text-6xl font-bold text-primary mb-4">$1,500<span className="text-2xl text-gray-600">/month</span></div>
+              <p className="text-gray-600 mb-8 text-lg">
+                Comprehensive SEO strategy and implementation to boost your search rankings 
+                and drive organic traffic growth consistently.
+              </p>
+              <ul className="text-left space-y-3 mb-10 max-w-md mx-auto">
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>Complete on-page & off-page optimization</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>Monthly comprehensive SEO audit</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>Keyword research & competitor analysis</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>High-quality backlink building</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>Monthly performance reporting</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-4"></div>
+                  <span>Ongoing optimization & support</span>
+                </li>
+              </ul>
+              <button className="cta-primary text-xl px-12 py-4">
+                Start SEO Campaign
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Form Section */}
-      <section id="contact" className="section-padding">
+      <section id="contact" className="section-padding bg-gray-50">
         <div className="container">
           <div className="max-w-2xl mx-auto">
             <h2 className="section-title text-center mb-8">

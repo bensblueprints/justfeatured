@@ -306,6 +306,85 @@ const WebsiteDevelopment = () => {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section className="section-padding bg-gray-50">
+        <div className="container">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="section-title text-center mb-12">
+              Website Development Pricing
+            </h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="card-standard p-8 text-center">
+                <h3 className="text-2xl font-semibold mb-4">Basic Local Lead Generation Website</h3>
+                <div className="text-5xl font-bold text-primary mb-4">$1,500</div>
+                <p className="text-gray-600 mb-6">
+                  Perfect for local businesses looking to generate leads and establish 
+                  an online presence with essential features.
+                </p>
+                <ul className="text-left space-y-2 mb-8">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    <span>Responsive mobile design</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    <span>Contact forms & lead capture</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    <span>SEO optimization</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    <span>Basic analytics setup</span>
+                  </li>
+                </ul>
+                <button className="cta-primary w-full">
+                  Get Started
+                </button>
+              </div>
+              
+              <div className="card-standard p-8 text-center border-2 border-primary">
+                <div className="bg-primary text-white px-4 py-1 rounded-full text-sm mb-4 inline-block">
+                  Most Popular
+                </div>
+                <h3 className="text-2xl font-semibold mb-4">E-commerce Website</h3>
+                <div className="text-5xl font-bold text-primary mb-4">$10,000</div>
+                <p className="text-gray-600 mb-6">
+                  Complete e-commerce solution with payment processing, inventory management, 
+                  and advanced features for online stores.
+                </p>
+                <ul className="text-left space-y-2 mb-8">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    <span>Full e-commerce functionality</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    <span>Payment gateway integration</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    <span>Inventory management system</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    <span>Custom admin dashboard</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    <span>Advanced analytics & reporting</span>
+                  </li>
+                </ul>
+                <button className="cta-primary w-full">
+                  Get Started
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Form Section */}
       <section id="contact" className="section-padding">
         <div className="container">

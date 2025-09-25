@@ -35,6 +35,7 @@ import FacebookMarketing from "./pages/services/FacebookMarketing";
 import FacebookAds from "./pages/services/FacebookAds";
 import WebsiteDevelopment from "./pages/services/WebsiteDevelopment";
 import SEO from "./pages/services/SEO";
+import ArticleWriting from "./pages/services/ArticleWriting";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ const App = () => {
                   <Route path="/services/facebook-ads" element={<FacebookAds />} />
                   <Route path="/services/website-development" element={<WebsiteDevelopment />} />
                   <Route path="/services/seo" element={<SEO />} />
+                  <Route path="/services/article-writing" element={<ArticleWriting />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
