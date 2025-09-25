@@ -152,23 +152,25 @@ All colors MUST be HSL.
   }
 
   .hero-title {
-    color: #FFFFFF;
+    font-family: 'Playfair Display', serif;
     font-size: 72px;
-    font-weight: 800;
-    text-shadow: 
-      0 2px 4px rgba(0, 0, 0, 0.5),
-      0 4px 8px rgba(0, 0, 0, 0.3),
-      0 0 20px rgba(59, 130, 246, 0.4);
+    font-weight: 700;
     letter-spacing: -0.02em;
-    animation: blueGlow 3s ease-in-out infinite;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    position: relative;
   }
 
   .hero-subtitle {
-    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    color: rgba(255, 255, 255, 0.96);
     font-size: 24px;
-    font-weight: 500;
-    opacity: 0.95;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    font-weight: 400;
+    line-height: 1.6;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   /* Blue Section Text Styling */
