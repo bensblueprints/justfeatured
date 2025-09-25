@@ -20,7 +20,7 @@ export const Header = () => {
   const publicationsData = usePublicationsSync();
   const { openChatbot } = useChatbot();
   
-  const { selectedPublications, removeFromCart, clearCart } = cartData;
+  const { selectedPublications, selectedServices, removeFromCart, removeServiceFromCart, clearCart } = cartData;
   const { publications } = publicationsData;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -129,8 +129,10 @@ export const Header = () => {
           {/* Cart - Always visible */}
           <CartDrawer
             selectedPublications={selectedPublications}
+            selectedServices={selectedServices}
             publications={publications}
             onRemoveFromCart={removeFromCart}
+            onRemoveServiceFromCart={removeServiceFromCart}
             onClearCart={clearCart}
           />
           

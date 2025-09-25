@@ -12,21 +12,26 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingCart, X, ExternalLink, ArrowRight } from "lucide-react";
-import { Publication } from "@/types";
+import { Publication, Service } from "@/types";
+import { services } from "@/lib/services";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 interface CartDrawerProps {
   selectedPublications: string[];
+  selectedServices: string[];
   publications: Publication[];
   onRemoveFromCart: (publicationId: string) => void;
+  onRemoveServiceFromCart: (serviceId: string) => void;
   onClearCart: () => void;
 }
 
 export const CartDrawer = ({ 
   selectedPublications, 
+  selectedServices,
   publications, 
   onRemoveFromCart,
+  onRemoveServiceFromCart,
   onClearCart 
 }: CartDrawerProps) => {
   const navigate = useNavigate();
@@ -65,8 +70,10 @@ export const CartDrawer = ({
 
   const allPublications = [...(publications || []), ...hardcodedPublications];
   const cartItems = allPublications.filter(pub => selectedPublications?.includes(pub.id)) || [];
-  const totalAmount = cartItems.reduce((sum, pub) => sum + (pub.price || 0), 0);
-  const cartCount = selectedPublications?.length || 0;
+  const cartServices = services.filter(service => selectedServices?.includes(service.id)) || [];
+  const totalAmount = cartItems.reduce((sum, pub) => sum + (pub.price || 0), 0) + 
+                     cartServices.reduce((sum, service) => sum + (service.price || 0), 0);
+  const cartCount = (selectedPublications?.length || 0) + (selectedServices?.length || 0);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -133,7 +140,7 @@ export const CartDrawer = ({
           <SheetDescription>
             {cartCount === 0 
               ? "Your cart is empty" 
-              : `${cartCount} publication${cartCount === 1 ? '' : 's'} selected`
+              : `${cartItems.length} publication${cartItems.length === 1 ? '' : 's'}${cartServices.length > 0 ? ` and ${cartServices.length} service${cartServices.length === 1 ? '' : 's'}` : ''} selected`
             }
           </SheetDescription>
         </SheetHeader>
@@ -161,38 +168,78 @@ export const CartDrawer = ({
           <div className="flex flex-col h-full min-h-0">
             <ScrollArea className="flex-1 mt-6">
               <div className="space-y-4">
-                {cartItems.map((publication) => (
-                  <Card key={publication.id} className="relative">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onRemoveFromCart(publication.id)}
-                      className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm pr-8">{publication.name}</CardTitle>
-                      <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="text-xs">
-                          {publication.category}
-                        </Badge>
-                        <div className="text-lg font-bold text-primary">
-                          {formatPrice(publication.price)}
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>TAT: {publication.tat_days}</span>
-                        <div className="flex items-center gap-2">
-                          <span>DA: {publication.da_score || 0}</span>
-                          <span>DR: {publication.dr_score || 0}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                {cartServices.length > 0 && (
+                  <>
+                    <h4 className="font-semibold text-sm text-muted-foreground">Services</h4>
+                    {cartServices.map((service) => (
+                      <Card key={service.id} className="relative">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onRemoveServiceFromCart(service.id)}
+                          className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm pr-8">{service.name}</CardTitle>
+                          <div className="flex items-center justify-between">
+                            <Badge variant="outline" className="text-xs">
+                              {service.category}
+                            </Badge>
+                            <div className="text-lg font-bold text-primary">
+                              {formatPrice(service.price)}
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="text-xs text-muted-foreground">
+                            <span>{service.type === 'recurring' ? `Monthly ${service.category}` : 'One-time service'}</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    {cartItems.length > 0 && <Separator />}
+                  </>
+                )}
+                
+                {cartItems.length > 0 && (
+                  <>
+                    <h4 className="font-semibold text-sm text-muted-foreground">Publications</h4>
+                    {cartItems.map((publication) => (
+                      <Card key={publication.id} className="relative">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onRemoveFromCart(publication.id)}
+                          className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm pr-8">{publication.name}</CardTitle>
+                          <div className="flex items-center justify-between">
+                            <Badge variant="outline" className="text-xs">
+                              {publication.category}
+                            </Badge>
+                            <div className="text-lg font-bold text-primary">
+                              {formatPrice(publication.price)}
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>TAT: {publication.tat_days}</span>
+                            <div className="flex items-center gap-2">
+                              <span>DA: {publication.da_score || 0}</span>
+                              <span>DR: {publication.dr_score || 0}</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </>
+                )}
               </div>
             </ScrollArea>
 
