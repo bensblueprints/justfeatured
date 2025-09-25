@@ -109,58 +109,97 @@ export const Checkout = () => {
   ];
 
   useEffect(() => {
-    // Get selected publications and services from navigation state (fallback to sessionStorage for mobile)
-    const statePublications = location.state?.selectedPublications || [];
-    const stateServices = location.state?.selectedServices || [];
-    const sessionItems = JSON.parse(sessionStorage.getItem('checkout_items') || '[]');
-    
-    // Combine state items and session items, prioritizing state
-    const allItems = [...statePublications, ...stateServices];
-    const finalItems = allItems.length > 0 ? allItems : sessionItems;
-    
-    const type = (location.state?.packageType as 'starter' | 'custom') || (sessionStorage.getItem('checkout_package_type') as 'starter' | 'custom') || 'custom';
-    const starterPubs = location.state?.selectedStarterPublications || [];
-    
-    console.log('Checkout useEffect:', {
-      statePublications,
-      stateServices,
-      sessionItems,
-      finalItems,
-      type
-    });
-    
-    setPackageType(type);
-    
-    if (type === 'starter') {
-      if (starterPubs.length > 0) {
-        setSelectedStarterPublications(starterPubs);
-        // Calculate starter package pricing
-        const starterItems = starterPubs.map((pub: any, index: number) => ({
-          id: `starter-${pub.id}`,
-          name: pub.name,
-          price: index === 0 ? 97 : 87,
-          category: 'Starter Package',
-          tat_days: 3,
-        }));
-        setItems(starterItems);
+    const loadItemsFromCart = async () => {
+      // Get selected publications and services from navigation state (fallback to sessionStorage for mobile)
+      const statePublications = location.state?.selectedPublications || [];
+      const stateServices = location.state?.selectedServices || [];
+      const sessionItems = JSON.parse(sessionStorage.getItem('checkout_items') || '[]');
+      
+      const type = (location.state?.packageType as 'starter' | 'custom') || (sessionStorage.getItem('checkout_package_type') as 'starter' | 'custom') || 'custom';
+      const starterPubs = location.state?.selectedStarterPublications || [];
+      
+      console.log('Checkout useEffect:', {
+        statePublications,
+        stateServices,
+        sessionItems,
+        type
+      });
+      
+      setPackageType(type);
+      
+      if (type === 'starter') {
+        if (starterPubs.length > 0) {
+          setSelectedStarterPublications(starterPubs);
+          // Calculate starter package pricing
+          const starterItems = starterPubs.map((pub: any, index: number) => ({
+            id: `starter-${pub.id}`,
+            name: pub.name,
+            price: index === 0 ? 97 : 87,
+            category: 'Starter Package',
+            tat_days: 3,
+          }));
+          setItems(starterItems);
+        } else {
+          navigate('/starter-selection');
+          return;
+        }
       } else {
-        navigate('/starter-selection');
-        return;
+        // Fetch publication details
+        const publicationItems = [];
+        if (statePublications.length > 0) {
+          const { data: publications } = await supabase
+            .from('publications')
+            .select('*')
+            .in('id', statePublications);
+          
+          if (publications) {
+            publicationItems.push(...publications.map(pub => ({
+              id: pub.id,
+              name: pub.name,
+              price: pub.price,
+              category: pub.category,
+              tat_days: pub.tat_days
+            })));
+          }
+        }
+
+        // Fetch service details from database
+        const serviceItems = [];
+        if (stateServices.length > 0) {
+          const { data: dbServices } = await supabase
+            .from('services')
+            .select('*')
+            .in('service_id', stateServices);
+          
+          if (dbServices) {
+            serviceItems.push(...dbServices.map(service => ({
+              id: service.service_id,
+              name: service.name,
+              price: service.price,
+              category: service.category,
+              tat_days: service.type === 'recurring' ? 'Monthly' : 'One-time'
+            })));
+          }
+        }
+
+        const allItems = [...publicationItems, ...serviceItems];
+        const finalItems = allItems.length > 0 ? allItems : sessionItems;
+        setItems(finalItems);
+
+        // Clean up persisted data once loaded
+        if (finalItems.length > 0) {
+          sessionStorage.removeItem('checkout_items');
+          sessionStorage.removeItem('checkout_package_type');
+        }
+
+        // If no items, redirect back to publications
+        if (finalItems.length === 0) {
+          navigate('/publications');
+        }
       }
-    } else {
-      setItems(finalItems);
-    }
+    };
 
-    // Clean up persisted data once loaded
-    if (finalItems.length > 0) {
-      sessionStorage.removeItem('checkout_items');
-      sessionStorage.removeItem('checkout_package_type');
-    }
-
-    // If no items, redirect back to publications
-    if (finalItems.length === 0 && type !== 'starter') {
-      navigate('/publications');
-    }
+    loadItemsFromCart();
   }, [location.state, navigate]);
 
   const handleStarterPublicationToggle = (publication: any, checked: boolean) => {
