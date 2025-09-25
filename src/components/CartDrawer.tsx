@@ -86,22 +86,35 @@ export const CartDrawer = ({
 
   const handleCheckout = () => {
     try {
-      const checkoutItems = cartItems.map(pub => ({
+      const checkoutPublications = cartItems.map(pub => ({
         id: pub.id,
         name: pub.name,
         price: Number(pub.price),
         category: pub.category,
         tat_days: parseInt(String(pub.tat_days)) || 3,
+        type: 'publication'
       }));
+      
+      const checkoutServices = cartServices.map(service => ({
+        id: service.id,
+        name: service.name,
+        price: Number(service.price),
+        category: service.category,
+        type: 'service'
+      }));
+      
+      const allItems = [...checkoutPublications, ...checkoutServices];
+      
       // Persist as fallback for navigation on mobile
-      sessionStorage.setItem('checkout_items', JSON.stringify(checkoutItems));
+      sessionStorage.setItem('checkout_items', JSON.stringify(allItems));
       sessionStorage.setItem('checkout_package_type', 'custom');
       setIsOpen(false);
       // Navigate after closing animation to avoid sheet focus trap issues on mobile
       setTimeout(() => {
         navigate('/checkout', {
           state: {
-            selectedPublications: checkoutItems,
+            selectedPublications: checkoutPublications,
+            selectedServices: checkoutServices,
             packageType: 'custom',
           },
         });
