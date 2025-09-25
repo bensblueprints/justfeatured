@@ -109,10 +109,25 @@ export const Checkout = () => {
   ];
 
   useEffect(() => {
-    // Get selected publications from navigation state (fallback to sessionStorage for mobile)
-    const stateItems = location.state?.selectedPublications || JSON.parse(sessionStorage.getItem('checkout_items') || '[]');
+    // Get selected publications and services from navigation state (fallback to sessionStorage for mobile)
+    const statePublications = location.state?.selectedPublications || [];
+    const stateServices = location.state?.selectedServices || [];
+    const sessionItems = JSON.parse(sessionStorage.getItem('checkout_items') || '[]');
+    
+    // Combine state items and session items, prioritizing state
+    const allItems = [...statePublications, ...stateServices];
+    const finalItems = allItems.length > 0 ? allItems : sessionItems;
+    
     const type = (location.state?.packageType as 'starter' | 'custom') || (sessionStorage.getItem('checkout_package_type') as 'starter' | 'custom') || 'custom';
     const starterPubs = location.state?.selectedStarterPublications || [];
+    
+    console.log('Checkout useEffect:', {
+      statePublications,
+      stateServices,
+      sessionItems,
+      finalItems,
+      type
+    });
     
     setPackageType(type);
     
@@ -133,17 +148,17 @@ export const Checkout = () => {
         return;
       }
     } else {
-      setItems(stateItems);
+      setItems(finalItems);
     }
 
     // Clean up persisted data once loaded
-    if (stateItems.length > 0) {
+    if (finalItems.length > 0) {
       sessionStorage.removeItem('checkout_items');
       sessionStorage.removeItem('checkout_package_type');
     }
 
     // If no items, redirect back to publications
-    if (stateItems.length === 0 && type !== 'starter') {
+    if (finalItems.length === 0 && type !== 'starter') {
       navigate('/publications');
     }
   }, [location.state, navigate]);
