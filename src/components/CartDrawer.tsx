@@ -262,7 +262,7 @@ export const CartDrawer = ({
                   variant="outline"
                   size="sm"
                   onClick={onClearCart}
-                  disabled={selectedPublications.length === 0}
+                  disabled={cartCount === 0}
                   className="w-full sm:w-auto"
                 >
                   Clear Cart
@@ -277,7 +277,7 @@ export const CartDrawer = ({
 
               <Button 
                 onClick={handleCheckout}
-                disabled={selectedPublications.length === 0}
+                disabled={cartCount === 0}
                 className="w-full h-12 text-base sm:text-lg sticky bottom-0"
                 size="lg"
               >
