@@ -1,0 +1,8 @@
+-- Delete the existing facebook-ads service
+DELETE FROM public.services WHERE service_id = 'facebook-ads';
+
+-- Insert the three new Facebook ads service tiers
+INSERT INTO public.services (service_id, name, price, category, description, features, type, interval) VALUES
+('facebook-ads-starter', 'Facebook Ads Starter', 1500, 'Facebook Advertising', 'Perfect for small businesses starting with Facebook advertising. One campaign with up to 5 different ads.', ARRAY['1 campaign setup', 'Up to 5 different ads', 'Basic audience targeting', 'Weekly optimization', 'Monthly reporting', 'ROI tracking'], 'recurring', 'month'),
+('facebook-ads-professional', 'Facebook Ads Professional', 2500, 'Facebook Advertising', 'Ideal for growing businesses needing comprehensive Facebook advertising. Two campaigns with up to 15 different ads.', ARRAY['2 campaigns setup', 'Up to 15 different ads', 'Advanced audience targeting', 'Creative testing & optimization', 'Daily monitoring', 'Bi-weekly reporting', 'ROI tracking & analysis'], 'recurring', 'month'),
+('facebook-ads-enterprise', 'Facebook Ads Enterprise', 5000, 'Facebook Advertising', 'Complete Facebook advertising solution for established businesses. Five campaigns with up to 50 different ads.', ARRAY['5 campaigns setup', 'Up to 50 different ads', 'Premium audience targeting', 'Extensive A/B testing', 'Real-time monitoring', 'Weekly detailed reporting', 'Comprehensive ROI analysis', 'Dedicated account manager'], 'recurring', 'month');
