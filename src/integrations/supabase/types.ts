@@ -473,6 +473,51 @@ export type Database = {
         }
         Relationships: []
       }
+      services: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          features: string[]
+          id: string
+          interval: string | null
+          is_active: boolean
+          name: string
+          price: number
+          service_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          features?: string[]
+          id?: string
+          interval?: string | null
+          is_active?: boolean
+          name: string
+          price?: number
+          service_id: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          features?: string[]
+          id?: string
+          interval?: string | null
+          is_active?: boolean
+          name?: string
+          price?: number
+          service_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
