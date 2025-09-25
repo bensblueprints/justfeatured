@@ -74,6 +74,14 @@ export const CartDrawer = ({
   const totalAmount = cartItems.reduce((sum, pub) => sum + (pub.price || 0), 0) + 
                      cartServices.reduce((sum, service) => sum + (service.price || 0), 0);
   const cartCount = (selectedPublications?.length || 0) + (selectedServices?.length || 0);
+  
+  console.log('Cart state:', {
+    selectedPublications,
+    selectedServices,
+    cartItems: cartItems.length,
+    cartServices: cartServices.length,
+    cartCount
+  });
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -85,6 +93,7 @@ export const CartDrawer = ({
   };
 
   const handleCheckout = () => {
+    console.log('Checkout button clicked - starting navigation...');
     try {
       const checkoutPublications = cartItems.map(pub => ({
         id: pub.id,
@@ -111,6 +120,11 @@ export const CartDrawer = ({
       setIsOpen(false);
       // Navigate after closing animation to avoid sheet focus trap issues on mobile
       setTimeout(() => {
+        console.log('Navigating to /checkout with state:', {
+          selectedPublications: checkoutPublications,
+          selectedServices: checkoutServices,
+          packageType: 'custom',
+        });
         navigate('/checkout', {
           state: {
             selectedPublications: checkoutPublications,
