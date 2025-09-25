@@ -1,8 +1,20 @@
 import { Header } from "@/components/Header";
 import { ServiceContactForm } from "@/components/ServiceContactForm";
 import { Search, TrendingUp, Target, BarChart } from "lucide-react";
+import { useCart } from "@/hooks/useCart";
+import { toast } from "@/hooks/use-toast";
 
 const SEO = () => {
+  const { addServiceToCart, isServiceInCart } = useCart();
+
+  const handleAddToCart = (serviceId: string, serviceName: string) => {
+    addServiceToCart(serviceId);
+    toast({
+      title: "Added to Cart",
+      description: `${serviceName} has been added to your cart.`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -369,8 +381,11 @@ const SEO = () => {
                   <span>Ongoing optimization & support</span>
                 </li>
               </ul>
-              <button className="cta-primary text-xl px-12 py-4">
-                Start SEO Campaign
+              <button 
+                className="cta-primary text-xl px-12 py-4"
+                onClick={() => handleAddToCart('seo-monthly', 'Monthly SEO Services')}
+              >
+                {isServiceInCart('seo-monthly') ? 'Added to Cart' : 'Start SEO Campaign'}
               </button>
             </div>
           </div>

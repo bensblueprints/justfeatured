@@ -1,8 +1,20 @@
 import { Header } from "@/components/Header";
 import { ServiceContactForm } from "@/components/ServiceContactForm";
 import { Code, Smartphone, Zap, Shield } from "lucide-react";
+import { useCart } from "@/hooks/useCart";
+import { toast } from "@/hooks/use-toast";
 
 const WebsiteDevelopment = () => {
+  const { addServiceToCart, isServiceInCart } = useCart();
+
+  const handleAddToCart = (serviceId: string, serviceName: string) => {
+    addServiceToCart(serviceId);
+    toast({
+      title: "Added to Cart",
+      description: `${serviceName} has been added to your cart.`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -339,8 +351,11 @@ const WebsiteDevelopment = () => {
                     <span>Basic analytics setup</span>
                   </li>
                 </ul>
-                <button className="cta-primary w-full">
-                  Get Started
+                <button 
+                  className="cta-primary w-full"
+                  onClick={() => handleAddToCart('website-basic', 'Basic Local Lead Generation Website')}
+                >
+                  {isServiceInCart('website-basic') ? 'Added to Cart' : 'Get Started'}
                 </button>
               </div>
               
@@ -376,8 +391,11 @@ const WebsiteDevelopment = () => {
                     <span>Advanced analytics & reporting</span>
                   </li>
                 </ul>
-                <button className="cta-primary w-full">
-                  Get Started
+                <button 
+                  className="cta-primary w-full"
+                  onClick={() => handleAddToCart('website-ecommerce', 'E-commerce Website')}
+                >
+                  {isServiceInCart('website-ecommerce') ? 'Added to Cart' : 'Get Started'}
                 </button>
               </div>
             </div>

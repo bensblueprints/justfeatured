@@ -1,8 +1,20 @@
 import { Header } from "@/components/Header";
 import { ServiceContactForm } from "@/components/ServiceContactForm";
 import { FileText, Search, TrendingUp, Users } from "lucide-react";
+import { useCart } from "@/hooks/useCart";
+import { toast } from "@/hooks/use-toast";
 
 const ArticleWriting = () => {
+  const { addServiceToCart, isServiceInCart } = useCart();
+
+  const handleAddToCart = (serviceId: string, serviceName: string) => {
+    addServiceToCart(serviceId);
+    toast({
+      title: "Added to Cart",
+      description: `${serviceName} has been added to your cart.`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

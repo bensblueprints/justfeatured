@@ -1,8 +1,20 @@
 import { Header } from "@/components/Header";
 import { ServiceContactForm } from "@/components/ServiceContactForm";
 import { Target, BarChart, DollarSign, Users } from "lucide-react";
+import { useCart } from "@/hooks/useCart";
+import { toast } from "@/hooks/use-toast";
 
 const FacebookAds = () => {
+  const { addServiceToCart, isServiceInCart } = useCart();
+
+  const handleAddToCart = (serviceId: string, serviceName: string) => {
+    addServiceToCart(serviceId);
+    toast({
+      title: "Added to Cart",
+      description: `${serviceName} has been added to your cart.`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -301,8 +313,11 @@ const FacebookAds = () => {
                   <span>ROI tracking & analysis</span>
                 </li>
               </ul>
-              <button className="cta-primary text-xl px-12 py-4">
-                Start Campaign
+              <button 
+                className="cta-primary text-xl px-12 py-4"
+                onClick={() => handleAddToCart('facebook-ads', 'Professional Facebook Ads Management')}
+              >
+                {isServiceInCart('facebook-ads') ? 'Added to Cart' : 'Start Campaign'}
               </button>
             </div>
           </div>

@@ -60,7 +60,19 @@ export interface OrderItem {
   quantity: number;
 }
 
+export interface Service {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  description: string;
+  features: string[];
+  type: 'one-time' | 'recurring';
+  interval?: 'month' | 'year';
+}
+
 export interface CartItem {
-  publication: Publication;
+  publication?: Publication;
+  service?: Service;
   selected: boolean;
 }
