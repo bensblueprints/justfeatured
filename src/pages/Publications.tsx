@@ -1,38 +1,36 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { PublicationCard } from "@/components/PublicationCard";
-import { PublicationListView } from "@/components/PublicationListView";
-import { SpreadsheetSync } from "@/components/SpreadsheetSync";
-
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import { Search, ShoppingCart, Filter, DollarSign, Building, Grid3X3, List } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Slider } from "@/components/ui/slider";
+import { Search, Star, ExternalLink, Image, FileText, Heart, Clock, MapPin, ShoppingCart } from "lucide-react";
 import { fetchPublications } from "@/lib/publications";
 import { usePublicationsSync } from "@/hooks/usePublicationsSync";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useCart } from "@/hooks/useCart";
 import { Publication, CartItem } from "@/types";
 import { ProtectedInteraction } from "@/components/ProtectedInteraction";
+import { SpreadsheetSync } from "@/components/SpreadsheetSync";
 
 export const Publications = () => {
   const navigate = useNavigate();
   const { selectedPublications, toggleCart } = useCart();
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("price-low");
-  const [activeTab, setActiveTab] = useState("all");
-  const [visibleCount, setVisibleCount] = useState(18);
-  const [priceRange, setPriceRange] = useState<string>("all");
-  const [industryFilter, setIndustryFilter] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"cards" | "list">("list");
-  
-  const LOAD_MORE_COUNT = 18;
+  const [sortBy, setSortBy] = useState("price-asc");
+  const [activeTab, setActiveTab] = useState("publications");
+  const [priceRange, setPriceRange] = useState<number[]>([85000]);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [typeFilters, setTypeFilters] = useState<string[]>([]);
+  const [sponsoredFilter, setSponsoredFilter] = useState<string>("all");
+  const [dofollowFilter, setDofollowFilter] = useState<string>("all");
+  const [indexedFilter, setIndexedFilter] = useState<string>("all");
 
   // Use real-time publications sync and admin check
   const { publications, loading, refreshPublications } = usePublicationsSync();
@@ -45,20 +43,20 @@ export const Publications = () => {
     
     let filtered = publications.filter(pub => pub.is_active !== false);
 
-    // Filter by tab
-    if (activeTab !== "all") {
+    // Filter by tab category
+    if (activeTab !== "publications") {
       switch (activeTab) {
-        case "nonsponsored":
-          filtered = filtered.filter(pub => pub.sponsored === false);
+        case "broadcasttv":
+          filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('broadcast'));
           break;
-        case "dofollow":
-          filtered = filtered.filter(pub => pub.dofollow_link === true);
-          break;
-        case "bestsellers":
-          filtered = filtered.filter(pub => pub.popularity > 70);
+        case "digitaltv":
+          filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('digital') || pub.category?.toLowerCase().includes('tv'));
           break;
         case "listicles":
           filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('listicle'));
+          break;
+        case "bestsellers":
+          filtered = filtered.filter(pub => pub.popularity > 70);
           break;
         case "bundles":
           filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('bundle'));
@@ -66,93 +64,97 @@ export const Publications = () => {
         case "print":
           filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('print'));
           break;
-        case "digitaltv":
-          filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('digital') || pub.category?.toLowerCase().includes('tv'));
-          break;
-        case "broadcasttv":
-          filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('broadcast'));
-          break;
         case "socialpost":
           filtered = filtered.filter(pub => pub.category?.toLowerCase().includes('social'));
           break;
-        case "starter":
-          filtered = filtered.filter(pub => pub.tier?.toLowerCase() === 'starter' || pub.price === 97);
-          break;
-        default:
-          filtered = filtered.filter(pub => pub.type === activeTab || pub.tier === activeTab);
       }
     }
 
     // Filter by price range
-    if (priceRange !== "all") {
-      const ranges = {
-        "under-200": [0, 200], // Under $200
-        "under-1000": [0, 1000], // Under $1,000
-        "1000-5000": [1000, 5000], // $1,000 - $5,000
-        "5000-15000": [5000, 15000], // $5,000 - $15,000
-        "15000-50000": [15000, 50000], // $15,000 - $50,000
-        "over-50000": [50000, Infinity] // Over $50,000
-      };
-      
-      const [min, max] = ranges[priceRange as keyof typeof ranges] || [0, Infinity];
-      console.log('Price filter:', priceRange, 'Range:', [min, max]);
-      
-      filtered = filtered.filter(pub => {
-        const price = Number(pub.price) || 0;
-        const inRange = price >= min && price < max;
-        console.log('Publication:', pub.name, 'Price:', price, 'In range:', inRange);
-        return inRange;
-      });
-    }
+    const maxPrice = priceRange[0];
+    filtered = filtered.filter(pub => Number(pub.price) <= maxPrice);
 
-    // Filter by industry/category
-    if (industryFilter !== "all") {
+    // Filter by genres
+    if (selectedGenres.length > 0) {
       filtered = filtered.filter(pub => 
-        pub.category.toLowerCase().includes(industryFilter.toLowerCase()) ||
-        pub.location?.toLowerCase().includes(industryFilter.toLowerCase())
+        selectedGenres.some(genre => 
+          pub.category.toLowerCase().includes(genre.toLowerCase()) ||
+          pub.type?.toLowerCase().includes(genre.toLowerCase())
+        )
       );
     }
 
-    // Enhanced search matching
+    // Filter by regions
+    if (selectedRegions.length > 0) {
+      filtered = filtered.filter(pub => 
+        selectedRegions.some(region => 
+          pub.location?.toLowerCase().includes(region.toLowerCase())
+        )
+      );
+    }
+
+    // Filter by sponsored
+    if (sponsoredFilter !== "all") {
+      const isSponsored = sponsoredFilter === "yes";
+      filtered = filtered.filter(pub => pub.sponsored === isSponsored);
+    }
+
+    // Filter by dofollow
+    if (dofollowFilter !== "all") {
+      const isDofollow = dofollowFilter === "yes";
+      filtered = filtered.filter(pub => pub.dofollow_link === isDofollow);
+    }
+
+    // Filter by indexed
+    if (indexedFilter !== "all") {
+      const isIndexed = indexedFilter === "yes";
+      filtered = filtered.filter(pub => pub.indexed === isIndexed);
+    }
+
+    // Search filter
     if (searchTerm) {
       const normalizedSearch = searchTerm.toLowerCase().trim();
       filtered = filtered.filter(pub =>
         pub.name.toLowerCase().includes(normalizedSearch) ||
         pub.category.toLowerCase().includes(normalizedSearch) ||
-        pub.location?.toLowerCase().includes(normalizedSearch) ||
-        pub.type?.toLowerCase().includes(normalizedSearch) ||
-        pub.tier?.toLowerCase().includes(normalizedSearch) ||
-        (pub.features && pub.features.some(f => f.toLowerCase().includes(normalizedSearch))) ||
-        pub.price.toString().includes(normalizedSearch) ||
-        pub.website_url?.toLowerCase().includes(normalizedSearch)
+        pub.location?.toLowerCase().includes(normalizedSearch)
       );
     }
 
     // Sort
     filtered = filtered.sort((a, b) => {
       switch (sortBy) {
-        case "price-low":
+        case "price-asc":
           return a.price - b.price;
-        case "price-high":
+        case "price-desc":
           return b.price - a.price;
-        case "name":
+        case "name-asc":
           return a.name.localeCompare(b.name);
-        case "popularity":
+        case "name-desc":
+          return b.name.localeCompare(a.name);
         default:
           return b.popularity - a.popularity;
       }
     });
 
     return filtered;
-  }, [searchTerm, sortBy, activeTab, priceRange, industryFilter, publications, loading]);
+  }, [searchTerm, sortBy, activeTab, priceRange, selectedGenres, selectedRegions, sponsoredFilter, dofollowFilter, indexedFilter, publications, loading]);
 
-  // Reset visible count when filters change
-  useMemo(() => {
-    setVisibleCount(18);
-  }, [searchTerm, sortBy, activeTab, priceRange, industryFilter]);
+  const genres = ["Music", "News", "Lifestyle", "Entertainment", "Business", "Tech", "Web 3", "Luxury", "Fashion", "Real Estate", "Sports", "Gaming", "Political", "Legal", "Alcohol"];
+  const regions = ["United States", "California", "New York", "Global", "UK", "Canada", "Australia"];
+  const typeOptions = ["Staff", "New", "Press Release", "Contributor", "On Hold", "6 Month Lifespan", "Raised"];
 
-  const visiblePublications = searchTerm ? filteredPublications : filteredPublications.slice(0, visibleCount);
-  const hasMorePublications = searchTerm ? false : visibleCount < filteredPublications.length;
+  const toggleGenre = (genre: string) => {
+    setSelectedGenres(prev => 
+      prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
+    );
+  };
+
+  const toggleRegion = (region: string) => {
+    setSelectedRegions(prev => 
+      prev.includes(region) ? prev.filter(r => r !== region) : [...prev, region]
+    );
+  };
 
   const selectedTotal = useMemo(() => {
     return selectedPublications.reduce((total, id) => {
@@ -162,371 +164,373 @@ export const Publications = () => {
   }, [selectedPublications, publications]);
 
   const handleSelectionChange = (publicationId: string, selected: boolean) => {
-    console.log('handleSelectionChange called:', publicationId, selected);
     toggleCart(publicationId);
   };
-
-  const getTabCounts = useMemo(() => {
-    return {
-      all: publications.length,
-      nonsponsored: publications.filter(p => p.sponsored === false).length,
-      dofollow: publications.filter(p => p.dofollow_link === true).length,
-      bestsellers: publications.filter(p => p.popularity > 70).length,
-      listicles: publications.filter(p => p.category?.toLowerCase().includes('listicle')).length,
-      bundles: publications.filter(p => p.category?.toLowerCase().includes('bundle')).length,
-      print: publications.filter(p => p.category?.toLowerCase().includes('print')).length,
-      digitaltv: publications.filter(p => p.category?.toLowerCase().includes('digital') || p.category?.toLowerCase().includes('tv')).length,
-      broadcasttv: publications.filter(p => p.category?.toLowerCase().includes('broadcast')).length,
-      socialpost: publications.filter(p => p.category?.toLowerCase().includes('social')).length,
-      starter: publications.filter(p => p.tier?.toLowerCase() === 'starter' || p.price === 97).length,
-    };
-  }, [publications]);
-
-  const tabCounts = getTabCounts;
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              Publications Marketplace
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Choose from {publications.length}+ premium publications to get your story featured
-            </p>
-          </div>
-          <div className="mt-4 md:mt-0 flex items-center gap-4">
-
-            {/* View Toggle */}
-            <div className="flex items-center border rounded-lg p-1 bg-background">
-              <Button
-                variant={viewMode === "cards" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("cards")}
-                className="h-8 px-3"
-              >
-                <Grid3X3 className="h-4 w-4 mr-1" />
-                Cards
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-                className="h-8 px-3"
-              >
-                <List className="h-4 w-4 mr-1" />
-                List
-              </Button>
+      {/* Top Header Section */}
+      <div className="border-b bg-background">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold mb-2">PRICING (ASCEND PR)</h1>
+              <p className="text-sm text-muted-foreground">
+                Once we have published the article on any further edits may include an extra charge.<br/>
+                Ascend Agency will use reasonable good faith efforts to ensure that such article will remain publicly available in the applicable publication for at least 12 months.
+              </p>
             </div>
-            
-          </div>
-        </div>
-
-        {/* Mobile-Optimized Filters */}
-        <div className="mb-8 space-y-4">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search publications..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          {/* Sort and View Toggle Row */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border border-border shadow-lg z-50">
-                <SelectItem value="popularity">Popularity</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="name">Name A-Z</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Mobile View Toggle */}
-            <div className="flex items-center border rounded-lg p-1 bg-background sm:hidden w-full">
-              <Button
-                variant={viewMode === "cards" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("cards")}
-                className="h-8 px-3 flex-1"
-              >
-                <Grid3X3 className="h-4 w-4 mr-1" />
-                Cards
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-                className="h-8 px-3 flex-1"
-              >
-                <List className="h-4 w-4 mr-1" />
-                List
-              </Button>
+            <div className="flex gap-2">
+              <Button variant="destructive" size="sm">Video Tutorial</Button>
+              <Button variant="destructive" size="sm">How To</Button>
+              <Button variant="destructive" size="sm">Download PR Questionnaire</Button>
+              <Button variant="destructive" size="sm">Download TV Questionnaire</Button>
             </div>
           </div>
-
-          {/* Price and Industry Filters */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Select value={priceRange} onValueChange={setPriceRange}>
-              <SelectTrigger>
-                <DollarSign className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Price Range" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border border-border shadow-lg z-50">
-                <SelectItem value="all">All Prices</SelectItem>
-                <SelectItem value="under-1000">Under $1,000</SelectItem>
-                <SelectItem value="under-200">Under $200</SelectItem>
-                <SelectItem value="1000-5000">$1,000 - $5,000</SelectItem>
-                <SelectItem value="5000-15000">$5,000 - $15,000</SelectItem>
-                <SelectItem value="15000-50000">$15,000 - $50,000</SelectItem>
-                <SelectItem value="over-50000">Over $50,000</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={industryFilter} onValueChange={setIndustryFilter}>
-              <SelectTrigger>
-                <Building className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Industry" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border border-border shadow-lg z-50">
-                <SelectItem value="all">All Industries</SelectItem>
-                <SelectItem value="tech">Technology</SelectItem>
-                <SelectItem value="news">News & Media</SelectItem>
-                <SelectItem value="business">Business & Finance</SelectItem>
-                <SelectItem value="lifestyle">Lifestyle & Culture</SelectItem>
-                <SelectItem value="entertainment">Entertainment</SelectItem>
-                <SelectItem value="music">Music</SelectItem>
-                <SelectItem value="sports">Sports</SelectItem>
-                <SelectItem value="crypto">Cryptocurrency</SelectItem>
-                <SelectItem value="fashion">Fashion</SelectItem>
-                <SelectItem value="real estate">Real Estate</SelectItem>
-                <SelectItem value="global">Global</SelectItem>
-                <SelectItem value="united states">United States</SelectItem>
-                <SelectItem value="california">California</SelectItem>
-                <SelectItem value="new york">New York</SelectItem>
-                <SelectItem value="texas">Texas</SelectItem>
-                <SelectItem value="uk">United Kingdom</SelectItem>
-                <SelectItem value="canada">Canada</SelectItem>
-                <SelectItem value="australia">Australia</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Category Filter */}
-          <Select value={activeTab} onValueChange={setActiveTab}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-              <SelectContent className="z-50 bg-background border border-border shadow-lg">
-              <SelectItem value="all">All ({tabCounts.all})</SelectItem>
-              <SelectItem value="nonsponsored">NonSponsored ({tabCounts.nonsponsored})</SelectItem>
-              <SelectItem value="dofollow">DoFollow ({tabCounts.dofollow})</SelectItem>
-              <SelectItem value="bestsellers">Best Sellers ({tabCounts.bestsellers})</SelectItem>
-              <SelectItem value="listicles">Listicles ({tabCounts.listicles})</SelectItem>
-              <SelectItem value="bundles">PR Bundles ({tabCounts.bundles})</SelectItem>
-              <SelectItem value="print">Print ({tabCounts.print})</SelectItem>
-              <SelectItem value="digitaltv">Digital TV ({tabCounts.digitaltv})</SelectItem>
-              <SelectItem value="broadcasttv">Broadcast TV ({tabCounts.broadcasttv})</SelectItem>
-              <SelectItem value="socialpost">Social Post ({tabCounts.socialpost})</SelectItem>
-              <SelectItem value="starter">Starter ($97) ({tabCounts.starter})</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
+      </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Publications Content */}
-          <div className="flex-1">
-            {viewMode === "list" ? (
-              <PublicationListView
-                publications={filteredPublications}
-                loading={loading}
-                selectedPublications={selectedPublications}
-                onSelectionChange={handleSelectionChange}
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-              />
-            ) : (
-              <>
-                <div className="mb-6 flex items-center justify-between">
-                  <p className="text-muted-foreground">
-                    Showing {visiblePublications.length} of {filteredPublications.length} publications
-                    {loading && " (Loading...)"}
-                  </p>
-                  {hasMorePublications && (
-                    <p className="text-sm text-muted-foreground">
-                      {filteredPublications.length - visibleCount} more available
-                    </p>
-                  )}
-                </div>
+      {/* Category Tabs */}
+      <div className="border-b bg-background">
+        <div className="container mx-auto px-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 h-auto p-0 bg-transparent">
+              <TabsTrigger value="publications" className="data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-none border-0 px-3 py-2">
+                PUBLICATIONS
+              </TabsTrigger>
+              <TabsTrigger value="broadcasttv" className="data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-none border-0 px-3 py-2">
+                BROADCAST TELEVISION
+              </TabsTrigger>
+              <TabsTrigger value="digitaltv" className="data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-none border-0 px-3 py-2 relative">
+                DIGITAL TELEVISION
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 rounded">NEW</span>
+              </TabsTrigger>
+              <TabsTrigger value="listicles" className="data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-none border-0 px-3 py-2">
+                LISTICLES
+              </TabsTrigger>
+              <TabsTrigger value="bestsellers" className="data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-none border-0 px-3 py-2">
+                BEST SELLERS
+              </TabsTrigger>
+              <TabsTrigger value="bundles" className="data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-none border-0 px-3 py-2">
+                PR BUNDLES
+              </TabsTrigger>
+              <TabsTrigger value="print" className="data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-none border-0 px-3 py-2">
+                PRINT
+              </TabsTrigger>
+              <TabsTrigger value="socialpost" className="data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-none border-0 px-3 py-2">
+                SOCIAL POST
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-                  {visiblePublications.map((publication) => (
-                    <ProtectedInteraction key={publication.id}>
-                      <div>
-                        <PublicationCard
-                          publication={publication}
-                          selected={selectedPublications.includes(publication.id)}
-                          onSelectionChange={(selected) => handleSelectionChange(publication.id, selected)}
-                          onUpdate={refreshPublications}
-                        />
-                      </div>
-                    </ProtectedInteraction>
-                  ))}
-                </div>
-
-                {/* Load More Button */}
-                {hasMorePublications && (
-                  <div className="flex justify-center mb-8">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={() => setVisibleCount(prev => prev + LOAD_MORE_COUNT)}
-                      className="min-w-[200px]"
-                    >
-                      Load More Publications ({filteredPublications.length - visibleCount} remaining)
-                    </Button>
-                  </div>
-                )}
-
-                {!hasMorePublications && filteredPublications.length > 18 && (
-                  <div className="text-center py-4 mb-8">
-                    <p className="text-muted-foreground">
-                      You've viewed all {filteredPublications.length} publications. Try adjusting your filters to see different results.
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* No results found message */}
-            {filteredPublications.length === 0 && !loading && (
-              <div className="text-center py-12">
-                <p className="text-lg text-muted-foreground mb-4">
-                  No publications found matching your criteria
-                </p>
-                <Button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setActiveTab('all');
-                    setPriceRange('all');
-                    setIndustryFilter('all');
-                    setSortBy('popularity');
-                  }}
-                  variant="outline"
-                  className="min-w-[200px]"
-                >
-                  Reset Filters
-                </Button>
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex gap-6">
+          {/* Left Sidebar Filters */}
+          <div className="w-80 space-y-6">
+            {/* Publication Name Search */}
+            <div>
+              <h3 className="font-medium mb-2">Publication name</h3>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search publication name"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-            )}
+            </div>
+
+            {/* Price Range */}
+            <div>
+              <h3 className="font-medium mb-2">Price range</h3>
+              <div className="px-2">
+                <Slider
+                  value={priceRange}
+                  onValueChange={setPriceRange}
+                  max={85000}
+                  min={0}
+                  step={100}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                  <span>$0</span>
+                  <span>${priceRange[0].toLocaleString()}</span>
+                  <span>$85,000</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sort By */}
+            <div>
+              <h3 className="font-medium mb-2">Sort by</h3>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Price (Asc)" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border border-border shadow-lg z-50">
+                  <SelectItem value="price-asc">Price (Asc)</SelectItem>
+                  <SelectItem value="price-desc">Price (Desc)</SelectItem>
+                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Select Regions */}
+            <div>
+              <h3 className="font-medium mb-2">Select regions</h3>
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select regions" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border border-border shadow-lg z-50">
+                  {regions.map(region => (
+                    <SelectItem key={region} value={region.toLowerCase()}>
+                      {region}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Select Genres */}
+            <div>
+              <h3 className="font-medium mb-2">Select genres</h3>
+              <div className="flex flex-wrap gap-2">
+                {genres.map(genre => (
+                  <Badge
+                    key={genre}
+                    variant={selectedGenres.includes(genre) ? "default" : "secondary"}
+                    className="cursor-pointer"
+                    onClick={() => toggleGenre(genre)}
+                  >
+                    {genre}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Type */}
+            <div>
+              <h3 className="font-medium mb-2">Type</h3>
+              <div className="flex flex-wrap gap-2">
+                {typeOptions.map(type => (
+                  <Badge
+                    key={type}
+                    variant="secondary"
+                    className="cursor-pointer"
+                  >
+                    {type}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Sponsored */}
+            <div>
+              <h3 className="font-medium mb-2">Sponsored</h3>
+              <div className="flex gap-2">
+                {["Yes", "No", "Discrete"].map(option => (
+                  <Badge
+                    key={option}
+                    variant={sponsoredFilter === option.toLowerCase() ? "default" : "secondary"}
+                    className="cursor-pointer"
+                    onClick={() => setSponsoredFilter(option.toLowerCase())}
+                  >
+                    {option}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Do follow */}
+            <div>
+              <h3 className="font-medium mb-2">Do follow</h3>
+              <div className="flex gap-2">
+                {["Yes", "No"].map(option => (
+                  <Badge
+                    key={option}
+                    variant={dofollowFilter === option.toLowerCase() ? "default" : "secondary"}
+                    className="cursor-pointer"
+                    onClick={() => setDofollowFilter(option.toLowerCase())}
+                  >
+                    {option}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Indexed */}
+            <div>
+              <h3 className="font-medium mb-2">Indexed</h3>
+              <div className="flex gap-2">
+                {["Yes", "No"].map(option => (
+                  <Badge
+                    key={option}
+                    variant={indexedFilter === option.toLowerCase() ? "default" : "secondary"}
+                    className="cursor-pointer"
+                    onClick={() => setIndexedFilter(option.toLowerCase())}
+                  >
+                    {option}
+                  </Badge>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Mobile-Optimized Checkout Sidebar */}
-          <div className="lg:w-80">
-            <Card className="sticky top-4 lg:top-24 bg-gradient-card">
-              <CardContent className="p-4 lg:p-6">
-                <div className="flex items-center mb-4">
-                  <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />
-                  <h3 className="text-base lg:text-lg font-semibold">
-                    Selected ({selectedPublications.length})
-                  </h3>
-                </div>
+          {/* Main Content */}
+          <div className="flex-1">
+            {/* Results Count */}
+            <div className="mb-4">
+              <p className="font-medium">SHOWING {filteredPublications.length} OF {publications.length} PUBLICATIONS</p>
+            </div>
 
-                {selectedPublications.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">
-                    No publications selected yet. Choose from the marketplace to get started.
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="max-h-60 overflow-y-auto space-y-2">
-                      {selectedPublications.map(id => {
-                        const pub = publications.find(p => p.id === id);
-                        if (!pub) return null;
-                        
-                        return (
-                          <div key={id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">{pub.name}</p>
-                              <p className="text-xs text-muted-foreground">{pub.category}</p>
-                            </div>
-                            <div className="text-sm font-semibold">
-                              ${pub.price.toFixed(0)}
-                            </div>
+            {/* Publications Table */}
+            <div className="bg-background border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="text-red-500 font-medium">PUBLICATION</TableHead>
+                    <TableHead className="text-red-500 font-medium">GENRES</TableHead>
+                    <TableHead className="text-red-500 font-medium">PRICE</TableHead>
+                    <TableHead className="text-red-500 font-medium">DA</TableHead>
+                    <TableHead className="text-red-500 font-medium">DR</TableHead>
+                    <TableHead className="text-red-500 font-medium">TAT</TableHead>
+                    <TableHead className="text-red-500 font-medium">REGION</TableHead>
+                    <TableHead className="text-red-500 font-medium">SPONSORED</TableHead>
+                    <TableHead className="text-red-500 font-medium">INDEXED</TableHead>
+                    <TableHead className="text-red-500 font-medium">DO FOLLOW</TableHead>
+                    <TableHead className="text-red-500 font-medium">EXAMPLE</TableHead>
+                    <TableHead className="text-red-500 font-medium">IMAGE</TableHead>
+                    <TableHead className="text-red-500 font-medium">NICHES</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredPublications.map((publication) => (
+                    <TableRow key={publication.id} className="hover:bg-muted/50">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-white text-sm font-bold">
+                            {publication.name.charAt(0)}
                           </div>
-                        );
-                      })}
-                    </div>
-
-                    <div className="border-t pt-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-lg font-semibold">Total</span>
-                        <span className="text-2xl font-bold text-primary">
-                          ${selectedTotal.toFixed(0)}
-                        </span>
-                      </div>
-
-                      <div className="space-y-3">
-                        <ProtectedInteraction action={() => navigate('/checkout', { 
-                          state: { 
-                            selectedPublications: selectedPublications.map(id => {
-                              const pub = publications.find(p => p.id === id);
-                              return pub ? {
-                                id: pub.id,
-                                name: pub.name,
-                                price: pub.price,
-                                category: pub.category,
-                                tat_days: pub.tat_days
-                              } : null;
-                            }).filter(Boolean),
-                            packageType: 'custom'
-                          }
-                        })}>
-                          <Button 
-                            variant="hero" 
-                            className="w-full" 
-                            size="lg"
-                          >
-                            Proceed to Checkout
-                          </Button>
-                        </ProtectedInteraction>
-                        
-                        <ProtectedInteraction action={() => navigate('/checkout', { 
-                          state: { 
-                            packageType: 'starter'
-                          }
-                        })}>
-                          <Button 
-                            variant="outline" 
-                            className="w-full"
-                          >
-                            Get <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span> Starter Package
-                          </Button>
-                        </ProtectedInteraction>
-                        
-                        <div className="text-center">
-                          <Badge variant="secondary">
-                            💡 Save with our <span className="line-through text-gray-400">$497</span> <span className="text-green-600">$97</span> starter package
+                          <div>
+                            <div className="font-medium">{publication.name}</div>
+                          </div>
+                          <Star className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <Badge variant="outline" className="text-xs">
+                            {publication.category}
                           </Badge>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        ${publication.price}
+                      </TableCell>
+                      <TableCell>
+                        {publication.da_score || 0}
+                      </TableCell>
+                      <TableCell>
+                        {publication.dr_score || 0}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-center">
+                          {publication.tat_days || "1 Day"}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-center text-sm">
+                          {publication.location || "Global"}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {publication.sponsored ? "Yes" : "No"}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {publication.indexed ? "Yes" : "No"}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {publication.dofollow_link ? "Yes" : "No"}
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="outline" size="sm">
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="outline" size="sm">
+                          <Image className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button variant="outline" size="sm">
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Heart className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Star className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Clock className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <MapPin className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </div>
+
+        {/* No Results Message */}
+        {filteredPublications.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-semibold mb-2">No publications found</h3>
+            <p className="text-muted-foreground mb-4">Try adjusting your filters or search terms</p>
+            <Button variant="outline" onClick={() => {
+              setSearchTerm("");
+              setActiveTab("publications");
+              setPriceRange([85000]);
+              setSelectedGenres([]);
+              setSelectedRegions([]);
+              setSponsoredFilter("all");
+              setDofollowFilter("all");
+              setIndexedFilter("all");
+            }}>
+              Reset Filters
+            </Button>
+          </div>
+        )}
+
+        {/* Admin Tools */}
+        {isAdmin && (
+          <div className="mt-8 p-4 bg-muted rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Admin Tools</h3>
+            <div className="flex gap-4">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/admin/setup')}
+              >
+                Admin Panel
+              </Button>
+              <SpreadsheetSync />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
